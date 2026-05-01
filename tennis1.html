@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple 2D Racing Game</title>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; /* Prevent scrollbars */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #333; /* Dark background */
+        }
+        canvas { 
+            border: 1px solid white; 
+            background-color: #66a166; /* Grassy green background */
+            display: block; 
+        }
+        #instructions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: sans-serif;
+            font-size: 16px;
+            background-color: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="instructions">
+        Use Arrow Keys: Up (Accelerate), Down (Brake/Reverse), Left/Right (Steer)
+    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script src="game.js"></script> 
+</body>
+</html>
