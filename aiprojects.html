@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Projects</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .truncate-3-lines {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+            background-color: white;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .star-rating {
+            display: flex;
+            align-items: center;
+        }
+
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+
+        .star-rating label {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #d3d3d3;
+            transition: color 0.2s;
+        }
+
+        .star-rating input[type="radio"]:checked~label {
+            color: #ffd700;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover~label,
+        .star-rating input[type="radio"]:checked~label:hover,
+        .star-rating input[type="radio"]:checked~label:hover~label {
+            color: #ffd700;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-10 gradient-bg">
+    <div class="container mx-auto">
+        <h1 class="text-4xl font-bold mb-8 text-center text-white">AI PROJECTS SECTION 6A</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Card 1 -->
+            <div class="rounded-lg shadow-md overflow-hidden card" onmousemove="this.style.backgroundColor = `rgba(173, 216, 230, 0.2)`" onmouseout="this.style.backgroundColor = `white`">
+                <img src="STOCK.PNG" alt="Stock Prediction System" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2">Stock Prediction System Based on Machine Learning Model</h2>
+                    <p class="text-gray-600 mb-4">Group Members: Muhammad Umer Shifa, Muhammad Oneeb, Salma</p>
+                    <p class="text-gray-700 truncate-3-lines">Stock Market Prediction Web App based on Machine Learning and Sentiment Analysis of Tweets (API keys included in code). The front end of the Web App is based on Flask and WordPress. The App forecasts stock prices of the next seven days for any given stock under NASDAQ or NSE as input by the user. Predictions are made using three algorithms: ARIMA, LSTM, Linear Regression. The Web App combines the predicted prices of the next seven days with the sentiment analysis of tweets to give recommendation whether the price is going to rise or fall.</p>
+                    <div class="star-rating mt-4">
+                        <input type="radio" id="star5-1" name="rating-1" value="5"><label for="star5-1">★</label>
+                        <input type="radio" id="star4-1" name="rating-1" value="4"><label for="star4-1">★</label>
+                        <input type="radio" id="star3-1" name="rating-1" value="3"><label for="star3-1">★</label>
+                        <input type="radio" id="star2-1" name="rating-1" value="2"><label for="star2-1">★</label>
+                        <input type="radio" id="star1-1" name="rating-1" value="1"><label for="star1-1">★</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="rounded-lg shadow-md overflow-hidden card" onmousemove="this.style.backgroundColor = `rgba(173, 216, 230, 0.2)`" onmouseout="this.style.backgroundColor = `white`">
+                <img src="HOUSE PREDICTION.PNG" alt="Real Estate Price Prediction" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2">Real Estate Price Prediction Machine Learning Model</h2>
+                    <p class="text-gray-600 mb-4">Group Members: Jawad Mohsin, Muhammad Adan Zaqaf, Mobin Ahmed</p>
+                    <p class="text-gray-700 truncate-3-lines">The project aims to create a comprehensive system for predicting real estate prices based on various input parameters such as the number of rooms, floors, and area. The system will preprocess the data, clean it, and then train a machine learning model to predict house prices. Additionally, a user-friendly interface will be developed using Stream lit to allow users to input property details and get real-time price estimates.</p>
+                    <div class="star-rating mt-4">
+                        <input type="radio" id="star5-2" name="rating-2" value="5"><label for="star5-2">★</label>
+                        <input type="radio" id="star4-2" name="rating-2" value="4"><label for="star4-2">★</label>
+                        <input type="radio" id="star3-2" name="rating-2" value="3"><label for="star3-2">★</label>
+                        <input type="radio" id="star2-2" name="rating-2" value="2"><label for="star2-2">★</label>
+                        <input type="radio" id="star1-2" name="rating-2" value="1"><label for="star1-2">★</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="rounded-lg shadow-md overflow-hidden card" onmousemove="this.style.backgroundColor = `rgba(173, 216, 230, 0.2)`" onmouseout="this.style.backgroundColor = `white`">
+                <img src="BASFLIX.PNG" alt="Movie Recommendation System" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2">Movie Recommendation System</h2>
+                    <p class="text-gray-600 mb-4">Group Members: Shahood Rehan, Basil Irfan Rizvi, Muhammad Arqam</p>
+                    <p class="text-gray-700 truncate-3-lines">The project aims to design and implement a content-based movie recommendation system that provides personalized movie suggestions to users. By leveraging data mining methodologies, the system will analyze movie attributes and user preferences to generate recommendations tailored to individual tastes.</p>
+                    <div class="star-rating mt-4">
+                        <input type="radio" id="star5-3" name="rating-3" value="5"><label for="star5-3">★</label>
+                        <input type="radio" id="star4-3" name="rating-3" value="4"><label for="star4-3">★</label>
+                        <input type="radio" id="star3-3" name="rating-3" value="3"><label for="star3-3">★</label>
+                        <input type="radio" id="star2-3" name="rating-3" value="2"><label for="star2-3">★</label>
+                        <input type="radio" id="star1-3" name="rating-3" value="1"><label for="star1-3">★</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="rounded-lg shadow-md overflow-hidden card" onmousemove="this.style.backgroundColor = `rgba(173, 216, 230, 0.2)`" onmouseout="this.style.backgroundColor = `white`">
+                <img src="WALK THE TALK.PNG" alt="ShoeSense E-Commerce Recommender System" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2">ShoeSense E-Commerce Recommender System</h2>
+                    <p class="text-gray-600 mb-4">Group Members: Zeeshan Ibrar, Abdul Haseeb Alam, Haseebullah</p>
+                    <p class="text-gray-700 truncate-3-lines">The scope of this project encompasses the development of an advanced e-commerce recommender system employing artificial intelligence and data mining techniques. The system aims to deliver personalized
+
+ product recommendations to users based on their preferences, browsing history, and purchasing behavior.</p>
+                    <div class="star-rating mt-4">
+                        <input type="radio" id="star5-4" name="rating-4" value="5"><label for="star5-4">★</label>
+                        <input type="radio" id="star4-4" name="rating-4" value="4"><label for="star4-4">★</label>
+                        <input type="radio" id="star3-4" name="rating-4" value="3"><label for="star3-4">★</label>
+                        <input type="radio" id="star2-4" name="rating-4" value="2"><label for="star2-4">★</label>
+                        <input type="radio" id="star1-4" name="rating-4" value="1"><label for="star1-4">★</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="rounded-lg shadow-md overflow-hidden card" onmousemove="this.style.backgroundColor = `rgba(173, 216, 230, 0.2)`" onmouseout="this.style.backgroundColor = `white`">
+                <img src="MEDICOHUB.PNG" alt="MedicoHUB (Medicine Recommendation System)" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2">MedicoHUB (Medicine Recommendation System)</h2>
+                    <p class="text-gray-600 mb-4">Group Members: Rimsha Zahid, Areeba Kabir, Ariba Azam</p>
+                    <p class="text-gray-700 truncate-3-lines">The system is built using Python Django, ensuring robust, scalable, and maintainable code. Modular design allows for easy updates and integration of additional features in the future. Users can input their symptoms through a user-friendly interface.</p>
+                    <div class="star-rating mt-4">
+                        <input type="radio" id="star5-5" name="rating-5" value="5"><label for="star5-5">★</label>
+                        <input type="radio" id="star4-5" name="rating-5" value="4"><label for="star4-5">★</label>
+                        <input type="radio" id="star3-5" name="rating-5" value="3"><label for="star3-5">★</label>
+                        <input type="radio" id="star2-5" name="rating-5" value="2"><label for="star2-5">★</label>
+                        <input type="radio" id="star1-5" name="rating-5" value="1"><label for="star1-5">★</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="rounded-lg shadow-md overflow-hidden card" onmousemove="this.style.backgroundColor = `rgba(173, 216, 230, 0.2)`" onmouseout="this.style.backgroundColor = `white`">
+                <img src="finance.png" alt="Financial Virtual Assistant (AI Chatbot)" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2">Financial Virtual Assistant (AI Chatbot)</h2>
+                    <p class="text-gray-600 mb-4">Group Members: Kashan, Yahya, Eima</p>
+                    <p class="text-gray-700 truncate-3-lines">We will use Yahoo Finance and OpenAI API to create an assistant in Python that gives specific financial advice using its knowledgebase. We will use Streamlit for the front end.</p>
+                    <div class="star-rating mt-4">
+                        <input type="radio" id="star5-6" name="rating-6" value="5"><label for="star5-6">★</label>
+                        <input type="radio" id="star4-6" name="rating-6" value="4"><label for="star4-6">★</label>
+                        <input type="radio" id="star3-6" name="rating-6" value="3"><label for="star3-6">★</label>
+                        <input type="radio" id="star2-6" name="rating-6" value="2"><label for="star2-6">★</label>
+                        <input type="radio" id="star1-6" name="rating-6" value="1"><label for="star1-6">★</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 7 -->
+            <div class="rounded-lg shadow-md overflow-hidden card" onmousemove="this.style.backgroundColor = `rgba(173, 216, 230, 0.2)`" onmouseout="this.style.backgroundColor = `white`">
+                <img src="SMART CHATBOT.jpeg" alt="Smart Chatbot" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2">Smart Chatbot</h2>
+                    <p class="text-gray-600 mb-4">Group Members: Amna Hussain, Muhammad Huzaifa, Hania Ahmed</p>
+                    <p class="text-gray-700 truncate-3-lines">The Smart Chatbot project is a Python-based application designed to interact with users by responding to their inputs with predefined messages. It utilizes a simple natural language processing approach to analyze user messages, identify keywords, and determine the most suitable response based on predefined criteria.</p>
+                    <div class="star-rating mt-4">
+                        <input type="radio" id="star5-7" name="rating-7" value="5"><label for="star5-7">★</label>
+                        <input type="radio" id="star4-7" name="rating-7" value="4"><label for="star4-7">★</label>
+                        <input type="radio" id="star3-7" name="rating-7" value="3"><label for="star3-7">★</label>
+                        <input type="radio" id="star2-7" name="rating-7" value="2"><label for="star2-7">★</label>
+                        <input type="radio" id="star1-7" name="rating-7" value="1"><label for="star1-7">★</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 8 -->
+            <div class="rounded-lg shadow-md overflow-hidden card" onmousemove="this.style.backgroundColor = `rgba(173, 216, 230, 0.2)`" onmouseout="this.style.backgroundColor = `white`">
+                <img src="ANIME RECOMMENDATION SYSTEM.PNG" alt="Anime Recommendation System" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2">Anime Recommendation System</h2>
+                    <p class="text-gray-600 mb-4">Group Members: Faiz Ul Amin Khan, Muhammad Qasim</p>
+                    <p class="text-gray-700 truncate-3-lines">The Anime Recommendation System aims to provide personalized recommendations to users based on their preferences and viewing history. The system will utilize machine learning algorithms and collaborative filtering techniques to analyze user data and suggest anime titles that are likely to be of interest to them.</p>
+                    <div class="star-rating mt-4">
+                        <input type="radio" id="star5-8" name="rating-8" value="5"><label for="star5-8">★</label>
+                        <input type="radio" id="star4-8" name="rating-8" value="4"><label for="star4-8">★</label>
+                        <input type="radio" id="star3-8" name="rating-8" value="3"><label for="star3-8">★</label>
+                        <input type="radio" id="star2-8" name="rating-8" value="2"><label for="star2-8">★</label>
+                        <input type="radio" id="star1-8" name="rating-8" value="1"><label for="star1-8">★</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+```
