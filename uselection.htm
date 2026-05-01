@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US Election 2024 Predictor</title>
+</head>
+<body>
+    <h1>Predict US Election 2024</h1>
+    <form action="predict.php" method="post">
+        <label for="state">Select State:</label>
+        <select id="state" name="state">
+            <option value="california">California</option>
+            <option value="texas">Texas</option>
+            <option value="florida">Florida</option>
+            <!-- Add more states as needed -->
+        </select><br><br>
+        
+        <label for="party">Select Party:</label>
+        <select id="party" name="party">
+            <option value="democratic">Democratic</option>
+            <option value="republican">Republican</option>
+            <!-- Add more parties as needed -->
+        </select><br><br>
+        
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br><br>
+        
+        <label for="income">Income:</label>
+        <input type="number" id="income" name="income" required><br><br>
+        
+        <input type="submit" value="Predict">
+    </form>
+</body>
+</html>
