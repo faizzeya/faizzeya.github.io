@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Faiz ul haque Zeya — Computer Scientist, Educator, Author</title>
+<meta name="description" content="Senior Associate Professor at Bahria University, CEO of Transys, author of 20+ books on AI and computer science. Teaches AI, NLP, and formal methods. MS CS, University of Tulsa." />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ink: #0B1B2B;
+    --ink-soft: #1F3346;
+    --paper: #F6F4EE;
+    --paper-tint: #EFEBE0;
+    --teal: #0E7A6C;
+    --teal-soft: #C8E6E0;
+    --teal-deep: #084E47;
+    --amber: #C77A30;
+    --rule: rgba(11, 27, 43, 0.12);
+    --rule-strong: rgba(11, 27, 43, 0.22);
+    --muted: #4A5A6B;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Subtle paper texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(14, 122, 108, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 88% 80%, rgba(11, 27, 43, 0.03) 0%, transparent 40%);
+  }
+
+  a { color: var(--teal-deep); text-decoration: none; border-bottom: 1px solid rgba(14, 78, 71, 0.25); transition: border-color 0.15s, color 0.15s; }
+  a:hover { color: var(--teal); border-bottom-color: var(--teal); }
+
+  ::selection { background: var(--teal-soft); color: var(--ink); }
+
+  /* === Layout shell === */
+  .shell { position: relative; z-index: 1; max-width: 1180px; padding: 0 32px; margin: 0 auto; }
+
+  /* === Navigation === */
+  nav.top {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(246, 244, 238, 0.85);
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
+    border-bottom: 1px solid var(--rule);
+  }
+  nav.top .shell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+  nav.top .mark {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    letter-spacing: 0.005em;
+    color: var(--ink);
+    border: none;
+  }
+  nav.top .mark em { font-style: italic; color: var(--teal-deep); }
+  nav.top ul {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  nav.top ul a {
+    font-size: 14px;
+    color: var(--ink-soft);
+    border: none;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+  }
+  nav.top ul a:hover { color: var(--teal-deep); }
+  @media (max-width: 760px) {
+    nav.top ul { display: none; }
+  }
+
+  /* === Hero === */
+  .hero {
+    padding: 88px 0 64px;
+  }
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--teal-deep);
+    margin: 0 0 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 28px;
+    height: 1px;
+    background: var(--teal-deep);
+  }
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: clamp(56px, 9vw, 124px);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    margin: 0 0 36px;
+    color: var(--ink);
+  }
+  .hero h1 .surname { font-style: italic; }
+  .hero h1 .credential {
+    display: block;
+    font-size: clamp(20px, 2vw, 26px);
+    font-style: normal;
+    color: var(--muted);
+    letter-spacing: 0.005em;
+    margin-top: 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .hero-lede {
+    font-size: clamp(18px, 1.6vw, 21px);
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin: 0 0 40px;
+  }
+  .hero-lede strong { font-weight: 600; color: var(--ink); }
+
+  .hero-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+  }
+  .hero-links a {
+    border: 1px solid var(--rule-strong);
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.4);
+    color: var(--ink);
+    font-weight: 500;
+    transition: all 0.18s ease;
+  }
+  .hero-links a:hover {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .hero-links svg { width: 15px; height: 15px; }
+
+  /* === Stats strip === */
+  .stats {
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 36px 0;
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 720px) {
+    .stats { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+  }
+  .stat { }
+  .stat .figure {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(40px, 5vw, 56px);
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    font-feature-settings: 'lnum';
+  }
+  .stat .label {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+  }
+
+  /* === Section primitives === */
+  section.block {
+    padding: 96px 0 24px;
+    position: relative;
+  }
+  .section-head {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 64px;
+    margin-bottom: 56px;
+    align-items: baseline;
+  }
+  @media (max-width: 860px) {
+    .section-head { grid-template-columns: 1fr; gap: 16px; margin-bottom: 40px; }
+  }
+  .section-head .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--teal-deep);
+    letter-spacing: 0.08em;
+  }
+  .section-head h2 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: clamp(36px, 4vw, 52px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin: 0;
+    color: var(--ink);
+  }
+  .section-head h2 em { font-style: italic; color: var(--teal-deep); }
+  .section-head .blurb {
+    margin-top: 12px;
+    color: var(--muted);
+    max-width: 580px;
+    font-size: 16px;
+  }
+
+  /* === Currently (3 role cards) === */
+  .roles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  @media (max-width: 860px) {
+    .roles { grid-template-columns: 1fr; }
+  }
+  .role {
+    background: var(--paper);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: background 0.2s;
+  }
+  .role:hover { background: #FBF9F3; }
+  .role .role-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--teal-deep);
+  }
+  .role h3 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1.15;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .role .org {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .role .role-body {
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.55;
+    margin: 0;
+    flex: 1;
+  }
+  .role a { font-size: 14px; }
+
+  /* === Teaching === */
+  .teaching {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 64px;
+  }
+  @media (max-width: 860px) { .teaching { grid-template-columns: 1fr; gap: 32px; } }
+
+  .subjects {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .pill {
+    border: 1px solid var(--rule-strong);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    background: rgba(255,255,255,0.5);
+  }
+  .pill.featured { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .teaching-callout {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 36px 32px;
+    border-radius: 4px;
+  }
+  .teaching-callout .quote {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 26px;
+    line-height: 1.25;
+    margin: 0 0 18px;
+  }
+  .teaching-callout .quote-meta {
+    font-size: 13px;
+    color: rgba(246, 244, 238, 0.6);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* === Selected work cards === */
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 1000px) { .work-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .work-grid { grid-template-columns: 1fr; } }
+
+  .work {
+    border: 1px solid var(--rule);
+    padding: 28px 24px;
+    background: rgba(255,255,255,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .work:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px -16px rgba(11, 27, 43, 0.18);
+    border-color: var(--rule-strong);
+  }
+  .work .kind {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--teal-deep);
+  }
+  .work h3 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: -0.005em;
+  }
+  .work p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    line-height: 1.55;
+    flex: 1;
+  }
+  .work .work-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--rule);
+  }
+  .work .work-links a {
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    border: none;
+    color: var(--teal-deep);
+  }
+  .work .work-links a:hover { color: var(--ink); }
+
+  /* === Books band === */
+  .books {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 64px 0;
+    margin: 64px 0 0;
+  }
+  .books .section-head h2 { color: var(--paper); }
+  .books .section-head .num { color: var(--teal-soft); }
+  .books .section-head .blurb { color: rgba(246, 244, 238, 0.7); }
+  .books .book-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: rgba(246, 244, 238, 0.1);
+    border-top: 1px solid rgba(246, 244, 238, 0.1);
+    border-bottom: 1px solid rgba(246, 244, 238, 0.1);
+  }
+  @media (max-width: 860px) { .books .book-list { grid-template-columns: 1fr; } }
+  .book {
+    background: var(--ink);
+    padding: 28px 32px;
+    display: flex;
+    gap: 24px;
+    align-items: baseline;
+  }
+  .book .platform {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--teal-soft);
+    min-width: 90px;
+  }
+  .book .desc {
+    flex: 1;
+  }
+  .book h4 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 22px;
+    margin: 0 0 6px;
+    color: var(--paper);
+  }
+  .book p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(246, 244, 238, 0.7);
+  }
+  .book a { color: var(--teal-soft); border-color: rgba(200, 230, 224, 0.3); font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+  .book a:hover { color: var(--paper); border-color: var(--paper); }
+
+  /* === Timeline (education + experience) === */
+  .timeline {
+    border-left: 1px solid var(--rule-strong);
+    padding-left: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+  .tl-item { position: relative; }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -41px;
+    top: 9px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1.5px solid var(--teal-deep);
+  }
+  .tl-item .when {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--teal-deep);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .tl-item h4 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 22px;
+    margin: 0 0 4px;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .tl-item .where {
+    font-size: 14.5px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .tl-item .note {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .tl-item .note .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--teal-soft);
+    color: var(--teal-deep);
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  /* === Affiliations === */
+  .affil {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 860px) { .affil { grid-template-columns: repeat(2, 1fr); } }
+  .affil-item {
+    border: 1px solid var(--rule);
+    padding: 24px 20px;
+    background: rgba(255,255,255,0.4);
+    text-align: center;
+  }
+  .affil-item .acronym {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    line-height: 1;
+    color: var(--teal-deep);
+    margin-bottom: 8px;
+  }
+  .affil-item .full {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .affil-item a { border: none; color: inherit; display: block; }
+  .affil-item:hover .acronym { color: var(--ink); }
+
+  /* === Elsewhere === */
+  .elsewhere {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  @media (max-width: 860px) { .elsewhere { grid-template-columns: 1fr; gap: 40px; } }
+  .link-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .link-list li {
+    border-bottom: 1px solid var(--rule);
+  }
+  .link-list a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    border: none;
+    color: var(--ink);
+    font-weight: 500;
+    font-size: 16px;
+    transition: padding 0.2s;
+  }
+  .link-list a:hover {
+    color: var(--teal-deep);
+    padding-left: 8px;
+  }
+  .link-list .arrow {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--teal-deep);
+    font-size: 14px;
+  }
+  .link-list .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 12px;
+  }
+
+  /* === Residences === */
+  .residences {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 860px) { .residences { grid-template-columns: 1fr; } }
+  .residence {
+    border: 1px solid var(--rule);
+    background: rgba(255,255,255,0.5);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .residence:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px -16px rgba(11, 27, 43, 0.18);
+    border-color: var(--rule-strong);
+  }
+  .residence .res-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--teal-deep);
+  }
+  .residence h3 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1.15;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .residence .where-res {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-top: -8px;
+  }
+  .residence .price {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(40px, 4vw, 48px);
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    font-feature-settings: 'lnum';
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .residence .price .currency {
+    font-size: 0.45em;
+    color: var(--teal-deep);
+    vertical-align: 0.5em;
+    margin-right: 4px;
+    letter-spacing: 0.04em;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .residence .price-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.45;
+  }
+  .residence .res-body {
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .residence .res-body a { font-size: 13px; font-family: 'JetBrains Mono', monospace; border: none; color: var(--teal-deep); }
+  .residence .res-body a:hover { color: var(--ink); }
+  .residence .res-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px dashed var(--rule);
+  }
+  .residence .res-links a {
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    border: none;
+    color: var(--teal-deep);
+  }
+  .residence .res-links a:hover { color: var(--ink); }
+
+  .other-stays {
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+  }
+  .other-stays h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin: 0 0 16px;
+  }
+  .other-stays ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 32px;
+  }
+  @media (max-width: 640px) { .other-stays ul { grid-template-columns: 1fr; } }
+  .other-stays li {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .other-stays li .room {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+
+  /* === Travel === */
+  .travel-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+  @media (max-width: 760px) { .travel-grid { grid-template-columns: 1fr; } }
+  .country {
+    border-top: 1px solid var(--rule-strong);
+    padding-top: 18px;
+  }
+  .country h4 {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-size: 22px;
+    margin: 0 0 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .country h4 .count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    font-style: normal;
+  }
+  .country .cities {
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* === Footer === */
+  footer {
+    margin-top: 120px;
+    padding: 64px 0 40px;
+    border-top: 1px solid var(--rule-strong);
+  }
+  footer .shell {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 48px;
+    align-items: end;
+  }
+  @media (max-width: 760px) { footer .shell { grid-template-columns: 1fr; } }
+  footer .sig {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+  footer .sig em { font-style: italic; color: var(--teal-deep); }
+  footer .colophon {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  footer .colophon a { font-size: 13px; }
+
+  /* === Reduced motion === */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* === Focus === */
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="shell">
+    <a href="#" class="mark">Faiz <em>Zeya</em></a>
+    <ul>
+      <li><a href="#now">Currently</a></li>
+      <li><a href="#teaching">Teaching</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#writing">Writing</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#residences">Residences</a></li>
+      <li><a href="#elsewhere">Elsewhere</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="shell">
+    <p class="eyebrow">Computer Scientist · Educator · Author</p>
+    <h1>
+      Faiz ul haque<br/>
+      <span class="surname">Zeya</span>
+      <span class="credential">
+        Senior Associate Professor, Bahria University Karachi Campus.<br/>
+        CEO of Transys. AI &amp; data-science consultant. MS&nbsp;CS, University of Tulsa.
+      </span>
+    </h1>
+
+    <p class="hero-lede">
+      I teach <strong>artificial intelligence, NLP, formal methods, and discrete structures</strong>
+      to undergraduate computer science students, and build agentic and generative AI systems
+      through <strong>Transys</strong>. Over twenty years I've taught more than three&nbsp;thousand
+      five hundred students, written twenty books, and published sixty-five papers and reports.
+    </p>
+
+    <div class="hero-links">
+      <a href="https://scholar.google.com/citations?user=IWpSoVIAAAAJ&hl=en&oi=ao" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L0 9l4.36 3.27L12 6.55l7.64 5.72L24 9zM4 11.66V18l8 6 8-6v-6.34l-8 6z"/></svg>
+        Google Scholar
+      </a>
+      <a href="https://github.com/faizulhz" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.01c-3.2.7-3.87-1.37-3.87-1.37-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.16 1.18.92-.26 1.9-.38 2.88-.39.98 0 1.96.13 2.88.39 2.19-1.49 3.16-1.18 3.16-1.18.62 1.58.23 2.75.11 3.04.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.05.78 2.12v3.14c0 .31.2.67.8.55 4.56-1.52 7.85-5.83 7.85-10.91C23.5 5.65 18.35.5 12 .5z"/></svg>
+        GitHub
+      </a>
+      <a href="https://www.linkedin.com/in/faizulhaquezeya/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45zM5.34 7.43A2.06 2.06 0 1 1 5.34 3.3a2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://www.amazon.com/author/faiz" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.4 4.6h3.2v1.6h-3.2zm-9 0h3.2v1.6H5.4zm5 0h3.2v1.6h-3.2zM21.5 16.85c-2.85 2.1-7 3.22-10.55 3.22-4.97 0-9.45-1.84-12.83-4.9-.27-.24-.03-.57.29-.39 3.65 2.12 8.16 3.4 12.82 3.4 3.16 0 6.63-.65 9.83-2.01.48-.2.88.32.44.68z"/></svg>
+        Amazon
+      </a>
+      <a href="http://consult.faizzeya.org" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Consulting
+      </a>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="figure">3,500<span style="font-size:0.6em">+</span></div>
+        <div class="label">Students taught<br/>at BUKC and elsewhere</div>
+      </div>
+      <div class="stat">
+        <div class="figure">20</div>
+        <div class="label">Books authored<br/>on Amazon &amp; Apple Books</div>
+      </div>
+      <div class="stat">
+        <div class="figure">65</div>
+        <div class="label">Publications<br/>and academic reports</div>
+      </div>
+      <div class="stat">
+        <div class="figure">131</div>
+        <div class="label">Classes taught at BUKC<br/>since joining as senior lecturer</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========== CURRENTLY ========== -->
+<section class="block" id="now">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="num">§ 01 / Currently</div>
+      </div>
+      <div>
+        <h2>Where I'm <em>spending my time</em></h2>
+        <p class="blurb">Three concurrent roles: classroom teaching, leading a small software company, and consulting on applied AI.</p>
+      </div>
+    </div>
+
+    <div class="roles">
+      <div class="role">
+        <div class="role-meta">Academic</div>
+        <h3>Senior Associate Professor</h3>
+        <div class="org">
+          <a href="https://www.bahria.edu.pk/bukc/se/faiz-3/" target="_blank" rel="noopener">Bahria University Karachi Campus</a><br/>
+          <span style="font-size:13px;">Department of Software Engineering · since 2014</span>
+        </div>
+        <p class="role-body">
+          Teach AI, natural language processing, formal methods, calculus, discrete structures,
+          and automata theory. Group head of the Big Data group. Past acting head of department.
+        </p>
+      </div>
+
+      <div class="role">
+        <div class="role-meta">Founder &amp; CEO</div>
+        <h3>Transys</h3>
+        <div class="org">
+          <a href="http://transys.us" target="_blank" rel="noopener">transys.us</a><br/>
+          <span style="font-size:13px;">Data science, AI, and analytics</span>
+        </div>
+        <p class="role-body">
+          Lead a small team building generative and agentic AI prototypes, retrieval-augmented
+          systems, and data-science tooling. Former Microsoft Management Alliance member.
+        </p>
+      </div>
+
+      <div class="role">
+        <div class="role-meta">Independent</div>
+        <h3>AI Consultant</h3>
+        <div class="org">
+          <a href="http://consult.faizzeya.org" target="_blank" rel="noopener">consult.faizzeya.org</a><br/>
+          <span style="font-size:13px;">Applied AI advisory</span>
+        </div>
+        <p class="role-body">
+          Advise on practical AI deployment, LLM integration, agentic workflows, and bringing
+          academic research into production. Member of ACM, AAAI, and the Pakistan Engineering Council.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TEACHING ========== -->
+<section class="block" id="teaching">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="num">§ 02 / Teaching</div>
+      </div>
+      <div>
+        <h2>Eleven years in <em>the classroom</em></h2>
+        <p class="blurb">Teaching across the CS curriculum, from foundational theory to applied AI. Have also taught at NU FAST, Mohammad Ali Jinnah University, UIT, and supervised MS theses at Iqra University.</p>
+      </div>
+    </div>
+
+    <div class="teaching">
+      <div>
+        <h4 style="font-family:'Inter',sans-serif; font-size:13px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin:0 0 18px;">Subjects taught</h4>
+        <div class="subjects">
+          <span class="pill featured">Artificial Intelligence</span>
+          <span class="pill featured">Natural Language Processing</span>
+          <span class="pill featured">Formal Methods</span>
+          <span class="pill">Calculus</span>
+          <span class="pill">Discrete Structures</span>
+          <span class="pill">Automata Theory</span>
+          <span class="pill">Compiler Construction</span>
+          <span class="pill">Assembly Language</span>
+          <span class="pill">Data Mining</span>
+          <span class="pill">Machine Learning</span>
+          <span class="pill">Database Systems</span>
+        </div>
+      </div>
+
+      <div class="teaching-callout">
+        <p class="quote">"Over 500 students have earned an A in my classes."</p>
+        <div class="quote-meta">From eleven years at BUKC</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SELECTED WORK ========== -->
+<section class="block" id="work">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="num">§ 03 / Selected work</div>
+      </div>
+      <div>
+        <h2>Software, decks, &amp; <em>experiments</em></h2>
+        <p class="blurb">A working selection from recent projects — most are downloadable or open on GitHub. The full list lives on the <a href="http://faizzeya.org/pd.htm">data science / Python page</a>.</p>
+      </div>
+    </div>
+
+    <div class="work-grid">
+
+      <article class="work">
+        <span class="kind">Generative AI · Python</span>
+        <h3>RAG with Llama 3 (Meta)</h3>
+        <p>Retrieval-augmented generation prototype built on Meta's Llama models. Companion Windows desktop build packages the same pipeline with a simple UI.</p>
+        <div class="work-links">
+          <a href="https://transys.faizzeya.org/prag.py">→ prag.py</a>
+          <a href="http://faizzeya.org/RAGWIN.zip">→ Windows build</a>
+        </div>
+      </article>
+
+      <article class="work">
+        <span class="kind">Generative AI · Python</span>
+        <h3>Deepseek-R1 chat app</h3>
+        <p>Interactive chat front-end against Deepseek-R1, useful as a starter pattern for swapping in alternative reasoning-tuned models.</p>
+        <div class="work-links">
+          <a href="https://transys.faizzeya.org/deepseekchat.py">→ deepseekchat.py</a>
+        </div>
+      </article>
+
+      <article class="work">
+        <span class="kind">Agentic AI · LangChain</span>
+        <h3>Agentic AI with SerpAPI</h3>
+        <p>Demonstrates a LangChain-based agent using the SerpAPIWrapper tool, illustrating tool-use patterns for early-stage agentic workflows.</p>
+        <div class="work-links">
+          <a href="https://transys.faizzeya.org/agentic0.py">→ agentic0.py</a>
+        </div>
+      </article>
+
+      <article class="work">
+        <span class="kind">Utility · Windows</span>
+        <h3>Pakistan Tax Calculator 2023</h3>
+        <p>Standalone Windows app that computes income tax against the 2023 Pakistani slab structure. Used by several teaching cohorts as a reference build.</p>
+        <div class="work-links">
+          <a href="http://faizzeya.org/Tax.zip">→ Tax.zip</a>
+        </div>
+      </article>
+
+      <article class="work">
+        <span class="kind">ML · Notebooks</span>
+        <h3>Scikit-learn &amp; TensorFlow demos</h3>
+        <p>A working notebook collection: MTCNN face recognition, AdaBoost and bagging on Iris, SVC, and an Adam-vs-Adagrad/Adadelta optimizer comparison.</p>
+        <div class="work-links">
+          <a href="https://github.com/faizulhz/ProgrammingAssignment2/blob/master/face.ipynb">→ MTCNN face</a>
+          <a href="https://github.com/faizulhz/ProgrammingAssignment2/blob/master/ADABOOST.ipynb">→ AdaBoost</a>
+          <a href="https://github.com/faizulhz/tensorflow/blob/master/tftut2.py">→ Optimizers</a>
+        </div>
+      </article>
+
+      <article class="work">
+        <span class="kind">Systems</span>
+        <h3>File encryption / decryption</h3>
+        <p>A small Windows desktop tool for symmetric file encryption — used as a teaching example for cryptographic primitives and Windows packaging.</p>
+        <div class="work-links">
+          <a href="http://faizzeya.org/secureapp.zip">→ secureapp.zip</a>
+        </div>
+      </article>
+
+      <article class="work">
+        <span class="kind">Simulation</span>
+        <h3>Conway's Game of Life</h3>
+        <p>Cellular automata implementation packaged as a Windows download. Used in lectures on emergent computation and discrete dynamical systems.</p>
+        <div class="work-links">
+          <a href="http://faizzeya.org/CA.zip">→ CA.zip</a>
+        </div>
+      </article>
+
+      <article class="work">
+        <span class="kind">Teaching · Student work</span>
+        <h3>BSE student AI projects</h3>
+        <p>Showcases of student work from the BSE 6A (Spring 2024) and 6B (Spring 2025) AI lab cohorts at Bahria University.</p>
+        <div class="work-links">
+          <a href="https://www.faizzeya.org/aiprojects.html">→ Spring 2024</a>
+          <a href="http://faizzeya.org/s20256a.html">→ Spring 2025</a>
+        </div>
+      </article>
+
+      <article class="work">
+        <span class="kind">In progress</span>
+        <h3>Introduction to Python</h3>
+        <p>A draft introductory Python textbook in active revision — companion to first-year CS courses and the data-science specialisation.</p>
+        <div class="work-links">
+          <a href="http://faizzeya.org/python.htm">→ Draft</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== BOOKS BAND ========== -->
+<section class="books" id="writing">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="num">§ 04 / Writing</div>
+      </div>
+      <div>
+        <h2>Twenty books, sixty-five <em>publications</em></h2>
+        <p class="blurb">Books on AI, computer science, and the practitioner's view of emerging technology — published through Amazon KDP and Apple Books. Indexed papers and conference work on Scholar, ACM Digital Library, and Microsoft Academic.</p>
+      </div>
+    </div>
+
+    <div class="book-list">
+      <div class="book">
+        <div class="platform">Amazon</div>
+        <div class="desc">
+          <h4>Twenty self-published titles</h4>
+          <p>Author page collects all books, with selected titles in Amazon's Select Global Fund.</p>
+          <a href="http://www.amazon.com/author/faiz" target="_blank" rel="noopener">→ amazon.com/author/faiz</a>
+        </div>
+      </div>
+      <div class="book">
+        <div class="platform">Apple Books</div>
+        <div class="desc">
+          <h4>Two titles on the Apple bookstore</h4>
+          <p>Available globally via the Apple Books storefront.</p>
+        </div>
+      </div>
+      <div class="book">
+        <div class="platform">Scholar</div>
+        <div class="desc">
+          <h4>Google Scholar profile</h4>
+          <p>Sixty-eight indexed publications and reports.</p>
+          <a href="http://scholar.google.com/citations?user=IWpSoVIAAAAJ&hl=en&oi=ao" target="_blank" rel="noopener">→ View profile</a>
+        </div>
+      </div>
+      <div class="book">
+        <div class="platform">ACM</div>
+        <div class="desc">
+          <h4>ACM Digital Library</h4>
+          <p>Indexed papers in the Association for Computing Machinery's digital library.</p>
+          <a href="https://dl.acm.org/action/doSearch?AllField=%22faiz+ul+haque+zeya%22&expand=all" target="_blank" rel="noopener">→ Browse</a>
+        </div>
+      </div>
+      <div class="book">
+        <div class="platform">Conferences</div>
+        <div class="desc">
+          <h4>Program committee — 10+ international</h4>
+          <p>Dubai, Australia, India, Switzerland. Editorial board, Horizon Publication CS&amp;IT, San José.</p>
+        </div>
+      </div>
+      <div class="book">
+        <div class="platform">All work</div>
+        <div class="desc">
+          <h4>Complete publications page</h4>
+          <p>Journal articles, conference papers, books, and program-committee memberships.</p>
+          <a href="http://faizzeya.org/pubs.html" target="_blank" rel="noopener">→ pubs.html</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== EDUCATION ========== -->
+<section class="block" id="education">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="num">§ 05 / Education</div>
+      </div>
+      <div>
+        <h2>Formal <em>training</em></h2>
+        <p class="blurb">Graduate work at the University of Tulsa, additional graduate coursework at NU FAST, San José State, and SZABIST, with specialisations through Coursera at Johns Hopkins and DeepLearning.AI.</p>
+      </div>
+    </div>
+
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="when">Admitted</div>
+        <h4>MS Computer Science</h4>
+        <div class="where">University of California, Santa Cruz · USA</div>
+        <div class="note"><span class="tag">Admitted</span>World ranking ~190 (2023). Admission held.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Completed</div>
+        <h4>MS Computer Science</h4>
+        <div class="where"><a href="http://WWW.UTULSA.EDU" target="_blank" rel="noopener">University of Tulsa</a> · Oklahoma, USA</div>
+        <div class="note">
+          Independent study <em>Some Experiments in AI</em> earned an A (semester GPA 4.0): restricted-natural-language agent, evolutionary computation via AVIDA, and two further experiments. Coursework in agent-based computing, advanced AI, and advanced ML.
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Coursework</div>
+        <h4>MS Information Technology</h4>
+        <div class="where"><a href="http://szabist.edu.pk" target="_blank" rel="noopener">SZABIST</a> · Karachi</div>
+        <div class="note">Six As / A−s across coursework including Advanced Database, ITIL, Data Mining, and Software Design and Architecture. Plus two NED University courses (Advanced Data Mining A−, Advanced Project Management A−).</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Graduate courses</div>
+        <h4>Two courses each at NU FAST &amp; San José State</h4>
+        <div class="where">National University of Computer &amp; Emerging Sciences (Karachi) · SJSU (California)</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Specialisations</div>
+        <h4>Coursera — Data Science &amp; Deep Learning</h4>
+        <div class="where">Johns Hopkins University · DeepLearning.AI</div>
+        <div class="note">Two courses from the Johns Hopkins Data Science specialisation (Prof. Victor Leek); one course from Andrew Ng's Deep Learning specialisation.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Certified</div>
+        <h4>Oracle DBA</h4>
+        <div class="where">ORASOFT · Instructor: Shahid ul Ghani</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Undergraduate</div>
+        <h4>BE</h4>
+        <div class="where">NED University of Engineering &amp; Technology · Karachi</div>
+        <div class="note">22 courses at ≥78 / 100 (A or A−), 10 B+, 7 B. 1st in first year, 6th in second year.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== EXPERIENCE ========== -->
+<section class="block">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="num">§ 06 / Experience</div>
+      </div>
+      <div>
+        <h2>Industry &amp; <em>research roles</em></h2>
+        <p class="blurb">A working chronology — academic appointments, the founding of Transys, software-engineering work in the US and Pakistan, and a handful of offered positions.</p>
+      </div>
+    </div>
+
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="when">Current</div>
+        <h4>Senior Associate Professor → Group Head, Big Data</h4>
+        <div class="where">Bahria University Karachi Campus</div>
+        <div class="note">Senior Lecturer · Assistant Professor · Senior Assistant Professor · Associate Professor · Senior Associate Professor · Acting Head of Department (Software Engineering). IEEE BUKC branch coordinator.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Offered</div>
+        <h4>Director of Education</h4>
+        <div class="where">Hevan Group of Companies</div>
+        <div class="note"><span class="tag">Offered</span>Declined.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Offered</div>
+        <h4>Data Science Course Director</h4>
+        <div class="where">Frontier Technology Institute · Karachi</div>
+        <div class="note"><span class="tag">Offered</span>Declined.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Founder, ongoing</div>
+        <h4>CEO, Transys</h4>
+        <div class="where">Karachi · Building software, products, and websites since 2001</div>
+        <div class="note">Member, Microsoft Management Alliance (2001–2005). Currently building an MMC-related product.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Visiting</div>
+        <h4>Visiting Faculty</h4>
+        <div class="where">Mohammad Ali Jinnah University · NU FAST Karachi · UIT</div>
+        <div class="note">Taught AI to 15 students at MAJU. Taught assembly language and automata theory to 80 students each at NU FAST. Supervised MS theses at Iqra University.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">Industry, USA</div>
+        <h4>Software Engineer</h4>
+        <div class="where">Docucentric Corp · Tulsa, Oklahoma</div>
+        <div class="note">Worked on a Capital One Bank project. Also SuperTechnology (Pensacola, FL and Karachi). Earlier, Java developer at Technology Tier, Karachi.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="when">USA research</div>
+        <h4>Research Assistant</h4>
+        <div class="where">University of Tulsa · Distributed AI Hards</div>
+        <div class="note">Under Dr. Kaveh Ashenayi. Also offered RA position by Dr. Peter LoPresti. Verbally offered IT Manager role at Oklahoma State University.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== AFFILIATIONS ========== -->
+<section class="block">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="num">§ 07 / Affiliations</div>
+      </div>
+      <div>
+        <h2>Memberships &amp; <em>communities</em></h2>
+        <p class="blurb">Professional bodies and research communities I'm an active member of.</p>
+      </div>
+    </div>
+
+    <div class="affil">
+      <a href="http://acm.org" target="_blank" rel="noopener" class="affil-item" style="text-decoration:none;">
+        <div class="acronym">ACM</div>
+        <div class="full">Association for Computing Machinery</div>
+      </a>
+      <a href="http://aaai.org" target="_blank" rel="noopener" class="affil-item" style="text-decoration:none;">
+        <div class="acronym">AAAI</div>
+        <div class="full">Association for the Advancement of AI</div>
+      </a>
+      <div class="affil-item">
+        <div class="acronym">IEEE</div>
+        <div class="full">Branch coordinator, Bahria University Karachi</div>
+      </div>
+      <div class="affil-item">
+        <div class="acronym">PEC</div>
+        <div class="full">Pakistan Engineering Council</div>
+      </div>
+      <div class="affil-item">
+        <div class="acronym">Google</div>
+        <div class="full">ML Community Network</div>
+      </div>
+      <div class="affil-item">
+        <div class="acronym">Foresight</div>
+        <div class="full">Foresight Institute (past)</div>
+      </div>
+      <div class="affil-item">
+        <div class="acronym">AIRCSSE</div>
+        <div class="full">Editorial board member</div>
+      </div>
+      <div class="affil-item">
+        <div class="acronym">Horizon</div>
+        <div class="full">CS &amp; IT editorial board, San José</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== RESIDENCES ========== -->
+<section class="block" id="residences">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="num">§ 08 / Residences</div>
+      </div>
+      <div>
+        <h2>Notable <em>addresses</em></h2>
+        <p class="blurb">Three residences from my years in Tulsa, Oklahoma — including the dormitory at the University of Tulsa where I lived during my MS&nbsp;CS, and two apartment buildings in the city.</p>
+      </div>
+    </div>
+
+    <div class="residences">
+
+      <article class="residence">
+        <span class="res-meta">Tulsa, Oklahoma · Apartment</span>
+        <h3>Oaklawn 5</h3>
+        <div class="where-res">2431 E 8th St, Tulsa, OK 74104</div>
+        <p class="res-body">
+          One of my residences while at the University of Tulsa.
+        </p>
+        <div class="res-links">
+          <a href="https://www.realtor.com/realestateandhomes-detail/2431-E-8th-St_Tulsa_OK_74104_M71064-54007" target="_blank" rel="noopener">→ View on Realtor.com</a>
+        </div>
+      </article>
+
+      <article class="residence">
+        <span class="res-meta">Tulsa, Oklahoma · Apartment complex</span>
+        <h3>Fiesta II</h3>
+        <div class="where-res">Tulsa, OK</div>
+        <p class="res-body">
+          A second Tulsa residence during my graduate studies.
+        </p>
+        <div class="res-links">
+          <a href="http://faizzeya.org/f2.jpg" target="_blank" rel="noopener">→ Photo</a>
+        </div>
+      </article>
+
+      <article class="residence">
+        <span class="res-meta">Tulsa, Oklahoma · University dormitory</span>
+        <h3>John Mabee Hall</h3>
+        <div class="where-res">University of Tulsa · Director: Kay Winn</div>
+        <p class="res-body">
+          On-campus dormitory at the University of Tulsa. Lived in rooms 1011, 2022, and 3033 across my time there.
+        </p>
+      </article>
+
+    </div>
+
+    <div class="other-stays">
+      <h4>Other stays</h4>
+      <ul>
+        <li>DoubleTree Hotel, Tulsa OK <span class="room">Room 510</span></li>
+        <li>Mövenpick Hotel, Karachi <span class="room">Room 520</span></li>
+        <li>BrookShire Hotel, Tulsa OK <span class="room">Room 28</span></li>
+        <li>Townhouse, San José CA <span class="room">Room 108</span></li>
+        <li>Executive Inn, San José CA <span class="room">Rooms 105 &amp; 106</span></li>
+        <li>Days Inn, Tulsa OK <span class="room">Room 102</span></li>
+        <li>Coral Deira, Dubai</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ELSEWHERE / TRAVEL ========== -->
+<section class="block" id="elsewhere">
+  <div class="shell">
+    <div class="section-head">
+      <div>
+        <div class="num">§ 09 / Elsewhere</div>
+      </div>
+      <div>
+        <h2>Around the <em>internet &amp; the world</em></h2>
+        <p class="blurb">Profiles, social, and a list of cities I've spent time in.</p>
+      </div>
+    </div>
+
+    <div class="elsewhere">
+      <div>
+        <h4 style="font-family:'Inter',sans-serif; font-size:13px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin:0 0 14px;">Profiles</h4>
+        <ul class="link-list">
+          <li><a href="https://scholar.google.com/citations?user=IWpSoVIAAAAJ" target="_blank" rel="noopener">Google Scholar<span class="arrow">→</span></a></li>
+          <li><a href="https://github.com/faizulhz" target="_blank" rel="noopener">GitHub<span class="arrow">→</span></a></li>
+          <li><a href="https://www.linkedin.com/in/faizulhaquezeya/" target="_blank" rel="noopener">LinkedIn<span class="arrow">→</span></a></li>
+          <li><a href="https://www.facebook.com/faizulhaque" target="_blank" rel="noopener">Facebook<span class="arrow">→</span></a></li>
+          <li><a href="https://twitter.com/faizzeya559326" target="_blank" rel="noopener">Twitter / X<span class="arrow">→</span></a></li>
+          <li><a href="http://member.acm.org/~fzeya" target="_blank" rel="noopener">ACM member page<span class="arrow">→</span></a></li>
+          <li><a href="http://transys.us" target="_blank" rel="noopener">Transys<span class="arrow">→</span></a></li>
+          <li><a href="http://books.faizzeya.org" target="_blank" rel="noopener">Books in progress<span class="arrow">→</span></a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 style="font-family:'Inter',sans-serif; font-size:13px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin:0 0 14px;">Lived &amp; visited</h4>
+        <div class="travel-grid">
+          <div class="country">
+            <h4>United States <span class="count">7 cities</span></h4>
+            <p class="cities">Tulsa OK · San José CA · Westmont IL · Plano TX · Los&nbsp;Angeles CA · Oklahoma City OK · Las&nbsp;Vegas NV</p>
+          </div>
+          <div class="country">
+            <h4>Pakistan <span class="count">3 cities</span></h4>
+            <p class="cities">Karachi · Lahore · Islamabad</p>
+          </div>
+          <div class="country">
+            <h4>Saudi Arabia <span class="count">3 cities</span></h4>
+            <p class="cities">Mecca · Medina · Jeddah</p>
+          </div>
+          <div class="country">
+            <h4>UAE <span class="count">1 city</span></h4>
+            <p class="cities">Dubai</p>
+          </div>
+          <div class="country">
+            <h4>United Kingdom <span class="count">1 city</span></h4>
+            <p class="cities">London</p>
+          </div>
+          <div class="country">
+            <h4>Turkey · Libya <span class="count">2 cities</span></h4>
+            <p class="cities">Istanbul · Tripoli</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="shell">
+    <div class="sig">
+      Faiz ul haque <em>Zeya</em>
+    </div>
+    <div class="colophon">
+      Karachi, Pakistan · Senior Associate Professor at <a href="https://www.bahria.edu.pk/bukc/se/faiz-3/">Bahria University</a> · CEO <a href="http://transys.us">Transys</a><br/>
+      Last updated 2026. Set in Instrument Serif &amp; Inter.
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Highlight current section in nav
+  const sections = document.querySelectorAll('section[id], header[id]');
+  const navLinks = document.querySelectorAll('nav.top ul a');
+  if ('IntersectionObserver' in window && navLinks.length) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navLinks.forEach(link => {
+            const active = link.getAttribute('href') === '#' + id;
+            link.style.color = active ? 'var(--teal-deep)' : '';
+          });
+        }
+      });
+    }, { rootMargin: '-30% 0px -65% 0px' });
+    sections.forEach(s => obs.observe(s));
+  }
+</script>
+
+</body>
+</html>
