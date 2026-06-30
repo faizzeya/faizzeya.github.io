@@ -183,6 +183,43 @@
   }
   .hero-links svg { width: 15px; height: 15px; }
 
+  /* === Credential card === */
+  .credential-card {
+    margin-top: 40px;
+    max-width: 420px;
+    border: 1px solid var(--rule-strong);
+    background: rgba(255,255,255,0.6);
+    padding: 18px;
+    border-radius: 4px;
+  }
+  .credential-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 2px;
+  }
+  .credential-card .credential-caption {
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .credential-card .credential-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--teal-deep);
+    font-weight: 600;
+  }
+  .credential-card .credential-note {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
   /* === Stats strip === */
   .stats {
     border-top: 1px solid var(--rule);
@@ -843,6 +880,14 @@
         Consulting
       </a>
     </div>
+
+    <figure class="credential-card">
+      <img src="fssna.png" alt="US Social Security card issued to Faiz ul Haque Zeya — number and signature redacted." />
+      <figcaption class="credential-caption">
+        <span class="credential-label">Authorized to work in the United States</span>
+        <span class="credential-note">SSN &amp; signature redacted</span>
+      </figcaption>
+    </figure>
 
     <div class="stats">
       <div class="stat">
