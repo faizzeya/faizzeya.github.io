@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Night Court — 3D Tennis for Two</title>
+<style>
+  :root{
+    --ink:#eef4f2;
+    --p1:#ffd447;   /* Player 1 — gold */
+    --p2:#4fd8ff;   /* Player 2 — cyan */
+    --panel:rgba(8,20,26,.72);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:#04090d;
+    font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;color:var(--ink)}
+  #game{position:fixed;inset:0}
+  .hud{position:fixed;left:0;right:0;top:0;display:flex;justify-content:center;
+    pointer-events:none;padding:14px}
+  .board{display:flex;align-items:center;gap:18px;background:var(--panel);
+    border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 22px;
+    backdrop-filter:blur(6px)}
+  .name{font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:.8}
+  .pts{font-size:34px;font-weight:700;min-width:44px;text-align:center;line-height:1}
+  .p1 .pts,.p1 .name{color:var(--p1)}
+  .p2 .pts,.p2 .name{color:var(--p2)}
+  .dash{opacity:.35;font-size:22px}
+  #msg{position:fixed;left:0;right:0;top:88px;text-align:center;pointer-events:none;
+    font-size:17px;letter-spacing:.04em;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+  #msg b{font-weight:700}
+  .keys{position:fixed;bottom:14px;display:flex;flex-direction:column;gap:4px;
+    background:var(--panel);border:1px solid rgba(255,255,255,.1);
+    border-radius:12px;padding:10px 14px;font-size:12px;pointer-events:none;
+    backdrop-filter:blur(6px)}
+  .keys .t{letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin-bottom:2px}
+  #keys1{left:14px}#keys1 .t{color:var(--p1)}
+  #keys2{right:14px}#keys2 .t{color:var(--p2)}
+  kbd{display:inline-block;min-width:20px;text-align:center;padding:1px 5px;
+    border:1px solid rgba(255,255,255,.25);border-bottom-width:2px;border-radius:5px;
+    font-family:inherit;font-size:11px;background:rgba(255,255,255,.06)}
+  #win{position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+    flex-direction:column;gap:14px;background:rgba(3,8,11,.78);backdrop-filter:blur(4px)}
+  #win h1{font-size:44px;letter-spacing:.06em}
+  #win p{opacity:.8}
+</style>
+</head>
+<body>
+<div id="game"></div>
+
+<div class="hud">
+  <div class="board">
+    <div class="p1"><div class="name">Player 1</div><div class="pts" id="s1">0</div></div>
+    <div class="dash">—</div>
+    <div class="p2"><div class="name">Player 2</div><div class="pts" id="s2">0</div></div>
+  </div>
+</div>
+
+<div id="msg"></div>
+
+<div class="keys" id="keys1">
+  <div class="t">Player 1 · near side</div>
+  <div>Move: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
+  <div>Serve / Swing: <kbd>Space</kbd></div>
+</div>
+<div class="keys" id="keys2">
+  <div class="t">Player 2 · far side</div>
+  <div>Move: <kbd>&#8593;</kbd><kbd>&#8592;</kbd><kbd>&#8595;</kbd><kbd>&#8594;</kbd></div>
+  <div>Serve / Swing: <kbd>Enter</kbd></div>
+</div>
+
+<div id="win">
+  <h1 id="winTitle"></h1>
+  <p>Press <kbd>R</kbd> to play again</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ============================================================
+   NIGHT COURT — 3D tennis for two players on one keyboard
+   Player 1 (gold)  : WASD + Space          (near baseline)
+   Player 2 (cyan)  : Arrow keys + Enter    (far baseline)
+   First to 7 points wins. Rules kept arcade-simple:
+   the ball must land in the opponent's half; a ball you
+   let past your baseline, or that bounces twice on your
+   side, is the opponent's point.
+   ============================================================ */
+
+// ---------- Court dimensions (metres-ish) ----------
+const COURT_W = 11;        // half-width  (x: -11 .. 11)
+const COURT_L = 12;        // half-length (z: -12 .. 12) per side
+const NET_H   = 1.1;
+const GRAVITY = -22;
+const WIN_SCORE = 7;
+
+// ---------- Renderer / scene ----------
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.getElementById('game').appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x04090d);
+scene.fog = new THREE.Fog(0x04090d, 55, 110);
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, .1, 200);
+camera.position.set(0, 15.5, 27);
+camera.lookAt(0, 0, -3);
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+// ---------- Lights (night match, floodlit) ----------
+scene.add(new THREE.AmbientLight(0x30414d, 1.1));
+
+const flood = new THREE.DirectionalLight(0xfff4dc, 1.15);
+flood.position.set(14, 26, 10);
+flood.castShadow = true;
+flood.shadow.mapSize.set(2048, 2048);
+flood.shadow.camera.left = -22; flood.shadow.camera.right = 22;
+flood.shadow.camera.top = 26;   flood.shadow.camera.bottom = -26;
+scene.add(flood);
+
+const fill = new THREE.DirectionalLight(0x88b6ff, .35);
+fill.position.set(-16, 18, -14);
+scene.add(fill);
+
+// ---------- Court ----------
+const court = new THREE.Group();
+scene.add(court);
+
+// surrounding apron
+const apron = new THREE.Mesh(
+  new THREE.PlaneGeometry(70, 70),
+  new THREE.MeshStandardMaterial({color:0x0d2b23, roughness:1})
+);
+apron.rotation.x = -Math.PI/2; apron.position.y = -.02; apron.receiveShadow = true;
+court.add(apron);
+
+// playing surface
+const surface = new THREE.Mesh(
+  new THREE.PlaneGeometry(COURT_W*2, COURT_L*2),
+  new THREE.MeshStandardMaterial({color:0x1f6f5c, roughness:.95})
+);
+surface.rotation.x = -Math.PI/2; surface.receiveShadow = true;
+court.add(surface);
+
+// white lines
+function line(w, l, x, z){
+  const m = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, l),
+    new THREE.MeshStandardMaterial({color:0xf2f5f4, roughness:.8})
+  );
+  m.rotation.x = -Math.PI/2; m.position.set(x, .01, z);
+  court.add(m);
+}
+const LW = .12;
+line(COURT_W*2, LW, 0,  COURT_L);      // baselines
+line(COURT_W*2, LW, 0, -COURT_L);
+line(LW, COURT_L*2, -COURT_W, 0);      // sidelines
+line(LW, COURT_L*2,  COURT_W, 0);
+line(LW, COURT_L*2, -COURT_W*.55, 0);  // singles-ish inner lines
+line(LW, COURT_L*2,  COURT_W*.55, 0);
+line(COURT_W*1.1, LW, 0,  COURT_L*.5); // service lines
+line(COURT_W*1.1, LW, 0, -COURT_L*.5);
+line(LW, COURT_L, 0, 0);               // centre service line
+
+// net
+const netGroup = new THREE.Group();
+const netMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(COURT_W*2 + 1, NET_H, 24, 5),
+  new THREE.MeshStandardMaterial({
+    color:0xdde5e2, roughness:.9, transparent:true, opacity:.42,
+    side:THREE.DoubleSide, wireframe:true
+  })
+);
+netMesh.position.y = NET_H/2;
+netGroup.add(netMesh);
+
+const netBand = new THREE.Mesh(
+  new THREE.BoxGeometry(COURT_W*2 + 1, .08, .05),
+  new THREE.MeshStandardMaterial({color:0xffffff, roughness:.6})
+);
+netBand.position.y = NET_H; netBand.castShadow = true;
+netGroup.add(netBand);
+
+for (const px of [-(COURT_W+.6), COURT_W+.6]){
+  const post = new THREE.Mesh(
+    new THREE.CylinderGeometry(.09,.09,NET_H+.15,12),
+    new THREE.MeshStandardMaterial({color:0x24303a, roughness:.5, metalness:.4})
+  );
+  post.position.set(px,(NET_H+.15)/2,0); post.castShadow = true;
+  netGroup.add(post);
+}
+scene.add(netGroup);
+
+// glowing horizon ring, the one flourish
+const halo = new THREE.Mesh(
+  new THREE.TorusGeometry(34, .12, 8, 120),
+  new THREE.MeshBasicMaterial({color:0x1a4a5c})
+);
+halo.rotation.x = Math.PI/2; halo.position.y = .05;
+scene.add(halo);
+
+// ---------- Players ----------
+function makePlayer(bodyColor, accent){
+  const g = new THREE.Group();
+  const mat  = new THREE.MeshStandardMaterial({color:bodyColor, roughness:.6});
+  const skin = new THREE.MeshStandardMaterial({color:0xd9a679, roughness:.7});
+
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(.34,.42,1.1,16), mat);
+  torso.position.y = 1.15; torso.castShadow = true; g.add(torso);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(.26,16,16), skin);
+  head.position.y = 1.95; head.castShadow = true; g.add(head);
+
+  const legs = new THREE.Mesh(new THREE.CylinderGeometry(.3,.24,.62,12),
+    new THREE.MeshStandardMaterial({color:0x1c242b, roughness:.8}));
+  legs.position.y = .31; legs.castShadow = true; g.add(legs);
+
+  // racket arm
+  const arm = new THREE.Group();
+  arm.position.set(.42, 1.35, 0);
+  const forearm = new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.55,8), skin);
+  forearm.rotation.z = Math.PI/2.6; forearm.position.set(.2,.05,0);
+  forearm.castShadow = true; arm.add(forearm);
+
+  const racket = new THREE.Group();
+  racket.position.set(.45,.2,0);
+  const hoop = new THREE.Mesh(new THREE.TorusGeometry(.3,.035,8,24),
+    new THREE.MeshStandardMaterial({color:accent, roughness:.4}));
+  hoop.castShadow = true; racket.add(hoop);
+  const strings = new THREE.Mesh(new THREE.CircleGeometry(.28,20),
+    new THREE.MeshStandardMaterial({color:0xffffff, transparent:true, opacity:.28, side:THREE.DoubleSide}));
+  racket.add(strings);
+  arm.add(racket);
+  g.add(arm);
+
+  g.userData.arm = arm;
+  return g;
+}
+
+const P1 = makePlayer(0xb98a1f, 0xffd447);   // gold, near side
+const P2 = makePlayer(0x1a7f9c, 0x4fd8ff);   // cyan, far side
+P2.rotation.y = Math.PI;
+scene.add(P1, P2);
+
+// ---------- Ball ----------
+const ball = new THREE.Mesh(
+  new THREE.SphereGeometry(.22, 20, 20),
+  new THREE.MeshStandardMaterial({color:0xd7ff3f, roughness:.45, emissive:0x223300})
+);
+ball.castShadow = true;
+scene.add(ball);
+
+const ballShadow = new THREE.Mesh(
+  new THREE.CircleGeometry(.22, 16),
+  new THREE.MeshBasicMaterial({color:0x000000, transparent:true, opacity:.3})
+);
+ballShadow.rotation.x = -Math.PI/2; ballShadow.position.y = .015;
+scene.add(ballShadow);
+
+// ---------- Game state ----------
+const state = {
+  score:[0,0],
+  server:0,               // 0 = P1, 1 = P2
+  phase:'serve',          // serve | rally | point | over
+  vel:new THREE.Vector3(),
+  bouncesOnSide:0,        // consecutive bounces on receiving side
+  lastHitter:-1,
+  msgTimer:0
+};
+
+const pos = {
+  p1:new THREE.Vector3(0, 0,  COURT_L - .8),
+  p2:new THREE.Vector3(0, 0, -(COURT_L - .8))
+};
+
+const keys = {};
+addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (['Space','Enter','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
+  if (e.code === 'KeyR' && state.phase === 'over') resetMatch();
+});
+addEventListener('keyup', e => keys[e.code] = false);
+
+const el = {
+  s1:document.getElementById('s1'),
+  s2:document.getElementById('s2'),
+  msg:document.getElementById('msg'),
+  win:document.getElementById('win'),
+  winTitle:document.getElementById('winTitle')
+};
+
+function say(html, seconds=2.4){
+  el.msg.innerHTML = html;
+  state.msgTimer = seconds;
+}
+
+function updateScore(){
+  el.s1.textContent = state.score[0];
+  el.s2.textContent = state.score[1];
+}
+
+function placeForServe(){
+  state.phase = 'serve';
+  state.bouncesOnSide = 0;
+  state.lastHitter = -1;
+  const server = state.server === 0 ? pos.p1 : pos.p2;
+  ball.position.set(server.x, 1.6, server.z + (state.server===0 ? -0.6 : 0.6));
+  state.vel.set(0,0,0);
+  const who  = state.server===0 ? 'Player 1' : 'Player 2';
+  const key  = state.server===0 ? 'Space' : 'Enter';
+  const col  = state.server===0 ? 'var(--p1)' : 'var(--p2)';
+  say(`<b style="color:${col}">${who}</b> to serve — press <b>${key}</b>`, 9999);
+}
+
+function awardPoint(winner, reason){
+  state.score[winner]++;
+  updateScore();
+  const who = winner===0 ? 'Player 1' : 'Player 2';
+  const col = winner===0 ? 'var(--p1)' : 'var(--p2)';
+  if (state.score[winner] >= WIN_SCORE){
+    state.phase = 'over';
+    el.winTitle.textContent = `${who} wins the match!`;
+    el.winTitle.style.color = col;
+    el.win.style.display = 'flex';
+    return;
+  }
+  state.phase = 'point';
+  say(`Point, <b style="color:${col}">${who}</b> — ${reason}`, 2.2);
+  state.server = winner;             // winner serves next, keeps play brisk
+  setTimeout(placeForServe, 1600);
+}
+
+function resetMatch(){
+  state.score = [0,0];
+  state.server = 0;
+  updateScore();
+  el.win.style.display = 'none';
+  placeForServe();
+}
+
+// ---------- Player control ----------
+const SPEED = 10.5;
+function movePlayers(dt){
+  // P1 — WASD (near side, z > 0)
+  let x1=0, z1=0;
+  if (keys.KeyA) x1 -= 1;
+  if (keys.KeyD) x1 += 1;
+  if (keys.KeyW) z1 -= 1;
+  if (keys.KeyS) z1 += 1;
+  pos.p1.x = THREE.MathUtils.clamp(pos.p1.x + x1*SPEED*dt, -COURT_W+.5, COURT_W-.5);
+  pos.p1.z = THREE.MathUtils.clamp(pos.p1.z + z1*SPEED*dt, 2.2, COURT_L+3);
+
+  // P2 — arrows (far side, z < 0); screen-relative so it feels natural
+  let x2=0, z2=0;
+  if (keys.ArrowLeft)  x2 -= 1;
+  if (keys.ArrowRight) x2 += 1;
+  if (keys.ArrowUp)    z2 -= 1;
+  if (keys.ArrowDown)  z2 += 1;
+  pos.p2.x = THREE.MathUtils.clamp(pos.p2.x + x2*SPEED*dt, -COURT_W+.5, COURT_W-.5);
+  pos.p2.z = THREE.MathUtils.clamp(pos.p2.z + z2*SPEED*dt, -(COURT_L+3), -2.2);
+
+  P1.position.copy(pos.p1);
+  P2.position.copy(pos.p2);
+
+  // lean toward the ball a little
+  P1.rotation.y = THREE.MathUtils.clamp((ball.position.x - pos.p1.x)*.05, -.5, .5);
+  P2.rotation.y = Math.PI + THREE.MathUtils.clamp((pos.p2.x - ball.position.x)*.05, -.5, .5);
+}
+
+// ---------- Swings ----------
+const swing = [0, 0];   // animation timers for the racket arms
+function trySwing(player){
+  const p = player===0 ? pos.p1 : pos.p2;
+  const reach = 2.6;
+  const dx = ball.position.x - p.x;
+  const dz = ball.position.z - p.z;
+  const dist = Math.hypot(dx, dz);
+  swing[player] = .28;                       // always animate the swing
+
+  if (state.phase === 'serve' && player === state.server){
+    hitBall(player, .35);
+    state.phase = 'rally';
+    say('', 0);
+    return;
+  }
+  if (state.phase !== 'rally') return;
+  if (dist > reach || ball.position.y > 3.2) return;   // whiffed
+  // must be hitting toward the opponent (ball on your side)
+  if (player===0 && ball.position.z < 0) return;
+  if (player===1 && ball.position.z > 0) return;
+  hitBall(player, 0);
+}
+
+function hitBall(player, extraLoft){
+  const p   = player===0 ? pos.p1 : pos.p2;
+  const dir = player===0 ? -1 : 1;                 // toward opponent
+  const aimX = THREE.MathUtils.clamp((ball.position.x - p.x)*2.2 + p.x*-.15, -7, 7);
+  const targetZ = dir * (COURT_L*.55 + Math.random()*COURT_L*.35);
+
+  const speed = 15 + Math.random()*3;
+  const dx = aimX - ball.position.x;
+  const dz = targetZ - ball.position.z;
+  const dist = Math.hypot(dx, dz);
+  const t = dist / speed;
+
+  state.vel.x = dx / t;
+  state.vel.z = dz / t;
+  // solve vy so ball lands (y = 0.22) at time t under gravity, plus loft
+  state.vel.y = ( .22 - ball.position.y - .5*GRAVITY*t*t) / t + extraLoft*6;
+  state.vel.y = Math.max(state.vel.y, 4.5);
+
+  state.lastHitter = player;
+  state.bouncesOnSide = 0;
+}
+
+// ---------- Physics ----------
+function stepBall(dt){
+  if (state.phase !== 'rally') return;
+
+  const prevZ = ball.position.z;
+  state.vel.y += GRAVITY * dt;
+  ball.position.addScaledVector(state.vel, dt);
+
+  // net collision
+  if (Math.sign(prevZ) !== Math.sign(ball.position.z) &&
+      ball.position.y < NET_H + .1 &&
+      Math.abs(ball.position.x) < COURT_W + .6){
+    ball.position.z = prevZ > 0 ? .25 : -.25;
+    state.vel.z *= -.25;
+    state.vel.x *= .5;
+    say('Net!', 1.2);
+  }
+
+  // floor bounce
+  if (ball.position.y <= .22 && state.vel.y < 0){
+    ball.position.y = .22;
+    state.vel.y *= -.72;
+    state.vel.x *= .96;
+    state.vel.z *= .96;
+
+    const inX = Math.abs(ball.position.x) <= COURT_W + .2;
+    const inZ = Math.abs(ball.position.z) <= COURT_L + .2;
+    const sideOfBounce = ball.position.z > 0 ? 0 : 1;   // 0 = P1's half
+
+    if (!(inX && inZ)){
+      // ball landed out — point to the side that did NOT hit it
+      awardPoint(state.lastHitter===0 ? 1 : 0, 'ball landed out');
+      return;
+    }
+    if (sideOfBounce !== state.lastHitter){
+      state.bouncesOnSide++;
+      if (state.bouncesOnSide >= 2){
+        awardPoint(state.lastHitter, 'double bounce');
+        return;
+      }
+    }
+  }
+
+  // past a baseline without bouncing there → receiver failed
+  if (ball.position.z >  COURT_L + 3.6) { awardPoint(1, 'passed the baseline'); return; }
+  if (ball.position.z < -(COURT_L + 3.6)) { awardPoint(0, 'passed the baseline'); return; }
+
+  // dead ball safety net
+  if (Math.hypot(state.vel.x, state.vel.z) < .4 && ball.position.y <= .23){
+    awardPoint(state.lastHitter===0 ? 1 : 0, 'ball died');
+  }
+}
+
+// ---------- Input polling for swings (edge-triggered) ----------
+let spaceHeld = false, enterHeld = false;
+function pollSwings(){
+  if (keys.Space && !spaceHeld) trySwing(0);
+  spaceHeld = !!keys.Space;
+  if (keys.Enter && !enterHeld) trySwing(1);
+  enterHeld = !!keys.Enter;
+}
+
+// ---------- Main loop ----------
+const clock = new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), .033);
+
+  if (state.phase !== 'over'){
+    movePlayers(dt);
+    pollSwings();
+    stepBall(dt);
+  }
+
+  // serve: ball floats by the server's hand
+  if (state.phase === 'serve'){
+    const s = state.server===0 ? pos.p1 : pos.p2;
+    ball.position.x = s.x + (state.server===0 ? .4 : -.4);
+    ball.position.z = s.z + (state.server===0 ? -.5 : .5);
+    ball.position.y = 1.6 + Math.sin(performance.now()*.004)*.08;
+  }
+
+  // racket swing animation
+  for (let i=0;i<2;i++){
+    const g = i===0 ? P1 : P2;
+    if (swing[i] > 0){
+      swing[i] -= dt;
+      const k = Math.sin((1 - swing[i]/.28) * Math.PI);
+      g.userData.arm.rotation.y = (i===0 ? -1 : 1) * k * 1.8;
+    } else {
+      g.userData.arm.rotation.y *= .8;
+    }
+  }
+
+  // ball ground shadow
+  ballShadow.position.x = ball.position.x;
+  ballShadow.position.z = ball.position.z;
+  const h = THREE.MathUtils.clamp(ball.position.y/6, 0, 1);
+  ballShadow.material.opacity = .32*(1-h) + .05;
+  ballShadow.scale.setScalar(1 + h*1.4);
+
+  // message fade
+  if (state.msgTimer < 9000 && state.msgTimer > 0){
+    state.msgTimer -= dt;
+    if (state.msgTimer <= 0) el.msg.innerHTML = '';
+  }
+
+  // gentle camera sway following the ball
+  camera.position.x += ((ball.position.x*.28) - camera.position.x) * .04;
+  camera.lookAt(0, 0, -3);
+
+  renderer.render(scene, camera);
+}
+
+updateScore();
+placeForServe();
+animate();
+</script>
+</body>
+</html>
