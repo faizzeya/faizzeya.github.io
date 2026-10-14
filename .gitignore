@@ -1,0 +1,14 @@
+# Build artifacts
+*.exe
+*.dll
+*.pdb
+*.zip
+*.deps.json
+*.runtimeconfig.json
+
+# Game
+game/.godot/
+
+# OS
+.DS_Store
+Thumbs.db

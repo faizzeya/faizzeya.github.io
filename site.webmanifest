@@ -1,0 +1,10 @@
+{
+  "name": "Faiz Zeya Portfolio",
+  "short_name": "Faiz Zeya",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F6F4EE",
+  "theme_color": "#0E7A6C",
+  "description": "Faiz ul haque Zeya — Computer Scientist, Educator, Author",
+  "icons": []
+}
