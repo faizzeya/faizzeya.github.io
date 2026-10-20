@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Agent Development at Folio3 — Faiz ul haque Zeya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#111;overflow:hidden;font-family:Arial,sans-serif}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#frame{width:1920px;height:1080px;position:relative;transform-origin:center center;flex:none;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+section{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden}
+section:not(.on){display:none!important}
+section *{margin:0}
+section aside{display:none!important}
+section ul,section ol{padding-left:1.3em}
+section table{border-collapse:collapse;width:100%}
+section th,section td{padding:.45em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(127,127,127,.25)}
+section div,section p,section h1,section h2,section h3{position:relative}
+section [style*="position:absolute"],section [style*="position: absolute"]{position:absolute}
+x-shape{display:block;flex:none}
+x-shape[kind=ellipse]{border-radius:50%}
+x-shape[kind=rounded]{border-radius:16px}
+x-shape[kind=arrow-right]{clip-path:polygon(0 30%,65% 30%,65% 0,100% 50%,65% 100%,65% 70%,0 70%)}
+x-shape[kind=arrow-left]{clip-path:polygon(100% 30%,35% 30%,35% 0,0 50%,35% 100%,35% 70%,100% 70%)}
+x-connector{display:block;flex:none;align-self:center;height:0;border-top-style:solid;border-top-color:currentColor;position:relative}
+x-connector::after{content:"";position:absolute;right:-2px;top:-11px;border:9px solid transparent;border-left:14px solid currentColor;border-right:0}
+x-connector[from=tr]::after{right:auto;left:-2px;border-left:0;border-right:14px solid currentColor}
+x-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;line-height:1}
+#bar{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:16px;padding:8px;background:rgba(0,0,0,.55);color:#eee;font:14px Arial,sans-serif;opacity:.15;transition:opacity .2s}
+#bar:hover{opacity:1}
+#bar button{background:#333;color:#eee;border:1px solid #555;border-radius:6px;padding:6px 14px;cursor:pointer;font:inherit}
+#bar a{color:#9cf}
+</style></head><body>
+<div id="stage"><div id="frame">
+<section id="cover" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Folio3 AI · Service walkthrough</p>
+<div style="display:flex;flex-direction:column;gap:32px">
+<h1 style="font-family:'Domine', Georgia, serif;font-size:96px;font-weight:700;line-height:1.1;color:#F7F5EF">AI Agent Development<br>at Folio3</h1>
+<p style="font-size:32px;line-height:1.35;color:#C4D0DB;max-width:1200px">Every section of the service page, each followed by how to achieve it and a study plan.</p>
+</div>
+<div style="display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-size:24px;color:#9FB0C0">Faiz ul Haque Zeya · October 2026</p>
+<p style="font-size:24px;color:#9FB0C0">Source: folio3.ai/services/ai-agent-development</p>
+</div>
+<aside>This deck walks through Folio3 AI's custom AI agent development service page section by section. Each Folio3 slide is followed by an independent slide on how to achieve the same thing and what to study.</aside>
+</section>
+<section id="agenda" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Outline</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Fourteen topics, two slides each</h2>
+<div style="display:flex;flex-direction:row;gap:64px;padding:24px 0 0 0;align-items:start">
+<div style="width:520px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Light slides</h3>
+<p style="font-size:26px;line-height:1.35">What Folio3's service page says, section by section.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#12263A;padding:32px;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">Dark slides</h3>
+<p style="font-size:26px;line-height:1.35;color:#EDEAE0">How to achieve it in four steps, then a study plan: read, build, prove.</p>
+</div>
+<p style="font-size:26px;line-height:1.35">The deck closes with a 12-week study roadmap.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">01</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">What agent development is</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">02</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Benchmarks and capabilities</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">03</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Agents versus alternatives</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">04</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Development services</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">05</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Why projects stall</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">06</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">The six-step process</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">07</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Key components of an agent</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">08</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Engagement models and cost</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">09</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Industry use cases</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">10</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Governance and compliance</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">11</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Technology ecosystem</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">12</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Scenario: prior authorization</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">13</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Why clients choose Folio3</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:baseline"><p style="width:48px;font-size:26px;font-weight:600;color:#B04A14">14</p><p style="flex:1;font-size:26px;line-height:1.35;color:#12263A">Team, FAQs, first meeting</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">02</p></div>
+</section>
+<section id="t01-definition" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 01 · Definition</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">What custom AI agent development is</h2>
+<div style="display:flex;flex-direction:row;gap:64px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:24px">
+<p style="font-size:32px;line-height:1.35;color:#12263A">Purpose-built systems that understand business objectives, access trusted company knowledge, use approved tools and complete defined workflows.</p>
+<p style="font-size:26px;line-height:1.35">Unlike generic assistants, custom agents interact with internal systems, manage multi-step tasks, handle exceptions, request approvals and operate within documented security and governance boundaries.</p>
+<p style="font-size:26px;line-height:1.35">Folio3 builds them around a client's workflows, data, approvals and systems, and suggests starting with a 2 to 4 week proof of concept.</p>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">The custom agent engine</h3>
+<p style="font-size:26px;line-height:1.35">Business-specific task execution</p>
+<p style="font-size:26px;line-height:1.35">Trusted enterprise knowledge access</p>
+<p style="font-size:26px;line-height:1.35">CRM, ERP, database and API integration</p>
+<p style="font-size:26px;line-height:1.35">Human approval and escalation controls</p>
+<p style="font-size:26px;line-height:1.35">Real-time monitoring and audit logging</p>
+<p style="font-size:24px;line-height:1.35;color:#B04A14">Guardian-ready governance when enterprise oversight is required.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">03</p></div>
+<aside>The definition is Folio3's own wording, lightly shortened. The five engine features are listed on the page's hero panel as a production-ready custom AI agent engine.</aside>
+</section>
+<section id="t01-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 01 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Building the foundations</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Pick one workflow with a clear owner, a measurable baseline and real exceptions, not a general assistant.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Write the agent's contract first: goal, allowed tools, readable data, actions needing approval, stop conditions.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Build the loop yourself once: model call, tool call, observation, repeat, with a step limit and a cost limit.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Add state, retrieval and human approval only when the bare loop shows it needs them.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> Anthropic's "Building Effective Agents" and the ReAct paper (Yao et al., 2022), to tell workflows from agents.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> A small tool-calling agent in plain Python against one API, with no framework, then port it to LangGraph.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> Run 20 real tasks; record completion rate, steps and cost per task, and explain every failure.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">04</p></div>
+</section>
+<section id="t02-benchmarks" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 02 · Performance</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Benchmarks and core capabilities</h2>
+<p style="font-size:26px;line-height:1.35">Estimated ranges from Folio3 AI's internal assessment of suitable agentic workflows. They show where agents may help; they are not guaranteed outcomes.</p>
+<div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:32px;padding:12px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:4px;border-top:4px solid #B04A14;padding:16px 0 0 0">
+<p style="font-family:'Domine', Georgia, serif;font-size:96px;font-weight:700;line-height:1.1;color:#12263A">68%</p>
+<p style="font-size:26px;line-height:1.35">straight-through processing rate</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;border-top:4px solid #B04A14;padding:16px 0 0 0">
+<p style="font-family:'Domine', Georgia, serif;font-size:96px;font-weight:700;line-height:1.1;color:#12263A">88%</p>
+<p style="font-size:26px;line-height:1.35">first-pass success rate</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;border-top:4px solid #B04A14;padding:16px 0 0 0">
+<p style="font-family:'Domine', Georgia, serif;font-size:96px;font-weight:700;line-height:1.1;color:#12263A">74%</p>
+<p style="font-size:26px;line-height:1.35">first-contact resolution rate</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;border-top:4px solid #B04A14;padding:16px 0 0 0">
+<p style="font-family:'Domine', Georgia, serif;font-size:96px;font-weight:700;line-height:1.1;color:#12263A">90%</p>
+<p style="font-size:26px;line-height:1.35">knowledge retrieval relevance</p>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:24px;padding:20px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:6px">
+<h3 style="font-size:26px;font-weight:600;line-height:1.3;color:#12263A">Business-specific reasoning</h3>
+<p style="font-size:24px;line-height:1.35">Agents apply business rules to select appropriate actions.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<h3 style="font-size:26px;font-weight:600;line-height:1.3;color:#12263A">Trusted knowledge access</h3>
+<p style="font-size:24px;line-height:1.35">Agents use governed sources for accurate company information.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<h3 style="font-size:26px;font-weight:600;line-height:1.3;color:#12263A">Tool and system integration</h3>
+<p style="font-size:24px;line-height:1.35">Agents connect with APIs, applications and business workflows.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<h3 style="font-size:26px;font-weight:600;line-height:1.3;color:#12263A">Human approval controls</h3>
+<p style="font-size:24px;line-height:1.35">High-risk actions require approval from authorized employees.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<h3 style="font-size:26px;font-weight:600;line-height:1.3;color:#12263A">Continuous monitoring</h3>
+<p style="font-size:24px;line-height:1.35">Dashboards track performance, costs, errors and exceptions.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">05</p></div>
+<aside>These four figures are Folio3's own estimates, described on the page as based on an internal assessment of suitable agentic workflows. Treat them as indicative, and ask what workflow and baseline each one came from.</aside>
+</section>
+<section id="t02-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 02 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Measuring what an agent really does</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Define each metric before building: what counts as straight-through, first-pass and resolved, and who labels it.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Capture a baseline from the current manual process, or the percentages have nothing to be compared against.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Assemble a golden set of 50 to 200 real cases with expected outcomes, including the awkward exceptions.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Score retrieval separately from the final answer, so you know which half is failing.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> The RAGAS metric definitions (context precision, faithfulness) and Hamel Husain's essays on LLM evals.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> An evaluation harness in LangSmith or Langfuse that replays the golden set on every change.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> A one-page scorecard: baseline, current rate and sample size for each of the four metrics.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">06</p></div>
+</section>
+<section id="t03-compare" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 03 · Comparison</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Custom agents versus the alternatives</h2>
+<table style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:24px;color:#55616D">
+<tr style="background:#ECE7DA"><th style="width:16%;text-align:left;color:#12263A">Capability</th><th style="width:21%;text-align:left;color:#12263A">Custom AI agents</th><th style="width:21%;text-align:left;color:#12263A">Off-the-shelf AI</th><th style="width:21%;text-align:left;color:#12263A">Generic chatbots</th><th style="width:21%;text-align:left;color:#12263A">Traditional RPA</th></tr>
+<tr><td style="color:#12263A">Business fit</td><td style="color:#12263A">Your workflows, rules</td><td>Vendor-supported flows</td><td>Common questions</td><td>Fixed, repetitive rules</td></tr>
+<tr><td style="color:#12263A">Decisions</td><td style="color:#12263A">Context within bounds</td><td>Fixed product features</td><td>Answers prompts only</td><td>Programmed rules only</td></tr>
+<tr><td style="color:#12263A">Integration</td><td style="color:#12263A">CRM, ERP, APIs, legacy</td><td>Vendor connectors</td><td>Retrieves, rarely acts</td><td>Scripts and selectors</td></tr>
+<tr><td style="color:#12263A">Knowledge</td><td style="color:#12263A">Governed data and RAG</td><td>Uploaded documents</td><td>Scripts and FAQs</td><td>Structured fields</td></tr>
+<tr><td style="color:#12263A">Exceptions</td><td style="color:#12263A">Adapts or escalates</td><td>Limited by settings</td><td>Hands off to staff</td><td>Stops or fixed rule</td></tr>
+<tr><td style="color:#12263A">Tool use</td><td style="color:#12263A">Calls APIs, updates</td><td>Vendor functions only</td><td>Answers, no actions</td><td>Fixed actions only</td></tr>
+<tr><td style="color:#12263A">Governance</td><td style="color:#12263A">Permissions and audit</td><td>Provider-dependent</td><td>Basic admin controls</td><td>Process logs only</td></tr>
+<tr><td style="color:#12263A">Oversight</td><td style="color:#12263A">Routes risky decisions</td><td>Product-dependent</td><td>Transfers hard chats</td><td>Needed when it fails</td></tr>
+<tr><td style="color:#12263A">Adaptability</td><td style="color:#12263A">Adjusts within bounds</td><td>Within vendor options</td><td>Replies, not processes</td><td>Needs redevelopment</td></tr>
+<tr><td style="color:#12263A">Scalability</td><td style="color:#12263A">Teams and multi-agent</td><td>Within vendor limits</td><td>More chats, same depth</td><td>New logic per workflow</td></tr>
+<tr><td style="color:#12263A">Best for</td><td style="color:#12263A">Complex, governed work</td><td>Standard use cases</td><td>FAQs, simple support</td><td>Stable, structured</td></tr>
+</table>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development (cells condensed)</p><p style="font-size:24px;color:#5F6973">07</p></div>
+<aside>Folio3's page gives a full sentence in each cell; this slide condenses each one to a phrase. The comparison is Folio3's own framing, so the custom-agent column is naturally the most favourable. Their summary: custom agents suit complex, high-value, multi-step workflows needing reasoning, integration and governance.</aside>
+</section>
+<section id="t03-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 03 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Choosing the right level of automation</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Start from the process, not the technology: stable, structured inputs point to RPA or plain code.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Use a chatbot or packaged tool when the task ends at an answer and no system has to change.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Justify a custom agent only where judgement, several systems and exceptions meet in one workflow.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Combine them: deterministic steps in code, and the model only at the decision points that need it.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> The workflow patterns in "Building Effective Agents": chaining, routing, orchestrator and workers.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> The same invoice-matching task three ways: a script, a single prompt and a tool-using agent.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> A decision matrix scoring the three on accuracy, cost per case, build effort and maintenance.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">08</p></div>
+</section>
+<section id="t04-services" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 04 · Services</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Six development services</h2>
+<p style="font-size:26px;line-height:1.35">End to end: strategy, design, integration, testing, deployment, governance, monitoring and optimization.</p>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;padding:12px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Strategy and discovery</h3>
+<p style="font-size:26px;line-height:1.35">Find costly bottlenecks, assess workflow suitability, estimate value and build a roadmap.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Architecture and design</h3>
+<p style="font-size:26px;line-height:1.35">Design reasoning, memory, retrieval, planning, integration, security and monitoring layers.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Multi-agent systems</h3>
+<p style="font-size:26px;line-height:1.35">Coordinated agents that divide responsibilities, manage handoffs and share context.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Business system integration</h3>
+<p style="font-size:26px;line-height:1.35">Secure connections to CRM, ERP, finance systems, databases, legacy applications and APIs.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Testing and red-teaming</h3>
+<p style="font-size:26px;line-height:1.35">Test for accuracy, unsafe behavior, policy violations, data exposure and unauthorized actions.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Deployment and optimization</h3>
+<p style="font-size:26px;line-height:1.35">Deploy monitored agents, measure impact, catch performance drift and expand use cases.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">09</p></div>
+<aside>Folio3's full names for these: AI Agent Strategy and Discovery; Custom Agent Architecture and Design; Multi-Agent System Development; Business System Integration; Agent Testing and Red-Teaming; Deployment and Managed Optimization.</aside>
+</section>
+<section id="t04-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 04 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Delivering the six services yourself</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Discovery: interview the people doing the work, map the workflow and price each delay before proposing anything.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Architecture: draw the layers (model, memory, tools, controls, monitoring) and log each choice as a decision record.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Integration: wrap each system as one well-described tool; add a second agent only for a separable role.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Test, deploy, optimize: red-team before launch, release behind approvals, then review traces weekly.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> Chip Huyen's "AI Engineering" for the full lifecycle, plus the Model Context Protocol specification.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> One service end to end, from discovery notes to a monitored deployment, for a process you know well.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> A client-style portfolio: roadmap, architecture diagram, test report and a 30-day metrics review.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">10</p></div>
+</section>
+<section id="t05-failures" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 05 · Failure modes</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Why most projects never reach production</h2>
+<p style="font-size:26px;line-height:1.35">Teams chase impressive demonstrations over ownership, integration, governance and measurable outcomes.</p>
+<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:24px;padding:12px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">The POC trap</h3>
+<p style="font-size:26px;line-height:1.35">A promising proof of concept impresses stakeholders but lacks the ownership, controls, integration architecture, deployment plan and investment case production needs.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">The generic agent ceiling</h3>
+<p style="font-size:26px;line-height:1.35">Off-the-shelf agents support simple tasks but struggle with the specific workflows, approvals, business rules, data sources and exceptions that drive operations.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Integration failure</h3>
+<p style="font-size:26px;line-height:1.35">An agent creates limited value when it cannot securely retrieve information, update records, trigger workflows or complete actions across existing systems.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">The compliance blind spot</h3>
+<p style="font-size:26px;line-height:1.35">Agents without access controls, decision boundaries, human approvals, audit trails and clear accountability create operational, financial, legal and reputational risk.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">11</p></div>
+</section>
+<section id="t05-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 05 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Getting past the pilot</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Name a business owner and a production budget before the pilot starts, with written go or no-go criteria.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Pilot against the real systems in a sandbox; a demo on copied data hides the integration risk.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Put permissions, approval steps and logging into the first version, not the last sprint.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Plan the operating model early: who watches the agent, who fixes it and who answers for its mistakes.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> Google's "Rules of Machine Learning" and the Govern and Manage functions of the NIST AI Risk Management Framework.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> A production-readiness checklist, then apply it to one of your own earlier prototypes.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> A gap report: what that prototype would need before going live, with an effort estimate for each item.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">12</p></div>
+</section>
+<section id="t06-process" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 06 · Process</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">The six-step development process</h2>
+<p style="font-size:26px;line-height:1.35">Each step validates value, feasibility, integration and security before wider deployment.</p>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;padding:12px 0 0 0">
+<div style="display:flex;flex-direction:row;gap:20px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="width:48px;font-family:'Domine', Georgia, serif;font-size:32px;font-weight:700;line-height:1.2;color:#B04A14">01</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Discovery and workflow mapping</h3>
+<p style="font-size:26px;line-height:1.35">Document objectives, current processes, delays, costs, exceptions, systems and risks.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:20px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="width:48px;font-family:'Domine', Georgia, serif;font-size:32px;font-weight:700;line-height:1.2;color:#B04A14">02</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Architecture and tool design</h3>
+<p style="font-size:26px;line-height:1.35">Select models, retrieval methods, tools, integrations, security controls and approvals.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:20px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="width:48px;font-family:'Domine', Georgia, serif;font-size:32px;font-weight:700;line-height:1.2;color:#B04A14">03</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Proof of concept build</h3>
+<p style="font-size:26px;line-height:1.35">Check the agent solves the problem with enough measurable value to justify production.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:20px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="width:48px;font-family:'Domine', Georgia, serif;font-size:32px;font-weight:700;line-height:1.2;color:#B04A14">04</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Development and integration</h3>
+<p style="font-size:26px;line-height:1.35">Build the production agent, connect required systems and establish permissions.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:20px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="width:48px;font-family:'Domine', Georgia, serif;font-size:32px;font-weight:700;line-height:1.2;color:#B04A14">05</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Testing and red-teaming</h3>
+<p style="font-size:26px;line-height:1.35">Evaluate accuracy, security threats, data leakage, unauthorized actions and escalation.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:20px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="width:48px;font-family:'Domine', Georgia, serif;font-size:32px;font-weight:700;line-height:1.2;color:#B04A14">06</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Deployment and optimization</h3>
+<p style="font-size:26px;line-height:1.35">Launch with dashboards, audit records, operating metrics and controlled updates.</p>
+</div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">13</p></div>
+<aside>Folio3 names the steps: Discovery and Workflow Mapping; Architecture and Tool Design; Proof of Concept Build; Development and System Integration; Testing and Red-Teaming; Deployment and Continuous Optimization.</aside>
+</section>
+<section id="t06-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 06 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Running the process on a real workflow</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Map the workflow as a swimlane diagram with times, volumes and exception rates at each step.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Turn the map into a tool list and a risk list; every risky action gets an approval or a hard limit.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Time-box the proof of concept to one workflow and one metric, and write down what good enough means.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Gate each stage: nothing moves to build, test or launch without evidence from the stage before.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> BPMN 2.0 basics for process mapping, and the LangGraph guides on state, checkpoints and interrupts.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> All six steps in miniature, over four weeks, on a single approval workflow.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> A stage-gate log: the evidence, the decision and who signed off at each step.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">14</p></div>
+</section>
+<section id="t07-components" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 07 · Components</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Key components of a custom agent</h2>
+<p style="font-size:26px;line-height:1.35">Every production agent combines reasoning, memory, planning, tools, controls and monitoring.</p>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;padding:12px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Agent reasoning engine</h3>
+<p style="font-size:26px;line-height:1.35">Understands objectives, weighs information, selects approved tools and picks the next action.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Memory and RAG</h3>
+<p style="font-size:26px;line-height:1.35">Connects agents to trusted organizational knowledge and preserves relevant context.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Planning module</h3>
+<p style="font-size:26px;line-height:1.35">Breaks goals into steps, checks dependencies and adjusts when conditions change.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Business tools</h3>
+<p style="font-size:26px;line-height:1.35">Search databases, update systems, call APIs, produce documents and trigger workflows.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Governance layer</h3>
+<p style="font-size:26px;line-height:1.35">Enforces permissions, action limits, approval requirements and escalation policies.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Monitoring layer</h3>
+<p style="font-size:26px;line-height:1.35">Tracks completion, accuracy, latency, exceptions, intervention rates and operating cost.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">15</p></div>
+</section>
+<section id="t07-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 07 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Engineering each component</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Reasoning: choose the smallest model that passes your evals; keep prompts versioned and tested like code.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Memory and RAG: separate short-term state from long-term knowledge; tune chunking and reranking with retrieval metrics.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Planning and tools: give each tool a typed schema, a clear description and a safe failure message; cap steps and retries.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Governance and monitoring: enforce permissions outside the model, and trace every call from the first day.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> The Reflexion and Plan-and-Solve papers, and the OpenTelemetry GenAI semantic conventions for tracing.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> A LangGraph agent with a checkpointer, a reranked retriever, three typed tools and an approval interrupt.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> An ablation table showing what each component adds to task success, latency and cost.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">16</p></div>
+</section>
+<section id="t08-engagement" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 08 · Engagement</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Engagement models and cost drivers</h2>
+<div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:24px;padding:16px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">POC sprint</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">2 to 4 weeks</h3>
+<p style="font-size:26px;line-height:1.35">Validates feasibility, integration requirements, operational risks and potential value for one carefully selected workflow.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">MVP build</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">2 to 4 months</h3>
+<p style="font-size:26px;line-height:1.35">Delivers a production-oriented agent with essential integrations, controls, monitoring and measurable initial outcomes.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Business rollout</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">6 to 12 months</h3>
+<p style="font-size:26px;line-height:1.35">Expands successful agents across functions, systems and teams with stronger governance, training and change management.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Staff augmentation</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Embedded specialists</h3>
+<p style="font-size:26px;line-height:1.35">Agent architects, AI engineers, integration developers, QA specialists and governance experts join your team.</p>
+</div>
+</div>
+<p style="font-size:26px;line-height:1.35;padding:12px 0 0 0"><span style="color:#12263A"><b>What drives cost.</b></span> Workflow complexity, the number of systems to integrate, data readiness, level of autonomy, security and compliance needs, and depth of testing. Folio3 scopes cost after discovery, and most teams start with a POC sprint.</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">17</p></div>
+<aside>The page publishes no prices. Durations are Folio3's stated ranges; staff augmentation has no stated duration.</aside>
+</section>
+<section id="t08-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 08 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Scoping and pricing agent work</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Scope by workflow, not by hours: one workflow, its systems, its exception paths and its success metric.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Estimate running cost from tokens per task times volume, then add retries, evaluation runs and monitoring.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Price the proof of concept as a small fixed commitment with a clear exit; it buys information, not software.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Put assumptions about data readiness and system access in writing; they cause most overruns.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> Model pricing and prompt-caching documentation, and Folio3's article on enterprise AI implementation cost.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> A spreadsheet cost model: tokens, calls, volume, human review time and infrastructure per month.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> A two-page POC proposal with scope, timeline, cost range, risks and go or no-go criteria.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">18</p></div>
+</section>
+<section id="t09-industries" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 09 · Industries</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Custom agents across 13 industries</h2>
+<div style="display:flex;flex-direction:row;gap:64px;padding:16px 0 0 0;align-items:start">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Healthcare</h3><p style="flex:1;font-size:26px;line-height:1.35">Clinical documentation, intake, prior authorization, care coordination.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Banking and finance</h3><p style="flex:1;font-size:26px;line-height:1.35">Fraud triage, transaction investigations and compliance reviews.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Insurance</h3><p style="flex:1;font-size:26px;line-height:1.35">Claims intake, policy verification, document review, fraud screening.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Legal</h3><p style="flex:1;font-size:26px;line-height:1.35">Contract review, obligation extraction, clause comparison, research.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Sports</h3><p style="flex:1;font-size:26px;line-height:1.35">Video analysis, event detection, player performance, coach reports.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Hospitality</h3><p style="flex:1;font-size:26px;line-height:1.35">Reservations, guest requests, service coordination, multilingual replies.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Manufacturing</h3><p style="flex:1;font-size:26px;line-height:1.35">Predictive maintenance, quality investigations, production planning.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Logistics</h3><p style="flex:1;font-size:26px;line-height:1.35">Route optimization, fleet monitoring, shipment exception handling.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Human resources</h3><p style="flex:1;font-size:26px;line-height:1.35">Resume screening, interview coordination, onboarding, staff questions.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Sales and marketing</h3><p style="flex:1;font-size:26px;line-height:1.35">Account research, lead qualification, outreach and CRM updates.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">IT help desk</h3><p style="flex:1;font-size:26px;line-height:1.35">Ticket classification, approved fixes, diagnostics and escalation.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Accounting</h3><p style="flex:1;font-size:26px;line-height:1.35">Collections, invoice matching, reconciliation, financial reporting.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline;padding:0 0 10px 0;border-bottom:1px solid #E2DDD0"><h3 style="width:220px;font-size:26px;font-weight:600;line-height:1.35;color:#12263A">Education</h3><p style="flex:1;font-size:26px;line-height:1.35">Enrollment, student inquiries, advising and course discovery.</p></div>
+<p style="font-size:26px;line-height:1.35;color:#B04A14">In every sector, sensitive or consequential decisions stay with authorized people.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">19</p></div>
+<aside>Each line lists the main workflows Folio3 names for that industry; the page gives slightly longer descriptions. The page also links dedicated solution pages for customer service, go-to-market, standard operating procedure and real estate agents.</aside>
+</section>
+<section id="t09-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 09 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Learning a domain well enough to build</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Choose one or two industries and learn their workflows, vocabulary, records and regulators before any code.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Look for the document-heavy, rule-bound, high-volume task; that is where agents pay back first.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Learn the domain's system of record and its interface: FHIR in healthcare, core banking APIs, an ERP.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Keep the licensed professional as the final decision-maker, and design the agent around their review.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> One domain standard in depth, such as HL7 FHIR, or your banking regulator's guidance on AI and outsourcing.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> A domain agent on public or synthetic data, such as a contract clause extractor or an invoice matcher.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> Ask a practitioner from that field to review 30 outputs, and record what they would change.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">20</p></div>
+</section>
+<section id="t10-governance" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 10 · Governance</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Governance and compliance in every agent</h2>
+<p style="font-size:26px;line-height:1.35">Built into access, data use, approvals, tool permissions, testing and monitoring from the beginning.</p>
+<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:24px;padding:12px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Human-in-the-loop safeguards</h3>
+<p style="font-size:26px;line-height:1.35">Route uncertain, sensitive, high-value or policy-defined decisions to authorized employees before consequential actions are completed.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Permission-aware tools</h3>
+<p style="font-size:26px;line-height:1.35">Restrict the information, platforms, records, APIs and actions each agent can access according to its operational role.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Audit-ready logging</h3>
+<p style="font-size:26px;line-height:1.35">Capture prompts, retrieved information, tool calls, actions, approvals, exceptions, failures, interventions and final outcomes.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Risk-based testing</h3>
+<p style="font-size:26px;line-height:1.35">Evaluate misuse scenarios, data exposure, unauthorized actions, hallucinations, operational failures and unexpected user behavior.</p>
+</div>
+</div>
+<p style="font-size:26px;line-height:1.35;padding:8px 0 0 0"><span style="color:#12263A"><b>AI Guardian.</b></span> Where enterprise LLM controls matter, agents join the Guardian agent registry and inherit its identity controls, data redaction, spend tracking and audit logging.</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">21</p></div>
+<aside>AI Guardian is Folio3's separate governance product for policy, audit and cost oversight of LLM use. The FAQ says third-party and custom agents can plug into its agent registry.</aside>
+</section>
+<section id="t10-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 10 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Making governance real</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Classify every tool action by risk: read-only, reversible write, irreversible or financial. Approvals follow the class.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Enforce permissions in the tool layer with the user's own identity, never by asking the model to behave.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Log each run as a trace: prompt, retrieved context, tool calls, approvals and outcome, with retention rules.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Red-team before launch for prompt injection, data leakage and excessive agency, and again after each change.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> The OWASP Top 10 for LLM Applications, the NIST AI RMF with its Generative AI Profile, and ISO/IEC 42001.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> An approval interrupt and role-based tool access in LangGraph, then attack it with garak, PyRIT or promptfoo.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> A risk register and a red-team report listing each attack, its result and the fix.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">22</p></div>
+</section>
+<section id="t11-stack" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 11 · Technology</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">The technology ecosystem</h2>
+<p style="font-size:26px;line-height:1.35">Chosen for flexible model selection, secure deployment, governed knowledge access and reliable orchestration.</p>
+<div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:24px;padding:12px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:16px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:26px;font-weight:600;line-height:1.3;color:#12263A">Large language models</h3>
+<p style="font-size:26px;line-height:1.5">OpenAI<br>Anthropic<br>Google Gemini<br>Llama<br>Mistral</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:26px;font-weight:600;line-height:1.3;color:#12263A">Agent orchestration</h3>
+<p style="font-size:26px;line-height:1.5">LangGraph<br>CrewAI<br>AutoGen<br>n8n</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:26px;font-weight:600;line-height:1.3;color:#12263A">Business integration</h3>
+<p style="font-size:26px;line-height:1.5">Salesforce<br>SAP<br>ServiceNow<br>Databases<br>Legacy systems<br>REST APIs</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:26px;font-weight:600;line-height:1.3;color:#12263A">Cloud deployment</h3>
+<p style="font-size:26px;line-height:1.5">Microsoft Azure<br>AWS<br>Google Cloud<br>Docker<br>Kubernetes</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:26px;font-weight:600;line-height:1.3;color:#12263A">Knowledge infrastructure</h3>
+<p style="font-size:26px;line-height:1.5">Pinecone<br>Weaviate<br>ChromaDB<br>Governed RAG pipelines<br>Enterprise databases</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">23</p></div>
+</section>
+<section id="t11-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 11 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Getting fluent in the stack</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Go deep on one tool per layer and stay literate in the rest; breadth without depth does not ship.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Hide the model behind a thin interface so providers can be swapped and compared on your own evals.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Pick the orchestrator by need: LangGraph for stateful control, CrewAI or AutoGen for role-based teams, n8n for low-code flows.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Containerize early; an agent that only runs in a notebook has not been integrated with anything.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> The LangGraph, CrewAI and AutoGen quick-starts side by side, plus one vector database's indexing and filtering guide.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> The same agent in two orchestrators, on Chroma locally and Pinecone or Weaviate hosted, shipped in Docker.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> Deploy it to one cloud with an authenticated endpoint, managed secrets and a load test.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">24</p></div>
+</section>
+<section id="t12-scenario" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 12 · Illustrative scenario</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Worked scenario: prior authorization</h2>
+<p style="font-size:26px;line-height:1.35">A healthcare network handling prior authorization across several hospitals faces recurring delays, administrative workload and growing backlogs. Folio3 presents this as a representative scenario, not a named client result.</p>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;padding:12px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:6px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Authorization processing</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Days to hours</h3>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Administrative workload</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Meaningfully reduced</h3>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#FFFDF8;padding:28px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Deployment scale</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Multi-site rollout</h3>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:64px;padding:16px 0 0 0;align-items:start">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;flex-direction:row;gap:16px;align-items:start"><x-icon name="Check" style="color:#B04A14;width:32px;height:32px;font-size:25px">✓</x-icon><p style="flex:1;font-size:26px;line-height:1.35">A purpose-specific agent is built around the network's existing prior authorization workflow.</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:start"><x-icon name="Check" style="color:#B04A14;width:32px;height:32px;font-size:25px">✓</x-icon><p style="flex:1;font-size:26px;line-height:1.35">Repetitive document processing, information retrieval and case routing are automated.</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:start"><x-icon name="Check" style="color:#B04A14;width:32px;height:32px;font-size:25px">✓</x-icon><p style="flex:1;font-size:26px;line-height:1.35">Authorization steps are coordinated across hospital teams and existing operational systems.</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;flex-direction:row;gap:16px;align-items:start"><x-icon name="Check" style="color:#B04A14;width:32px;height:32px;font-size:25px">✓</x-icon><p style="flex:1;font-size:26px;line-height:1.35">Defined decision boundaries escalate incomplete, uncertain or sensitive cases to employees.</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:start"><x-icon name="Check" style="color:#B04A14;width:32px;height:32px;font-size:25px">✓</x-icon><p style="flex:1;font-size:26px;line-height:1.35">Human approval checkpoints remain for decisions needing clinical or administrative oversight.</p></div>
+<div style="display:flex;flex-direction:row;gap:16px;align-items:start"><x-icon name="Check" style="color:#B04A14;width:32px;height:32px;font-size:25px">✓</x-icon><p style="flex:1;font-size:26px;line-height:1.35">Workflow monitoring, exception tracking and performance reporting begin on day one.</p></div>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">25</p></div>
+<aside>The page labels this an illustrative deployment scenario and a representative view. The three outcome labels are qualitative; no measured figures are given. Folio3's actual agentic AI case studies are linked separately from the page.</aside>
+</section>
+<section id="t12-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 12 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Building a prior authorization agent</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Learn the workflow: request, clinical documentation, payer rules, decision, appeal, and where each delay occurs.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Split the work: extraction and document checks for the agent, medical-necessity judgement for clinicians.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Integrate through standards where they exist, such as FHIR and X12 278, instead of scraping payer portals.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Treat patient data as regulated from the first prototype: synthetic test data, access logs, minimum necessary access.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> The CMS prior authorization rule (CMS-0057-F), the Da Vinci PAS implementation guide and a HIPAA Security Rule summary.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> A prototype on Synthea synthetic patients that assembles a request packet and flags missing documents.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> Compare turnaround and missing-document rate with a manual baseline on 50 synthetic cases.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">26</p></div>
+<aside>The standards named here are United States ones, matching the market Folio3's scenario describes. For another country, substitute the local payer rules and health-data law.</aside>
+</section>
+<section id="t13-why" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 13 · Differentiators</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Why clients choose Folio3</h2>
+<p style="font-size:26px;line-height:1.35">Folio3's stated figures: 20+ years of engineering, 950+ projects delivered worldwide, 99% client satisfaction.</p>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;padding:12px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">End-to-end delivery partner</h3>
+<p style="font-size:26px;line-height:1.35">One accountable team from discovery and architecture through deployment and optimization.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">20+ years of engineering</h3>
+<p style="font-size:26px;line-height:1.35">Long engineering experience fits agents to real enterprise systems and security needs.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">AI readiness methodology</h3>
+<p style="font-size:26px;line-height:1.35">The Folio3 AI AIR Framework evaluates readiness, prioritizes opportunities and flags risks.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Multi-agent orchestration</h3>
+<p style="font-size:26px;line-height:1.35">Coordinated agents with defined responsibilities, controlled handoffs and traceability.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Governance-first architecture</h3>
+<p style="font-size:26px;line-height:1.35">Governance embedded into access, data use, model choice, tool permissions and approvals.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Transparent ROI measurement</h3>
+<p style="font-size:26px;line-height:1.35">Documented baselines, operating metrics and dashboards make agent value visible.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">27</p></div>
+<aside>These are Folio3's own claims about itself and have not been independently verified. Worth asking for references and a comparable case study in a first meeting.</aside>
+</section>
+<section id="t13-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 13 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Building a comparable delivery practice</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Offer one accountable path from discovery to operations; clients buy outcomes, not separate specialists.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Create your own readiness assessment: data, systems, people and risk appetite, scored the same way every time.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Document two or three reference builds with baselines and results; evidence wins more work than claims.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Make measurement part of the contract: agreed metrics, a dashboard and a review date.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> Three agentic AI case studies from different vendors, noting how each one evidences its results.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> A readiness questionnaire and scoring sheet, then trial it on two organizations you can access.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> Publish one case study of your own with baseline, method, result and limitations.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">28</p></div>
+</section>
+<section id="t14-team" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 14 · Team</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">The team behind the build</h2>
+<p style="font-size:26px;line-height:1.35">Folio3's custom agent work is led by specialists spanning AI architecture and engineering, from agent design through production deployment.</p>
+<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:24px;padding:12px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">AI and ML lead</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Abdul Sami</h3>
+<p style="font-size:26px;line-height:1.35;color:#12263A">Head of AI and Machine Learning, Senior Software Architect</p>
+<p style="font-size:26px;line-height:1.35">Leads the engineering behind Folio3's agent and machine learning systems: reasoning architecture, tool integration and production-grade deployment. 20+ years in enterprise AI and software architecture.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">AI engineering lead</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Aneeq Hashmi</h3>
+<p style="font-size:26px;line-height:1.35;color:#12263A">Director of Engineering, AI and Machine Learning</p>
+<p style="font-size:26px;line-height:1.35">Leads engineering across agent architecture, model implementation, intelligent automation and scalable deployment. 18+ years in software engineering and enterprise delivery.</p>
+</div>
+</div>
+<p style="font-size:26px;line-height:1.35;padding:8px 0 0 0"><span style="color:#12263A"><b>Reaching them.</b></span> contact@folio3.ai, +1 408 365-4638, or the form at folio3.ai/contact-us. Both leads have profile and LinkedIn links on the service page.</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development</p><p style="font-size:24px;color:#5F6973">29</p></div>
+</section>
+<section id="t14-faq" data-transition="fade" style="background:#F7F5EF;color:#3D4A57;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B04A14">Folio3 · Topic 14 · FAQs</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#12263A">Questions the page answers</h2>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;padding:16px 0 0 0">
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Agent or chatbot?</h3>
+<p style="font-size:26px;line-height:1.35">A chatbot answers questions. An agent retrieves information, uses tools, updates systems and completes multi-step workflows.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">How long does it take?</h3>
+<p style="font-size:26px;line-height:1.35">From a two-to-four-week validation sprint to a multi-month enterprise rollout, depending on scope and readiness.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">Will it fit our systems?</h3>
+<p style="font-size:26px;line-height:1.35">Yes: CRM, ERP, finance applications, databases, APIs, legacy systems and internal tools, through secure integrations.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">What stops rogue actions?</h3>
+<p style="font-size:26px;line-height:1.35">Role-based permissions, action limits, approval checkpoints, audit logging, red-teaming and human escalation.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">How is ROI measured?</h3>
+<p style="font-size:26px;line-height:1.35">Against documented baselines: processing time, cost per task, intervention rate, throughput and error rate.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#FFFDF8;padding:32px;border:1px solid #E2DDD0;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#12263A">What should we prepare?</h3>
+<p style="font-size:26px;line-height:1.35">One high-value workflow, the systems and data it touches, who approves risky actions, and how success is measured.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#5F6973">Source: folio3.ai/services/ai-agent-development (questions shortened)</p><p style="font-size:24px;color:#5F6973">30</p></div>
+<aside>The page has nine FAQs. The three not shown cover what an agent development company does, what drives cost (covered on the engagement slide) and governing agents with AI Guardian (covered on the governance slide).</aside>
+</section>
+<section id="t14-path" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · Topic 14 · How to achieve it</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">Preparing the first conversation</h2>
+<div style="display:flex;flex-direction:row;gap:56px;padding:24px 0 0 0;align-items:start">
+<div style="flex:7;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2A65A">How to achieve it</h3>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">1</p><p style="flex:1;font-size:26px;line-height:1.35">Bring one high-value workflow, described step by step, with the systems and data it touches.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">2</p><p style="flex:1;font-size:26px;line-height:1.35">Bring a baseline for that workflow today: processing time, workload, cost per task or error rate.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">3</p><p style="flex:1;font-size:26px;line-height:1.35">Say who approves risky actions, and what the agent must never do without them.</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:baseline"><p style="width:32px;font-size:26px;font-weight:600;color:#F2A65A">4</p><p style="flex:1;font-size:26px;line-height:1.35">Propose a POC sprint on that workflow, and ask how success, cost and ownership of the work will be defined.</p></div>
+</div>
+<div style="flex:6;display:flex;flex-direction:column;gap:22px;background:#1B3550;padding:40px;border:1px solid #2C4763;border-radius:12px">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#7CC4D8">Study plan</h3>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Read.</b></span> Folio3's agentic AI case studies and its AI Guardian page, so your questions start from what they have built.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Build.</b></span> A two-page brief: problem, workflow map, baseline, constraints, success metric and the role you would play.</p>
+<p style="font-size:26px;line-height:1.35"><span style="color:#7CC4D8"><b>Prove.</b></span> Rehearse it as a ten-minute pitch until each likely question has a one-sentence answer.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Steps 1 to 3 follow Folio3's own FAQ; the rest is independent guidance</p><p style="font-size:24px;color:#9FB0C0">31</p></div>
+</section>
+<section id="roadmap" data-transition="fade" style="background:#12263A;color:#EDEAE0;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Your path · All topics · Study roadmap</p>
+<h2 style="font-family:'Domine', Georgia, serif;font-size:56px;font-weight:700;line-height:1.1;color:#F7F5EF">A 12-week study roadmap</h2>
+<div style="display:flex;flex-direction:column;padding:20px 0 0 0">
+<div style="display:flex;flex-direction:row;gap:24px;padding:0 0 12px 0;border-bottom:2px solid #F2A65A">
+<p style="width:150px;font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Weeks</p>
+<p style="width:190px;font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Topics</p>
+<p style="width:440px;font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Focus</p>
+<p style="flex:1;font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">What you finish with</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;padding:16px 0 16px 0;border-bottom:1px solid #2C4763">
+<p style="width:150px;font-size:26px;font-weight:600;line-height:1.35;color:#F7F5EF">1 to 2</p>
+<p style="width:190px;font-size:26px;line-height:1.35;color:#C4D0DB">01 to 03</p>
+<p style="width:440px;font-size:26px;line-height:1.35;color:#F7F5EF">Foundations and evaluation</p>
+<p style="flex:1;font-size:26px;line-height:1.35">Bare tool-calling agent, golden set and scorecard</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;padding:16px 0 16px 0;border-bottom:1px solid #2C4763">
+<p style="width:150px;font-size:26px;font-weight:600;line-height:1.35;color:#F7F5EF">3 to 4</p>
+<p style="width:190px;font-size:26px;line-height:1.35;color:#C4D0DB">04 to 07</p>
+<p style="width:440px;font-size:26px;line-height:1.35;color:#F7F5EF">Process and components</p>
+<p style="flex:1;font-size:26px;line-height:1.35">LangGraph agent with retrieval, tools and approvals</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;padding:16px 0 16px 0;border-bottom:1px solid #2C4763">
+<p style="width:150px;font-size:26px;font-weight:600;line-height:1.35;color:#F7F5EF">5 to 6</p>
+<p style="width:190px;font-size:26px;line-height:1.35;color:#C4D0DB">08 and 11</p>
+<p style="width:440px;font-size:26px;line-height:1.35;color:#F7F5EF">Stack, integration and cost</p>
+<p style="flex:1;font-size:26px;line-height:1.35">Two orchestrators, a cloud deployment and a cost model</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;padding:16px 0 16px 0;border-bottom:1px solid #2C4763">
+<p style="width:150px;font-size:26px;font-weight:600;line-height:1.35;color:#F7F5EF">7 to 8</p>
+<p style="width:190px;font-size:26px;line-height:1.35;color:#C4D0DB">10</p>
+<p style="width:440px;font-size:26px;line-height:1.35;color:#F7F5EF">Governance and red-teaming</p>
+<p style="flex:1;font-size:26px;line-height:1.35">Risk register, role-based tools and a red-team report</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;padding:16px 0 16px 0;border-bottom:1px solid #2C4763">
+<p style="width:150px;font-size:26px;font-weight:600;line-height:1.35;color:#F7F5EF">9 to 10</p>
+<p style="width:190px;font-size:26px;line-height:1.35;color:#C4D0DB">09 and 12</p>
+<p style="width:440px;font-size:26px;line-height:1.35;color:#F7F5EF">Domain depth</p>
+<p style="flex:1;font-size:26px;line-height:1.35">Domain prototype on synthetic data, reviewed by a practitioner</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;padding:16px 0 16px 0;border-bottom:1px solid #2C4763">
+<p style="width:150px;font-size:26px;font-weight:600;line-height:1.35;color:#F7F5EF">11 to 12</p>
+<p style="width:190px;font-size:26px;line-height:1.35;color:#C4D0DB">05, 13, 14</p>
+<p style="width:440px;font-size:26px;line-height:1.35;color:#F7F5EF">Delivery practice</p>
+<p style="flex:1;font-size:26px;line-height:1.35">Readiness checklist, case study, POC proposal and pitch</p>
+</div>
+</div>
+<p style="font-size:26px;line-height:1.35;color:#C4D0DB;padding:8px 0 0 0">Each fortnight ends with something you can show, which is what a delivery partner will ask to see.</p>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:24px;color:#9FB0C0">Independent guidance, not Folio3 material</p><p style="font-size:24px;color:#9FB0C0">32</p></div>
+<aside>The roadmap strings together the read, build and prove steps from the fourteen dark slides. The pace assumes steady part-time study; stretch the calendar if needed, but keep the outputs.</aside>
+</section>
+
+</div></div>
+<div id="bar"><a href="pres.htm">← Presentations</a><button onclick="go(i-1)">‹ Prev</button><span id="n"></span><button onclick="go(i+1)">Next ›</button><span>← → keys · F for full screen</span></div>
+<script>
+const S=[...document.querySelectorAll('section')],f=document.getElementById('frame'),n=document.getElementById('n');let i=0;
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);f.style.transform='scale('+s+')'}
+function go(k){i=Math.max(0,Math.min(S.length-1,k));S.forEach((s,j)=>s.classList.toggle('on',j===i));n.textContent=(i+1)+' / '+S.length;history.replaceState(null,'','#'+(i+1))}
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){go(i+1);e.preventDefault()}else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){go(i-1);e.preventDefault()}else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);else if(e.key==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}});
+document.getElementById('stage').addEventListener('click',e=>{if(e.target.closest('a'))return;go(e.clientX<innerWidth/3?i-1:i+1)});
+let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX);addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>40)go(d<0?i+1:i-1);tx=null});
+fit();go((parseInt(location.hash.slice(1))||1)-1);
+</script></body></html>

@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Inference — Faiz ul haque Zeya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#111;overflow:hidden;font-family:Arial,sans-serif}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#frame{width:1920px;height:1080px;position:relative;transform-origin:center center;flex:none;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+section{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden}
+section:not(.on){display:none!important}
+section *{margin:0}
+section aside{display:none!important}
+section ul,section ol{padding-left:1.3em}
+section table{border-collapse:collapse;width:100%}
+section th,section td{padding:.45em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(127,127,127,.25)}
+section div,section p,section h1,section h2,section h3{position:relative}
+section [style*="position:absolute"],section [style*="position: absolute"]{position:absolute}
+x-shape{display:block;flex:none}
+x-shape[kind=ellipse]{border-radius:50%}
+x-shape[kind=rounded]{border-radius:16px}
+x-shape[kind=arrow-right]{clip-path:polygon(0 30%,65% 30%,65% 0,100% 50%,65% 100%,65% 70%,0 70%)}
+x-shape[kind=arrow-left]{clip-path:polygon(100% 30%,35% 30%,35% 0,0 50%,35% 100%,35% 70%,100% 70%)}
+x-connector{display:block;flex:none;align-self:center;height:0;border-top-style:solid;border-top-color:currentColor;position:relative}
+x-connector::after{content:"";position:absolute;right:-2px;top:-11px;border:9px solid transparent;border-left:14px solid currentColor;border-right:0}
+x-connector[from=tr]::after{right:auto;left:-2px;border-left:0;border-right:14px solid currentColor}
+x-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;line-height:1}
+#bar{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:16px;padding:8px;background:rgba(0,0,0,.55);color:#eee;font:14px Arial,sans-serif;opacity:.15;transition:opacity .2s}
+#bar:hover{opacity:1}
+#bar button{background:#333;color:#eee;border:1px solid #555;border-radius:6px;padding:6px 14px;cursor:pointer;font:inherit}
+#bar a{color:#9cf}
+</style></head><body>
+<div id="stage"><div id="frame">
+<section id="cover" data-transition="fade" style="background:#14213D;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;color:#F2A65A;letter-spacing:2px">tokenize → prefill → decode → serve</p>
+<div style="display:flex;flex-direction:column;gap:36px">
+<div style="width:140px;height:8px;background:#F2A65A;border-radius:4px"></div>
+<h1 style="font-size:140px;font-weight:700;line-height:1.02;color:#F2EFE8">LLM Inference</h1>
+<div style="width:1300px">
+<p style="font-size:44px;line-height:1.3;color:#B9C6D8">How large language models turn prompts into tokens — and how we make that fast and cheap</p>
+</div>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:end">
+<p style="font-size:30px;font-weight:500;color:#F2EFE8">Prof. Engr. Faiz ul Haque Zeya</p>
+<p style="font-size:26px;color:#B9C6D8">[Course] · [Date]</p>
+</div>
+<aside>Welcome. Today we look at the other half of the LLM life cycle: not training, but serving. By the end you should be able to explain why generation is slow, what the KV cache is, and which optimizations matter for latency versus throughput.</aside>
+</section>
+<section id="agenda" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Outline</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Roadmap: where does the time go?</h2>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:24px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:600;color:#B4531A">01</p>
+<h3 style="font-size:34px;font-weight:600;line-height:1.2;color:#14213D">Foundations</h3>
+<p style="font-size:24px;line-height:1.4;color:#3E4A5C">Prefill, decode, sampling and the metrics we serve against</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:600;color:#B4531A">02</p>
+<h3 style="font-size:34px;font-weight:600;line-height:1.2;color:#14213D">The memory wall</h3>
+<p style="font-size:24px;line-height:1.4;color:#3E4A5C">Roofline thinking and the KV cache</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:600;color:#B4531A">03</p>
+<h3 style="font-size:34px;font-weight:600;line-height:1.2;color:#14213D">Serving systems</h3>
+<p style="font-size:24px;line-height:1.4;color:#3E4A5C">Continuous batching, paging, prefix caching, disaggregation</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:600;color:#B4531A">04</p>
+<h3 style="font-size:34px;font-weight:600;line-height:1.2;color:#14213D">Kernels &amp; numerics</h3>
+<p style="font-size:24px;line-height:1.4;color:#3E4A5C">FlashAttention, quantization, FP8 and FP4</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:600;color:#B4531A">05</p>
+<h3 style="font-size:34px;font-weight:600;line-height:1.2;color:#14213D">Smarter decoding</h3>
+<p style="font-size:24px;line-height:1.4;color:#3E4A5C">Speculative decoding and EAGLE</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:600;color:#B4531A">06</p>
+<h3 style="font-size:34px;font-weight:600;line-height:1.2;color:#14213D">Scaling out</h3>
+<p style="font-size:24px;line-height:1.4;color:#3E4A5C">Parallelism, mixture-of-experts, hardware</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:600;color:#B4531A">07</p>
+<h3 style="font-size:34px;font-weight:600;line-height:1.2;color:#14213D">In practice</h3>
+<p style="font-size:24px;line-height:1.4;color:#3E4A5C">Engines, reasoning workloads, playbook, lab</p>
+</div>
+<div style="display:flex;flex-direction:column;justify-content:center;gap:12px;background:#14213D;border-radius:16px;padding:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Goal</p>
+<p style="font-size:28px;line-height:1.35;color:#F2EFE8">Reason about any serving setup from first principles</p>
+</div>
+</div>
+<aside>Each part builds on the previous one. Parts 1 and 2 give the mental model; parts 3 to 6 are the toolbox; part 7 turns it into practice.</aside>
+</section>
+<section id="why" data-transition="fade" style="background:#F2A65A;color:#14213D;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#14213D">Why inference matters</p>
+<h1 style="font-size:96px;font-weight:700;line-height:1.08;color:#14213D">Training happens once.<br>Inference runs on every request, for the life of the model.</h1>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;border-top:4px solid #14213D;padding:24px 0 0 0">
+<h3 style="font-size:36px;font-weight:600;color:#14213D">Cost</h3>
+<p style="font-size:28px;line-height:1.4;color:#14213D">Every generated token consumes GPU time; at scale this dominates the bill</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;border-top:4px solid #14213D;padding:24px 0 0 0">
+<h3 style="font-size:36px;font-weight:600;color:#14213D">Latency</h3>
+<p style="font-size:28px;line-height:1.4;color:#14213D">Users feel the wait for the first token and the speed of the stream</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;border-top:4px solid #14213D;padding:24px 0 0 0">
+<h3 style="font-size:36px;font-weight:600;color:#14213D">Scale</h3>
+<p style="font-size:28px;line-height:1.4;color:#14213D">Agents and reasoning models chain many long calls per task</p>
+</div>
+</div>
+<aside>Frame the lecture: a model is trained once, but served billions of times. Ask the class which of the three — cost, latency, scale — matters most for a chatbot, a batch summarizer, and a coding agent. The answers differ, and so do the optimizations.</aside>
+</section>
+<section id="pipeline" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Foundations</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">The inference pipeline</h2>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:28px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Tokenize</h3>
+<p style="font-size:24px;line-height:1.35;color:#3E4A5C">Text → token IDs</p>
+</div>
+<x-shape kind="arrow-right" style="width:56px;height:28px;background:#B4531A"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#E4ECF6;border:1px solid #2F6FB0;border-radius:16px;padding:28px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Prefill</h3>
+<p style="font-size:24px;line-height:1.35;color:#3E4A5C">Whole prompt in one parallel pass</p>
+</div>
+<x-shape kind="arrow-right" style="width:56px;height:28px;background:#B4531A"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:28px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">KV cache</h3>
+<p style="font-size:24px;line-height:1.35;color:#3E4A5C">Keys and values stored per token</p>
+</div>
+<x-shape kind="arrow-right" style="width:56px;height:28px;background:#B4531A"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FBE9D8;border:1px solid #B4531A;border-radius:16px;padding:28px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Decode</h3>
+<p style="font-size:24px;line-height:1.35;color:#3E4A5C">One token per step, in a loop</p>
+</div>
+<x-shape kind="arrow-right" style="width:56px;height:28px;background:#B4531A"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:28px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Stream</h3>
+<p style="font-size:24px;line-height:1.35;color:#3E4A5C">Detokenize and send to the user</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<p style="font-size:26px;font-weight:600;color:#14213D">The decode loop, step by step</p>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#E4ECF6;color:#14213D;padding:10px 18px;border-radius:10px">Explain</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#E4ECF6;color:#14213D;padding:10px 18px;border-radius:10px">the</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#E4ECF6;color:#14213D;padding:10px 18px;border-radius:10px">KV</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#E4ECF6;color:#14213D;padding:10px 18px;border-radius:10px">cache</p>
+<p style="font-size:26px;color:#3E4A5C">→</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#FBE9D8;color:#14213D;padding:10px 18px;border-radius:10px">The</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#FBE9D8;color:#14213D;padding:10px 18px;border-radius:10px">KV</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#FBE9D8;color:#14213D;padding:10px 18px;border-radius:10px">cache</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#FBE9D8;color:#14213D;padding:10px 18px;border-radius:10px">stores</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;border:2px dashed #B4531A;color:#B4531A;padding:8px 16px;border-radius:10px">next?</p>
+</div>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Blue = prompt tokens (prefilled together). Orange = generated tokens: each needs a full forward pass that reads all weights plus the growing KV cache.</p>
+</div>
+<aside>Walk the pipeline left to right. Emphasize the asymmetry: the prompt is processed in one big parallel pass, but output is produced one token at a time. Everything later in the lecture attacks one of these two phases.</aside>
+</section>
+<section id="autoreg" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Foundations</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Generation is a loop: score, sample, append</h2>
+</div>
+<div style="display:flex;gap:40px;align-items:start">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#14213D;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Pseudocode</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.65;color:#E9EEF5">logits, kv = prefill(prompt)<br>tok = sample(logits)<br>while tok != EOS and n &lt; max_new:<br>&#160;&#160;&#160;&#160;emit(tok)<br>&#160;&#160;&#160;&#160;logits, kv = decode_step(tok, kv)<br>&#160;&#160;&#160;&#160;tok = sample(logits / T)</p>
+<p style="font-size:26px;line-height:1.4;color:#B9C6D8">Each iteration depends on the previous token, so steps cannot run in parallel for one sequence.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:26px;font-weight:600;color:#14213D">Sampling turns logits into one token</p>
+<table style="font-size:26px;color:#1B2433">
+<tr><th style="width:32%;text-align:left">Method</th><th style="width:68%;text-align:left">What it does</th></tr>
+<tr><td>Greedy</td><td>Always pick the most likely token</td></tr>
+<tr><td>Temperature T</td><td>T &lt; 1 sharpens, T &gt; 1 flattens</td></tr>
+<tr><td>Top-k</td><td>Sample from the k most likely tokens</td></tr>
+<tr><td>Top-p</td><td>Smallest set whose probability ≥ p</td></tr>
+<tr><td>Min-p</td><td>Drop tokens below p × the top probability</td></tr>
+</table>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Sampling is cheap; the forward pass that produces the logits is the expensive part.</p>
+</div>
+</div>
+<aside>Point out the data dependency: token n+1 needs token n. That is why we cannot parallelize decode within a sequence, and why later tricks like batching and speculative decoding exist. Sampling choices change output quality, not speed.</aside>
+</section>
+<section id="phases" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Foundations</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Two phases with opposite bottlenecks</h2>
+</div>
+<table style="font-size:28px;color:#1B2433">
+<tr><th style="width:24%;text-align:left">&#160;</th><th style="width:38%;text-align:left;color:#2F6FB0">Prefill</th><th style="width:38%;text-align:left;color:#B4531A">Decode</th></tr>
+<tr><td><b>Input per step</b></td><td>All prompt tokens at once</td><td>One new token per sequence</td></tr>
+<tr><td><b>Math shape</b></td><td>Matrix × matrix (big GEMMs)</td><td>Matrix × vector (GEMV)</td></tr>
+<tr><td><b>Bottleneck</b></td><td>Compute-bound (FLOPs)</td><td>Memory-bandwidth-bound (bytes)</td></tr>
+<tr><td><b>User sees</b></td><td>Time to first token</td><td>Speed of the token stream</td></tr>
+<tr><td><b>Main levers</b></td><td>FlashAttention, prefix caching, chunking</td><td>Batching, quantization, speculative decoding</td></tr>
+</table>
+<div style="display:flex;gap:20px;align-items:center;background:#14213D;border-radius:16px;padding:32px 40px">
+<x-icon name="Lightbulb" style="width:48px;height:48px;color:#F2A65A;font-size:38px">💡</x-icon>
+<p style="font-size:30px;line-height:1.35;color:#F2EFE8">Most of the rest of this lecture is about keeping both phases busy without letting one hurt the other.</p>
+</div>
+<aside>This is the single most important table in the deck. Prefill looks like training: large matrix multiplies that saturate tensor cores. Decode looks nothing like training: tiny amounts of math per byte read. Optimizations that help one phase often do nothing, or harm, the other.</aside>
+</section>
+<section id="metrics" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Foundations</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Four numbers every serving team watches</h2>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:24px">
+<div style="display:flex;flex-direction:column;gap:14px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:52px;font-weight:600;color:#2F6FB0">TTFT</p>
+<h3 style="font-size:30px;font-weight:600;line-height:1.2;color:#14213D">Time to first token</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Queueing plus prefill. How long until something appears.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:52px;font-weight:600;color:#2F6FB0">ITL</p>
+<h3 style="font-size:30px;font-weight:600;line-height:1.2;color:#14213D">Inter-token latency</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Also TPOT. Gap between streamed tokens; set by decode.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:52px;font-weight:600;color:#2F6FB0">tok/s</p>
+<h3 style="font-size:30px;font-weight:600;line-height:1.2;color:#14213D">Throughput</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Output tokens per second across all users. Sets cost per token.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:52px;font-weight:600;color:#2F6FB0">Goodput</p>
+<h3 style="font-size:30px;font-weight:600;line-height:1.2;color:#14213D">Requests within SLO</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Requests/s meeting targets, e.g. P99 TTFT and P99 ITL limits.</p>
+</div>
+</div>
+<div style="display:flex;gap:20px;align-items:center;border-left:6px solid #B4531A;padding:8px 0 8px 28px">
+<p style="font-size:30px;line-height:1.4;color:#14213D">The core trade-off: <b>bigger batches raise throughput but slow every individual stream.</b> Always report tail latency (P99), not just averages.</p>
+</div>
+<aside>Define each metric precisely, since students will use them in the lab. Goodput is the honest metric: throughput only counts if the requests behind it met the latency promise. Mention that average latency hides the users who had a bad experience.</aside>
+</section>
+<section id="d-memory" data-transition="push" style="background:#14213D;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:44px;font-weight:600;color:#F2A65A">02</p>
+<h1 style="font-size:112px;font-weight:700;line-height:1.05;color:#F2EFE8">The memory wall</h1>
+<div style="width:1300px">
+<p style="font-size:40px;line-height:1.35;color:#B9C6D8">Why decode speed is set by bytes moved, not FLOPs — and why the KV cache becomes the central resource</p>
+</div>
+<aside>Transition: we have the vocabulary; now we build the mental model that explains almost every optimization that follows.</aside>
+</section>
+<section id="roofline" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">The memory wall</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">The roofline model explains decode</h2>
+</div>
+<div style="display:flex;gap:48px;align-items:start">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;background:#14213D;color:#F2EFE8;padding:20px 28px;border-radius:12px">intensity = FLOPs ÷ bytes moved</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C"><b>H100 SXM:</b> ~989 TFLOPS dense BF16 vs 3.35 TB/s HBM → the ridge is at <b>≈ 295 FLOP/byte</b>.</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C"><b>Decode</b> reads each 2-byte weight once per step and does ~2 FLOPs with it per sequence → intensity ≈ <b>batch size</b>.</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C">At batch 1 the GPU reaches about <b>0.3% of peak compute</b>. Prefill of a long prompt sits on the flat roof.</p>
+</div>
+<div style="position:relative;width:760px;height:520px">
+<svg aria-label="Roofline chart: attainable TFLOPS rises with arithmetic intensity until the ridge near 295 FLOP per byte, then stays flat at about 989 TFLOPS. Decode at batch 1 sits far down the sloped part, decode at batch 64 higher on the slope, prefill on the flat roof." width="760" height="520" viewBox="0 0 760 520" xmlns="http://www.w3.org/2000/svg">
+<rect x="0" y="0" width="760" height="520" fill="#FFFDF8" rx="16"/>
+<line x1="80" y1="440" x2="730" y2="440" stroke="#8A93A3" stroke-width="2"/>
+<line x1="80" y1="440" x2="80" y2="50" stroke="#8A93A3" stroke-width="2"/>
+<line x1="475" y1="81" x2="475" y2="440" stroke="#8A93A3" stroke-width="2" stroke-dasharray="8 8"/>
+<polyline points="80,377 475,81 720,81" fill="none" stroke="#B4531A" stroke-width="6" stroke-linejoin="round"/>
+<circle cx="80" cy="377" r="12" fill="#2F6FB0"/>
+<circle cx="369" cy="160" r="12" fill="#2F6FB0"/>
+<circle cx="608" cy="81" r="12" fill="#14213D"/>
+</svg>
+<p style="position:absolute;left:16px;top:12px;width:300px;font-size:24px;color:#3E4A5C">TFLOPS (log)</p>
+<p style="position:absolute;left:390px;top:22px;width:300px;font-size:24px;color:#14213D">Ridge ≈ 295 FLOP/B</p>
+<p style="position:absolute;left:494px;top:100px;width:266px;font-size:24px;color:#14213D">Prefill, 2k tokens</p>
+<p style="position:absolute;left:388px;top:168px;width:200px;font-size:24px;color:#2F6FB0">Decode, B=64</p>
+<p style="position:absolute;left:104px;top:384px;width:370px;font-size:24px;color:#2F6FB0">Decode, B=1 (~1 FLOP/B)</p>
+<p style="position:absolute;left:100px;top:460px;width:640px;font-size:24px;color:#3E4A5C">Arithmetic intensity, FLOP per byte (log)</p>
+</div>
+</div>
+<aside>Derive the decode intensity live on the board: each weight is 2 bytes in BF16 and contributes one multiply and one add per sequence in the batch, so intensity is about one FLOP per byte per sequence. At batch 1 we use roughly 3.35 TFLOPS out of 989, about a third of a percent. Batching moves us up the slope for free until we hit the ridge. Peak figures are NVIDIA H100 SXM datasheet values.</aside>
+</section>
+<section id="decode-math" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">The memory wall</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">The speed limit for a single stream</h2>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;background:#14213D;color:#F2EFE8;padding:22px 32px;border-radius:12px">time per token ≥ bytes of weights ÷ memory bandwidth</p>
+<table style="font-size:28px;color:#1B2433">
+<tr><th style="width:22%;text-align:left">Model &amp; precision</th><th style="width:16%;text-align:right">Weights</th><th style="width:28%;text-align:left">Hardware</th><th style="width:16%;text-align:right">≥ ms/token</th><th style="width:18%;text-align:right">≤ tok/s (B=1)</th></tr>
+<tr><td>8B, BF16</td><td>16 GB</td><td>1× H100 (3.35 TB/s)</td><td>4.8</td><td>~210</td></tr>
+<tr><td>8B, FP8</td><td>8 GB</td><td>1× H100</td><td>2.4</td><td>~420</td></tr>
+<tr><td>70B, BF16</td><td>140 GB</td><td>4× H100, TP=4 (13.4 TB/s)</td><td>10.4</td><td>~96</td></tr>
+<tr><td>70B, 4-bit</td><td>35 GB</td><td>1× H100</td><td>10.4</td><td>~96</td></tr>
+</table>
+<div style="display:flex;gap:20px;align-items:center;border-left:6px solid #B4531A;padding:8px 0 8px 28px">
+<p style="font-size:28px;line-height:1.4;color:#14213D">Halving bytes per weight doubles the ceiling. 4-bit quantization gives one GPU the decode speed of four. These are ideal bounds: KV-cache reads, kernel overheads and communication push real numbers lower.</p>
+</div>
+<aside>Work one row out loud: 16 GB divided by 3.35 TB per second is about 4.8 milliseconds, so at most about 210 tokens per second for a single user. Note the last two rows: quantizing the 70B model to 4 bits on one GPU matches the bandwidth bound of four GPUs in BF16. This is why quantization is a speed optimization, not only a memory one.</aside>
+</section>
+<section id="kv-intro" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">The memory wall</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">The KV cache: remember, don’t recompute</h2>
+</div>
+<div style="display:flex;gap:56px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:22px">
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C">Attention for a new token needs the <b>keys and values of every earlier token</b>, in every layer.</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C">Recomputing them each step makes generating n tokens cost O(n²) projection work.</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C">So we compute them once — in prefill for the prompt, then one row per decode step — and <b>keep them in GPU memory</b>.</p>
+<p style="font-size:28px;line-height:1.45;color:#B4531A"><b>The price:</b> memory that grows with layers × context length × batch size.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:600;color:#14213D">One layer, one sequence</p>
+<div style="display:grid;grid-template-columns:repeat(6, 96px);gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#3E4A5C">t1</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#3E4A5C">t2</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#3E4A5C">t3</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#3E4A5C">t4</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#3E4A5C">t5</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;text-align:center;color:#B4531A">new</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#E4ECF6;color:#14213D;padding:14px 0;border-radius:8px">K</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#E4ECF6;color:#14213D;padding:14px 0;border-radius:8px">K</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#E4ECF6;color:#14213D;padding:14px 0;border-radius:8px">K</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#E4ECF6;color:#14213D;padding:14px 0;border-radius:8px">K</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#E4ECF6;color:#14213D;padding:14px 0;border-radius:8px">K</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#FBE9D8;border:2px solid #B4531A;color:#14213D;padding:12px 0;border-radius:8px">K</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#E4ECF6;color:#14213D;padding:14px 0;border-radius:8px">V</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#E4ECF6;color:#14213D;padding:14px 0;border-radius:8px">V</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#E4ECF6;color:#14213D;padding:14px 0;border-radius:8px">V</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#E4ECF6;color:#14213D;padding:14px 0;border-radius:8px">V</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#E4ECF6;color:#14213D;padding:14px 0;border-radius:8px">V</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#FBE9D8;border:2px solid #B4531A;color:#14213D;padding:12px 0;border-radius:8px">V</p>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;text-align:center;background:#B4531A;color:#FFFDF8;padding:14px 0;border-radius:8px">Q</p>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#3E4A5C">Blue: cached from earlier steps (read).<br>Orange: computed this step, then appended.</p>
+</div>
+</div>
+<aside>The new token’s query is compared with every cached key, and the result weights every cached value. Only the new token’s K and V are computed this step. Stress that this cache must be read in full at every decode step, which is why it shows up in the bandwidth budget too, not just the capacity budget.</aside>
+</section>
+<section id="kv-math" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">The memory wall</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Sizing the KV cache</h2>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;background:#14213D;color:#F2EFE8;padding:22px 32px;border-radius:12px">bytes/token = 2 (K and V) × layers × kv_heads × head_dim × bytes/element</p>
+<table style="font-size:28px;color:#1B2433">
+<tr><th style="width:20%;text-align:left">Model (BF16)</th><th style="width:28%;text-align:left">layers · kv_heads · head_dim</th><th style="width:16%;text-align:right">Per token</th><th style="width:36%;text-align:left">Per sequence</th></tr>
+<tr><td>Llama 3 8B</td><td>32 · 8 · 128</td><td>128 KiB</td><td>1 GiB at 8K context</td></tr>
+<tr><td>Llama 3 70B</td><td>80 · 8 · 128</td><td>320 KiB</td><td>40 GiB at 128K context</td></tr>
+</table>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-size:64px;font-weight:700;line-height:1.1;color:#2F6FB0">32 GiB</p>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">KV cache for 32 users at 8K context on the 8B model — twice its 16 GB of weights</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-size:64px;font-weight:700;line-height:1.1;color:#B4531A">40 GiB</p>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">One 128K-token conversation on the 70B model — half an 80 GB GPU, for a single user</p>
+</div>
+</div>
+<aside>Compute the 8B number together: 2 times 32 layers times 8 KV heads times 128 dimensions times 2 bytes equals 131,072 bytes, which is 128 KiB per token. Multiply by 8,192 tokens to get 1 GiB. The lesson: at long context or high concurrency, the KV cache, not the weights, decides how many users fit on a GPU.</aside>
+</section>
+<section id="kv-shrink" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">The memory wall</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Shrinking the KV cache</h2>
+</div>
+<table style="font-size:26px;color:#1B2433">
+<tr><th style="width:24%;text-align:left">Technique</th><th style="width:46%;text-align:left">Idea</th><th style="width:30%;text-align:left">Effect</th></tr>
+<tr><td><b>MHA</b> (baseline)</td><td>Every attention head keeps its own K and V</td><td>Largest cache</td></tr>
+<tr><td><b>MQA</b></td><td>All query heads share one K/V head</td><td>Smallest cache; some quality risk</td></tr>
+<tr><td><b>GQA</b></td><td>Groups of query heads share K/V (Llama 3: 8 KV heads)</td><td>4–8× smaller than MHA</td></tr>
+<tr><td><b>MLA</b></td><td>Store a compressed low-rank latent instead of K/V (DeepSeek-V2/V3)</td><td>Large cut, decompress on the fly</td></tr>
+<tr><td><b>KV quantization</b></td><td>Store the cache in FP8 or lower</td><td>2× or more vs BF16</td></tr>
+<tr><td><b>Window / eviction</b></td><td>Keep recent and “important” tokens only</td><td>Bounded memory; lossy</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.4;color:#14213D;border-left:6px solid #B4531A;padding:8px 0 8px 28px">The first four are architecture choices made at training time; the last two can be applied by the serving engine.</p>
+<aside>GQA is the reason the Llama 3 numbers on the previous slide are manageable: 32 or 64 query heads, but only 8 KV heads. MLA is DeepSeek’s approach and is now copied by others. KV quantization and eviction are knobs the operator controls, with eviction trading accuracy on long-range recall.</aside>
+</section>
+<section id="d-serving" data-transition="push" style="background:#14213D;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:44px;font-weight:600;color:#F2A65A">03</p>
+<h1 style="font-size:112px;font-weight:700;line-height:1.05;color:#F2EFE8">Serving systems</h1>
+<div style="width:1300px">
+<p style="font-size:40px;line-height:1.35;color:#B9C6D8">Packing many users onto one GPU: batching, paging, caching and splitting the work</p>
+</div>
+<aside>The roofline told us decode wastes compute at small batch. Serving systems exist to build big, efficient batches out of many unpredictable users.</aside>
+</section>
+<section id="batching" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Serving systems</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Static vs continuous batching</h2>
+</div>
+<div style="display:flex;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<h3 style="font-size:32px;font-weight:600;color:#14213D">Static: wait for the slowest</h3>
+<div style="display:flex;height:40px"><div style="width:620px;background:#2F6FB0;border-radius:6px"></div></div>
+<div style="display:flex;height:40px"><div style="width:260px;background:#2F6FB0;border-radius:6px 0 0 6px"></div><div style="width:360px;background:#D9D6CE;border-radius:0 6px 6px 0"></div></div>
+<div style="display:flex;height:40px"><div style="width:420px;background:#2F6FB0;border-radius:6px 0 0 6px"></div><div style="width:200px;background:#D9D6CE;border-radius:0 6px 6px 0"></div></div>
+<div style="display:flex;height:40px"><div style="width:160px;background:#2F6FB0;border-radius:6px 0 0 6px"></div><div style="width:460px;background:#D9D6CE;border-radius:0 6px 6px 0"></div></div>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Gray = idle slot. New requests queue until the whole batch finishes.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<h3 style="font-size:32px;font-weight:600;color:#14213D">Continuous: refill every step</h3>
+<div style="display:flex;height:40px"><div style="width:620px;background:#2F6FB0;border-radius:6px"></div></div>
+<div style="display:flex;gap:4px;height:40px"><div style="width:260px;background:#2F6FB0;border-radius:6px"></div><div style="width:356px;background:#F2A65A;border-radius:6px"></div></div>
+<div style="display:flex;gap:4px;height:40px"><div style="width:420px;background:#2F6FB0;border-radius:6px"></div><div style="width:196px;background:#F2A65A;border-radius:6px"></div></div>
+<div style="display:flex;gap:4px;height:40px"><div style="width:160px;background:#2F6FB0;border-radius:6px"></div><div style="width:240px;background:#F2A65A;border-radius:6px"></div><div style="width:212px;background:#B4531A;border-radius:6px"></div></div>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Orange = new requests admitted the moment a slot frees up.</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#14213D;border-left:6px solid #B4531A;padding:8px 0 8px 28px">Scheduling at the granularity of one decode step (Orca, OSDI 2022) keeps the batch full. It is now standard in every serious engine and often the single largest throughput win.</p>
+<aside>Each bar is one request slot over time. With static batching, short answers leave their slot idle while the longest answer finishes, and queued users wait. Continuous, or in-flight, batching re-forms the batch after every iteration, so throughput rises and queueing time drops.</aside>
+</section>
+<section id="paged" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Serving systems</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">PagedAttention: virtual memory for the KV cache</h2>
+</div>
+<div style="display:flex;gap:56px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:22px">
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C"><b>Problem:</b> reserving one contiguous slab per request for its maximum length wastes memory to fragmentation and over-reservation — the vLLM paper measured <b>60–80%</b> waste in earlier systems.</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C"><b>Idea:</b> split the cache into fixed-size blocks (e.g. 16 tokens) placed anywhere in memory, tracked by a per-sequence block table — like OS pages.</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C"><b>Bonus:</b> sequences can share blocks with copy-on-write, so parallel samples and common prefixes cost memory once.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<p style="font-size:24px;font-weight:600;color:#14213D">Logical blocks</p>
+<div style="display:flex;gap:10px;align-items:center">
+<p style="font-size:24px;width:110px;color:#3E4A5C">Seq A</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#2F6FB0;color:#FFFDF8;padding:10px 16px;border-radius:8px">A0</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#2F6FB0;color:#FFFDF8;padding:10px 16px;border-radius:8px">A1</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#2F6FB0;color:#FFFDF8;padding:10px 16px;border-radius:8px">A2</p>
+</div>
+<div style="display:flex;gap:10px;align-items:center">
+<p style="font-size:24px;width:110px;color:#3E4A5C">Seq B</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#B4531A;color:#FFFDF8;padding:10px 16px;border-radius:8px">B0</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#B4531A;color:#FFFDF8;padding:10px 16px;border-radius:8px">B1</p>
+</div>
+<p style="font-size:24px;font-weight:600;color:#14213D">Physical GPU memory (block table maps them)</p>
+<div style="display:grid;grid-template-columns:repeat(4, 96px);gap:10px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;background:#ECE9E1;color:#6B7280;padding:10px 0;border-radius:8px">free</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;background:#B4531A;color:#FFFDF8;padding:10px 0;border-radius:8px">B0</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;background:#2F6FB0;color:#FFFDF8;padding:10px 0;border-radius:8px">A1</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;background:#ECE9E1;color:#6B7280;padding:10px 0;border-radius:8px">free</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;background:#2F6FB0;color:#FFFDF8;padding:10px 0;border-radius:8px">A0</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;background:#ECE9E1;color:#6B7280;padding:10px 0;border-radius:8px">free</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;background:#B4531A;color:#FFFDF8;padding:10px 0;border-radius:8px">B1</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;background:#2F6FB0;color:#FFFDF8;padding:10px 0;border-radius:8px">A2</p>
+</div>
+</div>
+</div>
+<aside>Draw the analogy explicitly: logical pages, physical frames, and a page table. vLLM’s 2023 SOSP paper reported 60 to 80 percent KV memory waste in prior systems and near-zero waste with paging; more free memory means larger batches, which, from the roofline, means more throughput.</aside>
+</section>
+<section id="prefix" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Serving systems</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Prefix caching: never prefill the same text twice</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<div style="display:flex;gap:16px;align-items:center">
+<p style="font-size:24px;width:150px;color:#3E4A5C">Request 1</p>
+<p style="font-size:24px;width:820px;background:#2F6FB0;color:#FFFDF8;padding:12px 20px;border-radius:8px">System prompt + tool definitions (computed once)</p>
+<p style="font-size:24px;width:260px;background:#FBE9D8;color:#14213D;padding:12px 20px;border-radius:8px">Question 1</p>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<p style="font-size:24px;width:150px;color:#3E4A5C">Request 2</p>
+<p style="font-size:24px;width:820px;background:#BFD3EA;color:#14213D;padding:12px 20px;border-radius:8px">Same prefix — reused from cache</p>
+<p style="font-size:24px;width:300px;background:#FBE9D8;color:#14213D;padding:12px 20px;border-radius:8px">Question 2</p>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<p style="font-size:24px;width:150px;color:#3E4A5C">Turn 2</p>
+<p style="font-size:24px;width:820px;background:#BFD3EA;color:#14213D;padding:12px 20px;border-radius:8px">Same prefix — reused from cache</p>
+<p style="font-size:24px;width:220px;background:#BFD3EA;color:#14213D;padding:12px 20px;border-radius:8px">Turn 1</p>
+<p style="font-size:24px;width:180px;background:#FBE9D8;color:#14213D;padding:12px 20px;border-radius:8px">Turn 2</p>
+</div>
+<p style="font-size:24px;color:#3E4A5C">Dark blue: prefilled. Light blue: KV blocks reused, no compute. Orange: new tokens to prefill.</p>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">How</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Hash KV blocks by their token content (vLLM) or keep a radix tree of prefixes (SGLang’s RadixAttention).</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Why it matters</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Chat history, RAG documents, few-shot examples and agent loops all resend long shared prefixes.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Design tip</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Put stable content first in prompts; route requests to the replica that holds their prefix.</p>
+</div>
+</div>
+<aside>This is what commercial “prompt caching” features expose to API users, usually as a discount on cached input tokens. A cache hit removes most of the prefill, so TTFT drops sharply. Ask students why putting a timestamp at the start of a system prompt would destroy the hit rate.</aside>
+</section>
+<section id="chunked" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Serving systems</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Chunked prefill: stop long prompts from freezing everyone</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:18px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Without chunking — a 32K-token prompt arrives</h3>
+<div style="display:flex;gap:6px;height:56px">
+<div style="width:90px;background:#F2A65A;border-radius:6px"></div>
+<div style="width:90px;background:#F2A65A;border-radius:6px"></div>
+<div style="width:900px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:90px;background:#F2A65A;border-radius:6px"></div>
+<div style="width:90px;background:#F2A65A;border-radius:6px"></div>
+</div>
+<p style="font-size:26px;color:#3E4A5C">Every decoding user stalls for the whole prefill → an inter-token latency spike.</p>
+<h3 style="font-size:30px;font-weight:600;color:#14213D">With chunking — fixed token budget per step</h3>
+<div style="display:flex;gap:6px;height:56px">
+<div style="width:90px;background:#F2A65A;border-radius:6px"></div>
+<div style="width:200px;display:flex"><div style="flex:3;background:#2F6FB0;border-radius:6px 0 0 6px"></div><div style="flex:1;background:#F2A65A;border-radius:0 6px 6px 0"></div></div>
+<div style="width:200px;display:flex"><div style="flex:3;background:#2F6FB0;border-radius:6px 0 0 6px"></div><div style="flex:1;background:#F2A65A;border-radius:0 6px 6px 0"></div></div>
+<div style="width:200px;display:flex"><div style="flex:3;background:#2F6FB0;border-radius:6px 0 0 6px"></div><div style="flex:1;background:#F2A65A;border-radius:0 6px 6px 0"></div></div>
+<div style="width:200px;display:flex"><div style="flex:3;background:#2F6FB0;border-radius:6px 0 0 6px"></div><div style="flex:1;background:#F2A65A;border-radius:0 6px 6px 0"></div></div>
+<div style="width:200px;display:flex"><div style="flex:3;background:#2F6FB0;border-radius:6px 0 0 6px"></div><div style="flex:1;background:#F2A65A;border-radius:0 6px 6px 0"></div></div>
+<div style="width:90px;background:#F2A65A;border-radius:6px"></div>
+</div>
+<p style="font-size:26px;color:#3E4A5C">Blue = prefill chunk, orange = decode tokens. Each step mixes both, so streams keep flowing.</p>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#14213D;border-left:6px solid #B4531A;padding:8px 0 8px 28px">Introduced as Sarathi-Serve (OSDI 2024). Tuning knob: the per-step token budget — larger favors TTFT and throughput, smaller favors smooth streaming.</p>
+<aside>Each block is one engine iteration. A large prefill in a single iteration holds every other user hostage. Chunked prefill slices the prompt into pieces of, say, 512 to 2,048 tokens and piggybacks the decode tokens of other requests on each slice. The prefill also fills otherwise-idle compute in decode-heavy batches.</aside>
+</section>
+<section id="disagg" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Serving systems</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Disaggregation: prefill and decode on separate GPUs</h2>
+</div>
+<div style="display:flex;align-items:center;gap:20px">
+<div style="width:220px;display:flex;flex-direction:column;gap:8px;background:#14213D;border-radius:16px;padding:28px">
+<h3 style="font-size:30px;font-weight:600;color:#F2EFE8">Router</h3>
+<p style="font-size:24px;line-height:1.35;color:#B9C6D8">KV-aware, load-aware</p>
+</div>
+<x-shape kind="arrow-right" style="width:56px;height:28px;background:#B4531A"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#E4ECF6;border:2px solid #2F6FB0;border-radius:16px;padding:28px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Prefill pool</h3>
+<p style="font-size:24px;line-height:1.35;color:#3E4A5C">Compute-bound. Big batches of prompt tokens; compute-dense GPUs.</p>
+</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+<p style="font-size:24px;font-weight:600;color:#B4531A">KV cache</p>
+<x-shape kind="arrow-right" style="width:120px;height:32px;background:#B4531A"></x-shape>
+<p style="font-size:24px;color:#3E4A5C">RDMA / NVLink</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FBE9D8;border:2px solid #B4531A;border-radius:16px;padding:28px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Decode pool</h3>
+<p style="font-size:24px;line-height:1.35;color:#3E4A5C">Bandwidth-bound. Many concurrent streams; HBM-rich GPUs.</p>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Gains</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">No prefill–decode interference; each pool scales and is parallelized for its own phase. Published benchmarks report roughly 2–3× throughput, workload-dependent.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Costs</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">KV transfer over a fast fabric, more moving parts, and a prefill:decode ratio to tune. Rarely worth it on a single small server.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Where</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">vLLM, SGLang and TensorRT-LLM support it; NVIDIA Dynamo orchestrates the pools and routing.</p>
+</div>
+</div>
+<aside>DistServe (OSDI 2024) and Splitwise made the academic case in 2024; by 2026 every major stack supports it. The key insight goes back to the phases table: the two halves want different hardware and different batch shapes, so stop forcing them onto the same GPU.</aside>
+</section>
+<section id="d-kernels" data-transition="push" style="background:#14213D;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:44px;font-weight:600;color:#F2A65A">04</p>
+<h1 style="font-size:112px;font-weight:700;line-height:1.05;color:#F2EFE8">Kernels &amp; numerics</h1>
+<div style="width:1300px">
+<p style="font-size:40px;line-height:1.35;color:#B9C6D8">The same math with fewer bytes and fewer trips to memory</p>
+</div>
+<aside>Serving systems decide what runs together; kernels and number formats decide how fast each step runs.</aside>
+</section>
+<section id="flash" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Kernels &amp; numerics</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">FlashAttention: IO-aware, exact attention</h2>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<h3 style="font-size:32px;font-weight:600;color:#14213D">Naive attention</h3>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#E4ECF6;color:#14213D;padding:10px 16px;border-radius:8px">S = QKᵀ</p>
+<p style="font-size:24px;color:#3E4A5C">→ HBM →</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#E4ECF6;color:#14213D;padding:10px 16px;border-radius:8px">P = softmax(S)</p>
+<p style="font-size:24px;color:#3E4A5C">→ HBM →</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#E4ECF6;color:#14213D;padding:10px 16px;border-radius:8px">PV</p>
+</div>
+<p style="font-size:26px;line-height:1.45;color:#3E4A5C">Writes and re-reads the full N × N score matrix in slow GPU memory. Memory traffic grows with N², so long contexts become bandwidth-bound.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:2px solid #2F6FB0;border-radius:16px;padding:36px">
+<h3 style="font-size:32px;font-weight:600;color:#14213D">FlashAttention</h3>
+<div style="display:flex;gap:12px;align-items:center">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#2F6FB0;color:#FFFDF8;padding:10px 16px;border-radius:8px">tile Q, K, V</p>
+<p style="font-size:24px;color:#3E4A5C">→ on-chip SRAM →</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#2F6FB0;color:#FFFDF8;padding:10px 16px;border-radius:8px">online softmax</p>
+</div>
+<p style="font-size:26px;line-height:1.45;color:#3E4A5C">Processes blocks that fit in fast on-chip memory and rescales the softmax as it goes. The N × N matrix is never stored. Same result, linear memory, far less HBM traffic.</p>
+</div>
+</div>
+<table style="font-size:26px;color:#1B2433">
+<tr><th style="width:22%;text-align:left">Version</th><th style="width:78%;text-align:left">What it added</th></tr>
+<tr><td>FlashAttention (2022)</td><td>Tiling + online softmax; exact attention with O(N) memory</td></tr>
+<tr><td>FlashAttention-2 (2023)</td><td>Better work partitioning across GPU thread blocks and warps</td></tr>
+<tr><td>FlashAttention-3 (2024)</td><td>Hopper features: asynchronous data movement, FP8</td></tr>
+<tr><td>Flash-Decoding, FlashInfer</td><td>Split the KV cache across blocks so decode with long context stays parallel</td></tr>
+</table>
+<aside>Key word: IO-aware. FlashAttention does the same number of FLOPs, in fact slightly more, but moves far fewer bytes, which is what matters on a bandwidth-bound device. Every major engine uses Flash-style kernels by default today, so this is table stakes rather than a knob.</aside>
+</section>
+<section id="quant" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Kernels &amp; numerics</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Quantization: fewer bytes per weight</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:22px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:40px">
+<p style="font-size:26px;font-weight:600;color:#14213D">A 70B-parameter model’s weights</p>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="font-size:26px;width:120px;color:#3E4A5C">BF16</p>
+<div style="width:1000px;height:48px;background:#14213D;border-radius:8px"></div>
+<p style="font-size:26px;font-weight:600;color:#14213D">140 GB · ≥ 2 GPUs</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="font-size:26px;width:120px;color:#3E4A5C">FP8</p>
+<div style="width:500px;height:48px;background:#2F6FB0;border-radius:8px"></div>
+<p style="font-size:26px;font-weight:600;color:#14213D">70 GB · 1× 80 GB GPU, little room for KV</p>
+</div>
+<div style="display:flex;gap:24px;align-items:center">
+<p style="font-size:26px;width:120px;color:#3E4A5C">4-bit</p>
+<div style="width:250px;height:48px;background:#B4531A;border-radius:8px"></div>
+<p style="font-size:26px;font-weight:600;color:#14213D">35 GB · fits one 48 GB GPU</p>
+</div>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">W4A16 (weight-only)</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">4-bit weights, 16-bit math. Speeds up memory-bound decode; little help for prefill.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">W8A8 (INT8 / FP8)</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Weights and activations in 8 bits. Faster tensor-core math too, so prefill gains as well.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">W4A4 (FP4)</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Both in 4-bit floats on Blackwell tensor cores. Highest speed; needs careful calibration.</p>
+</div>
+</div>
+<aside>The naming convention WxAy means x-bit weights and y-bit activations. Weight-only quantization reduces bytes, which helps decode. Quantizing activations as well lets the matrix multiply itself run in low precision, which helps compute-bound prefill. Always re-run your quality evaluations after quantizing.</aside>
+</section>
+<section id="quant-methods" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Kernels &amp; numerics</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">The quantization toolbox</h2>
+</div>
+<table style="font-size:26px;color:#1B2433">
+<tr><th style="width:18%;text-align:left">Method</th><th style="width:15%;text-align:left">Scheme</th><th style="width:45%;text-align:left">Core idea</th><th style="width:22%;text-align:left">Typical use</th></tr>
+<tr><td><b>GPTQ</b></td><td>Weight-only</td><td>Rounding with second-order error correction</td><td>INT4 / INT3 weights</td></tr>
+<tr><td><b>AWQ</b></td><td>Weight-only</td><td>Protect salient channels via activations</td><td>INT4 GPU serving</td></tr>
+<tr><td><b>SmoothQuant</b></td><td>W8A8</td><td>Shift activation outliers into weights</td><td>INT8 on any GPU</td></tr>
+<tr><td><b>FP8 (E4M3)</b></td><td>W8A8</td><td>Native 8-bit floats, per-channel scales</td><td>Default on H100/B200</td></tr>
+<tr><td><b>NVFP4 / MXFP4</b></td><td>W4A4, W4A16</td><td>4-bit floats, one scale per small block</td><td>Blackwell-native</td></tr>
+<tr><td><b>GGUF k-quants</b></td><td>Weight-only</td><td>Mixed 2–8-bit blocks per tensor</td><td>llama.cpp, Ollama</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.4;color:#14213D;border-left:6px solid #B4531A;padding:8px 0 8px 28px">Rule of thumb: start with FP8, move to 4-bit when memory-bound — and keep sensitive layers in higher precision if evaluations drop.</p>
+<aside>These are post-training methods; no retraining is needed, only a small calibration set. GPTQ uses approximate second-order information to compensate rounding error; AWQ scales the small fraction of weight channels that matter most; SmoothQuant moves the difficulty of quantizing activations into the weights. Some recent models ship natively in FP8 or 4-bit, avoiding the conversion step.</aside>
+</section>
+<section id="fp4" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Kernels &amp; numerics</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Inside FP4: micro-block scaling</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:18px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<p style="font-size:26px;font-weight:600;color:#14213D">One NVFP4 block: 16 values share one FP8 scale</p>
+<div style="display:flex;gap:8px;align-items:center">
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<div style="width:60px;height:56px;background:#2F6FB0;border-radius:6px"></div>
+<p style="font-size:26px;color:#3E4A5C">+</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;background:#B4531A;color:#FFFDF8;padding:12px 20px;border-radius:8px">scale (E4M3)</p>
+</div>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Each blue cell is a 4-bit E2M1 value. The only magnitudes it can hold: <b>0, 0.5, 1, 1.5, 2, 3, 4, 6</b> (plus sign). The block scale stretches that grid to fit the block’s range.</p>
+</div>
+<table style="font-size:26px;color:#1B2433">
+<tr><th style="width:18%;text-align:left">Format</th><th style="width:16%;text-align:left">Block size</th><th style="width:30%;text-align:left">Scale</th><th style="width:16%;text-align:left">Bits/value</th><th style="width:20%;text-align:left">Notes</th></tr>
+<tr><td><b>MXFP4</b> (OCP)</td><td>32</td><td>E8M0 (power of two)</td><td>4.25</td><td>Coarser scaling</td></tr>
+<tr><td><b>NVFP4</b></td><td>16</td><td>FP8 E4M3 + FP32 per tensor</td><td>4.5</td><td>Finer, more accurate</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.4;color:#14213D;border-left:6px solid #B4531A;padding:8px 0 8px 28px">Smaller blocks isolate outliers better. NVIDIA reports accuracy close to FP8 on large models; layers that suffer are often kept in FP8 or BF16.</p>
+<aside>The bits per value include the amortized scale: NVFP4 adds an 8-bit scale per 16 values, half a bit each; MXFP4 adds 8 bits per 32 values, a quarter bit each. Blackwell tensor cores handle the scaling in hardware, which is why W4A4 is fast there and not on older GPUs.</aside>
+</section>
+<section id="fusion" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Kernels &amp; numerics</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Small batches drown in overhead</h2>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#3E4A5C">A decode step at small batch is hundreds of tiny GPU kernels. Launching them from the CPU, and writing intermediates between them, can take longer than the math itself.</p>
+<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:24px">
+<div style="display:flex;gap:24px;align-items:start;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<x-icon name="Wrench" style="width:48px;height:48px;color:#2F6FB0;font-size:38px">🔧</x-icon>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Kernel fusion</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Merge steps (QKV projection, norm + matmul, fused MoE) so intermediates never leave the chip.</p>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:start;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<x-icon name="Play" style="width:48px;height:48px;color:#2F6FB0;font-size:38px">▶</x-icon>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">CUDA Graphs</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Record a decode step once, replay it with one launch per step instead of hundreds.</p>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:start;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<x-icon name="Code" style="width:48px;height:48px;color:#2F6FB0;font-size:38px">&lt;/&gt;</x-icon>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Compilers</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">torch.compile and TensorRT generate fused, shape-specialized kernels automatically.</p>
+</div>
+</div>
+<div style="display:flex;gap:24px;align-items:start;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<x-icon name="Clock" style="width:48px;height:48px;color:#2F6FB0;font-size:38px">⏱</x-icon>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Overlap scheduling</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">The CPU prepares the next batch while the GPU runs the current one, hiding scheduler time.</p>
+</div>
+</div>
+</div>
+<aside>This is the slide that explains why a naive Hugging Face generate loop is so much slower than vLLM or SGLang on the same GPU, even before batching. Much of modern engine work is removing CPU-side overhead.</aside>
+</section>
+<section id="d-decoding" data-transition="push" style="background:#14213D;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:44px;font-weight:600;color:#F2A65A">05</p>
+<h1 style="font-size:112px;font-weight:700;line-height:1.05;color:#F2EFE8">Smarter decoding</h1>
+<div style="width:1300px">
+<p style="font-size:40px;line-height:1.35;color:#B9C6D8">Getting more than one token out of each expensive forward pass</p>
+</div>
+<aside>Decode at small batch leaves compute idle. Speculative decoding spends that idle compute to cut latency, without changing the output distribution.</aside>
+</section>
+<section id="spec" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Smarter decoding</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Speculative decoding: draft cheaply, verify in parallel</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:22px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<div style="display:flex;gap:16px;align-items:center">
+<p style="font-size:26px;font-weight:600;width:300px;color:#14213D">1 · Draft proposes</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#E4ECF6;color:#14213D;padding:10px 18px;border-radius:8px">the</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#E4ECF6;color:#14213D;padding:10px 18px;border-radius:8px">cat</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#E4ECF6;color:#14213D;padding:10px 18px;border-radius:8px">sat</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#E4ECF6;color:#14213D;padding:10px 18px;border-radius:8px">on</p>
+<p style="font-size:24px;color:#3E4A5C">k = 4 cheap guesses</p>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<p style="font-size:26px;font-weight:600;width:300px;color:#14213D">2 · Target verifies</p>
+<p style="font-size:26px;color:#3E4A5C">one forward pass of the big model scores all 4 positions at once</p>
+</div>
+<div style="display:flex;gap:16px;align-items:center">
+<p style="font-size:26px;font-weight:600;width:300px;color:#14213D">3 · Accept prefix</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#D7EBDD;color:#14213D;padding:10px 18px;border-radius:8px">the ✓</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#D7EBDD;color:#14213D;padding:10px 18px;border-radius:8px">cat ✓</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#D7EBDD;color:#14213D;padding:10px 18px;border-radius:8px">sat ✓</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#ECE9E1;color:#6B7280;padding:10px 18px;border-radius:8px;text-decoration:line-through">on</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;background:#B4531A;color:#FFFDF8;padding:10px 18px;border-radius:8px">under</p>
+<p style="font-size:24px;color:#3E4A5C">rejected → target’s own token</p>
+</div>
+<p style="font-size:26px;font-weight:600;color:#14213D">Result: 4 tokens for one target pass instead of 4 sequential passes.</p>
+</div>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Why it works</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Verifying k tokens costs about the same as generating one: decode is memory-bound, so the extra math is nearly free.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Why it is lossless</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">A rejection-sampling rule makes the output distribution exactly the target model’s (Leviathan et al., 2023).</p>
+</div>
+</div>
+<aside>Walk through the example. The draft guesses four tokens; the target checks them in one pass and agrees with the first three. At the first disagreement, we keep the target’s own token, so every round produces at least one token. With greedy decoding it is easy to see why output is identical; with sampling, the accept-reject rule guarantees the same distribution.</aside>
+</section>
+<section id="spec-math" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Smarter decoding</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">How much does speculation buy?</h2>
+</div>
+<div style="display:flex;gap:56px;align-items:start">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;background:#14213D;color:#F2EFE8;padding:24px 32px;border-radius:12px">E[tokens per pass] = (1 − α^(k+1)) ÷ (1 − α)</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C"><b>α</b> = probability the target accepts a draft token<br><b>k</b> = draft length</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C">Real speedup is lower: drafting and verification cost time too. Long drafts only pay off when α is high.</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C">At large batch the GPU is already busy, so gains shrink — speculation is mainly a <b>latency</b> tool.</p>
+</div>
+<div style="width:640px;display:flex;flex-direction:column;gap:16px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:36px">
+<p style="font-size:26px;font-weight:600;color:#14213D">Expected tokens per target pass</p>
+<table style="font-size:30px;color:#1B2433">
+<tr><th style="width:28%;text-align:left">α</th><th style="width:24%;text-align:right">k = 2</th><th style="width:24%;text-align:right">k = 4</th><th style="width:24%;text-align:right">k = 8</th></tr>
+<tr><td>0.6</td><td>1.96</td><td>2.31</td><td>2.47</td></tr>
+<tr><td>0.8</td><td>2.44</td><td>3.36</td><td>4.33</td></tr>
+<tr><td>0.9</td><td>2.71</td><td>4.10</td><td>6.13</td></tr>
+</table>
+<p style="font-size:24px;line-height:1.4;color:#3E4A5C">At α = 0.6, doubling k from 4 to 8 adds only 0.16 tokens.</p>
+</div>
+</div>
+<aside>Derivation: the number of accepted tokens is geometric, truncated at k, plus one bonus token from the target. Have students compute the alpha 0.8, k 4 cell: one minus 0.8 to the fifth is 0.672, divided by 0.2 gives 3.36. This assumes each token is accepted independently with probability alpha, a simplification from the Leviathan et al. paper.</aside>
+</section>
+<section id="eagle" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Smarter decoding</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Where drafts come from</h2>
+</div>
+<table style="font-size:26px;color:#1B2433">
+<tr><th style="width:22%;text-align:left">Drafter</th><th style="width:50%;text-align:left">How it guesses</th><th style="width:28%;text-align:left">Trade-off</th></tr>
+<tr><td><b>Small draft model</b></td><td>A smaller LM from the same family</td><td>Easy; must share tokenizer</td></tr>
+<tr><td><b>N-gram lookup</b></td><td>Copy continuations already in the context</td><td>Free; good for code edits</td></tr>
+<tr><td><b>Medusa</b></td><td>Extra prediction heads on the target model</td><td>Needs head training</td></tr>
+<tr><td><b>EAGLE-1/2</b></td><td>Light head on hidden features; draft trees</td><td>Higher acceptance</td></tr>
+<tr><td><b>EAGLE-3</b></td><td>Predicts tokens; fuses low/mid/high features</td><td>Current engine default</td></tr>
+</table>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-size:48px;font-weight:700;line-height:1.1;color:#2F6FB0">up to 6.5×</p>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">EAGLE-3 paper, best case</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-size:48px;font-weight:700;line-height:1.1;color:#2F6FB0">2–3×</p>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Decode latency, Llama 4 Scout on SGLang (Vertex AI)</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<p style="font-size:48px;font-weight:700;line-height:1.1;color:#B4531A">1.84× vs 0.99×</p>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">One 8B vLLM test: code refactoring vs general chat</p>
+</div>
+</div>
+<aside>The lesson from the three numbers: speedup is workload-dependent. Predictable text, such as code edits, structured output and retrieval answers, accepts long drafts; open-ended chat and creative writing do not. Always benchmark on your own traffic before enabling speculation by default.</aside>
+</section>
+<section id="d-scale" data-transition="push" style="background:#14213D;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:44px;font-weight:600;color:#F2A65A">06</p>
+<h1 style="font-size:112px;font-weight:700;line-height:1.05;color:#F2EFE8">Scaling out</h1>
+<div style="width:1300px">
+<p style="font-size:40px;line-height:1.35;color:#B9C6D8">When one GPU is not enough: splitting models, experts and hardware choices</p>
+</div>
+<aside>Frontier models do not fit on one accelerator. This part covers how the work is split and what that costs in communication.</aside>
+</section>
+<section id="parallel" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Scaling out</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Five ways to split the work</h2>
+</div>
+<table style="font-size:26px;color:#1B2433">
+<tr><th style="width:20%;text-align:left">Strategy</th><th style="width:27%;text-align:left">What is split</th><th style="width:27%;text-align:left">Communication</th><th style="width:26%;text-align:left">Best for</th></tr>
+<tr><td><b>Tensor (TP)</b></td><td>Each weight matrix</td><td>All-reduce every layer</td><td>Latency, inside one node</td></tr>
+<tr><td><b>Pipeline (PP)</b></td><td>Layers into stages</td><td>Activations between stages</td><td>Fitting across nodes</td></tr>
+<tr><td><b>Expert (EP)</b></td><td>MoE experts across GPUs</td><td>All-to-all token routing</td><td>Large MoE models</td></tr>
+<tr><td><b>Data / replicas</b></td><td>Nothing — full copies</td><td>None between replicas</td><td>Throughput, simplicity</td></tr>
+<tr><td><b>Context (CP)</b></td><td>The sequence itself</td><td>KV exchange in attention</td><td>Prefill of very long prompts</td></tr>
+</table>
+<div style="display:flex;gap:24px">
+<div style="flex:1;display:flex;gap:20px;align-items:center;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:28px 32px">
+<x-icon name="Lightning" style="width:44px;height:44px;color:#2F6FB0;font-size:35px">⚡</x-icon>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">TP needs fast links (NVLink); across slower networks it stops scaling.</p>
+</div>
+<div style="flex:1;display:flex;gap:20px;align-items:center;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:28px 32px">
+<x-icon name="Users" style="width:44px;height:44px;color:#2F6FB0;font-size:35px">👥</x-icon>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Default recipe: TP inside a node, replicas across nodes, EP for MoE.</p>
+</div>
+</div>
+<aside>Recall the decode bound: splitting weights over four GPUs with tensor parallelism quadruples the aggregate memory bandwidth, which is why TP cuts per-token latency. The price is an all-reduce in every layer, so it only works over very fast interconnect. Replicas are embarrassingly parallel and should be the first scaling step for throughput.</aside>
+</section>
+<section id="moe" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Scaling out</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Mixture-of-experts changes the math</h2>
+</div>
+<div style="display:flex;gap:56px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:24px;width:620px">
+<div style="display:flex;flex-direction:column;gap:4px;background:#14213D;border-radius:16px;padding:36px">
+<p style="font-size:96px;font-weight:700;line-height:1.05;color:#F2EFE8">671B</p>
+<p style="font-size:28px;color:#B9C6D8">total parameters — must sit in memory</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#FBE9D8;border:2px solid #B4531A;border-radius:16px;padding:36px">
+<p style="font-size:96px;font-weight:700;line-height:1.05;color:#B4531A">37B</p>
+<p style="font-size:28px;color:#14213D">active per token — sets the compute</p>
+</div>
+<p style="font-size:24px;color:#3E4A5C">DeepSeek-V3 (2024)</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:22px">
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C">A router sends each token to a few experts out of many. <b>Compute scales with active parameters; memory scales with total.</b></p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C"><b>Small batches:</b> few experts are touched, but you still pay to hold them all.</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C"><b>Large batches:</b> nearly every expert is used, so intensity recovers — MoE serving wants big batches and expert parallelism.</p>
+<p style="font-size:28px;line-height:1.45;color:#3E4A5C"><b>New problems:</b> load imbalance across experts and all-to-all communication every MoE layer.</p>
+</div>
+</div>
+<aside>Most frontier open models are now mixture-of-experts. DeepSeek-V3 is a good teaching example because its numbers are public: 671 billion total parameters, 37 billion activated per token. Ask the class: what does that do to the roofline intensity of decode at batch 1 versus batch 256?</aside>
+</section>
+<section id="hardware" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Scaling out</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Hardware: read the memory line first</h2>
+</div>
+<table style="font-size:26px;color:#1B2433">
+<tr><th style="width:24%;text-align:left">Accelerator</th><th style="width:32%;text-align:left">Memory · bandwidth</th><th style="width:44%;text-align:left">Inference angle</th></tr>
+<tr><td><b>NVIDIA H100 SXM</b></td><td>80 GB HBM3 · 3.35 TB/s</td><td>The reference workhorse; FP8 tensor cores</td></tr>
+<tr><td><b>NVIDIA H200</b></td><td>141 GB HBM3e · 4.8 TB/s</td><td>Same compute, more room for KV, faster decode</td></tr>
+<tr><td><b>NVIDIA B200 / GB200</b></td><td>~180–192 GB HBM3e · 8 TB/s</td><td>Native FP4; NVL72 racks make 72 GPUs one domain</td></tr>
+<tr><td><b>Google TPU</b></td><td>HBM per chip, large pods</td><td>Tight compiler stack (JAX, XLA); big-pod serving</td></tr>
+<tr><td><b>SRAM-centric chips</b></td><td>Weights in on-chip SRAM</td><td>Cerebras, Groq: very high single-stream speed</td></tr>
+</table>
+<div style="display:flex;gap:20px;align-items:center;background:#14213D;border-radius:16px;padding:32px 40px">
+<x-icon name="Lightbulb" style="width:48px;height:48px;color:#F2A65A;font-size:38px">💡</x-icon>
+<p style="font-size:28px;line-height:1.4;color:#F2EFE8">For decode, bandwidth and capacity predict speed better than peak TFLOPS. Cerebras reports 2,000+ tok/s on Llama 3.3 70B by avoiding the HBM round-trip.</p>
+</div>
+<aside>Use the decode bound again: H200 has the same compute as H100 but about 43 percent more bandwidth, so decode gets faster without any software change. Chips that hold weights in on-chip SRAM sidestep the memory wall entirely for single streams, at the cost of needing many chips for big models. Vendor speed claims should always be read with their batch size and model in mind.</aside>
+</section>
+<section id="d-practice" data-transition="push" style="background:#14213D;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:32px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:44px;font-weight:600;color:#F2A65A">07</p>
+<h1 style="font-size:112px;font-weight:700;line-height:1.05;color:#F2EFE8">In practice</h1>
+<div style="width:1300px">
+<p style="font-size:40px;line-height:1.35;color:#B9C6D8">Engines, reasoning workloads, a tuning playbook and a hands-on lab</p>
+</div>
+<aside>We now have the toolbox. This last part shows how it is packaged in real engines and how to apply it.</aside>
+</section>
+<section id="engines" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">In practice</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">The inference engine landscape</h2>
+</div>
+<table style="font-size:26px;color:#1B2433">
+<tr><th style="width:20%;text-align:left">Engine</th><th style="width:42%;text-align:left">Signature idea</th><th style="width:38%;text-align:left">Pick it when</th></tr>
+<tr><td><b>vLLM</b></td><td>PagedAttention; broad model and hardware support</td><td>You want the general-purpose default</td></tr>
+<tr><td><b>SGLang</b></td><td>RadixAttention prefix cache; fast scheduler</td><td>Agents, multi-turn, structured output</td></tr>
+<tr><td><b>TensorRT-LLM</b></td><td>Compiled engines tuned for NVIDIA GPUs</td><td>One model, fixed NVIDIA fleet, peak tok/s</td></tr>
+<tr><td><b>llama.cpp / Ollama</b></td><td>GGUF quantization; CPU and Apple Silicon</td><td>Laptops, edge, offline use</td></tr>
+<tr><td><b>NVIDIA Dynamo</b></td><td>Orchestration above engines: disaggregated pools, KV-aware routing</td><td>Multi-node production fleets</td></tr>
+</table>
+<p style="font-size:28px;line-height:1.4;color:#14213D;border-left:6px solid #B4531A;padding:8px 0 8px 28px">All of them now share the same core: continuous batching, paged KV cache, Flash-style kernels, quantization and speculative decoding. Differences are in defaults, scheduling and hardware reach.</p>
+<aside>All three main GPU engines expose an OpenAI-compatible HTTP API, so switching between them is usually a deployment change, not an application change. Benchmarks change monthly, so teach students to benchmark on their own workload rather than trusting leaderboards.</aside>
+</section>
+<section id="reasoning" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">In practice</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Reasoning models and agents shift the load</h2>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#3E4A5C">“Thinking” models generate long hidden chains of thought; agents call the model again and again with a growing context. Both stress the exact resources we have discussed.</p>
+<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:24px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Decode-heavy</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Thousands of output tokens per answer: speculative decoding and low-precision weights pay off most.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">KV-heavy</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Long sequences grow the cache; fewer users fit, so GQA/MLA and FP8 KV matter more.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Prefix-heavy</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Agent loops resend tools, instructions and history: prefix caching becomes essential.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFDF8;border:1px solid #E2DDD1;border-radius:16px;padding:32px">
+<h3 style="font-size:30px;font-weight:600;color:#14213D">Parallel sampling</h3>
+<p style="font-size:26px;line-height:1.4;color:#3E4A5C">Best-of-n and self-consistency share one prompt: copy-on-write KV blocks make it cheap.</p>
+</div>
+</div>
+<aside>Test-time compute means quality now scales with inference spend, not only with model size. That turns every optimization in this lecture into a quality lever: if tokens are cheaper, you can afford to let the model think longer or sample more candidates.</aside>
+</section>
+<section id="playbook" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">In practice</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">A tuning playbook, in order</h2>
+</div>
+<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:28px">
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;font-weight:600;color:#B4531A">01</p>
+<p style="font-size:26px;line-height:1.4;color:#1B2433"><b>Define SLOs</b> (P99 TTFT, P99 ITL) and load-test with realistic prompt and output lengths.</p>
+</div>
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;font-weight:600;color:#B4531A">05</p>
+<p style="font-size:26px;line-height:1.4;color:#1B2433"><b>Tune batch limits</b> and the chunked-prefill token budget against the SLO.</p>
+</div>
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;font-weight:600;color:#B4531A">02</p>
+<p style="font-size:26px;line-height:1.4;color:#1B2433"><b>Use a modern engine.</b> Continuous batching, paged KV and Flash kernels are table stakes.</p>
+</div>
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;font-weight:600;color:#B4531A">06</p>
+<p style="font-size:26px;line-height:1.4;color:#1B2433"><b>Add speculative decoding</b> for latency-sensitive, low-batch traffic; measure acceptance.</p>
+</div>
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;font-weight:600;color:#B4531A">03</p>
+<p style="font-size:26px;line-height:1.4;color:#1B2433"><b>Quantize:</b> FP8 first; 4-bit when memory-bound and evaluations still pass.</p>
+</div>
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;font-weight:600;color:#B4531A">07</p>
+<p style="font-size:26px;line-height:1.4;color:#1B2433"><b>Scale out:</b> replicas first, TP within a node, disaggregate at multi-node scale.</p>
+</div>
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;font-weight:600;color:#B4531A">04</p>
+<p style="font-size:26px;line-height:1.4;color:#1B2433"><b>Cache prefixes:</b> enable prefix caching and put stable content first in prompts.</p>
+</div>
+<div style="display:flex;gap:20px;align-items:start">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;font-weight:600;color:#B4531A">08</p>
+<p style="font-size:26px;line-height:1.4;color:#1B2433"><b>Re-check quality</b> after every change; speed that breaks answers is not a win.</p>
+</div>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#14213D;border-left:6px solid #B4531A;padding:8px 0 8px 28px">Change one thing at a time, and keep the benchmark that proved it.</p>
+<aside>The order matters: cheapest and safest changes first, architectural changes last. The grid reads down each column, one through four, then five through eight.</aside>
+</section>
+<section id="lab" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Hands-on lab</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">Measure it yourself with vLLM</h2>
+</div>
+<div style="display:flex;gap:40px;align-items:start">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#14213D;border-radius:16px;padding:36px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Serve</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.6;color:#E9EEF5">pip install vllm<br>vllm serve Qwen/Qwen2.5-1.5B-Instruct \<br>&#160;&#160;--max-model-len 8192</p>
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#F2A65A">Benchmark</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.6;color:#E9EEF5">vllm bench serve \<br>&#160;&#160;--model Qwen/Qwen2.5-1.5B-Instruct \<br>&#160;&#160;--dataset-name random \<br>&#160;&#160;--random-input-len 1024 \<br>&#160;&#160;--random-output-len 256 \<br>&#160;&#160;--num-prompts 200 --request-rate 4</p>
+</div>
+<div style="width:700px;display:flex;flex-direction:column;gap:18px">
+<p style="font-size:26px;font-weight:600;color:#14213D">Tasks</p>
+<ol style="font-size:26px;line-height:1.45;color:#1B2433">
+<li>Record TTFT, ITL and throughput at request rates 1, 4 and 16.</li>
+<li>Plot throughput against P99 ITL and find the knee.</li>
+<li>Repeat with --quantization fp8 and compare.</li>
+<li>Add a shared 2K-token system prompt; compare prefix caching on vs off.</li>
+<li>Explain every result using the roofline and KV-cache math.</li>
+</ol>
+<p style="font-size:24px;line-height:1.4;color:#3E4A5C">Any GPU with ~16 GB works for this model. Flags change between vLLM releases; check vllm serve --help.</p>
+</div>
+</div>
+<aside>A small model keeps the lab accessible on free cloud notebooks or a lab GPU. Students with larger GPUs can swap in an 8B model. The final task is the important one: every number they measure should be explainable with the models from parts 1 and 2.</aside>
+</section>
+<section id="summary" data-transition="fade" style="background:#14213D;color:#F2EFE8;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#F2A65A">Key takeaways</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#F2EFE8">Six ideas to keep</h2>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px;border-top:4px solid #F2A65A;padding:24px 0 0 0">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2EFE8">Two phases</h3>
+<p style="font-size:26px;line-height:1.4;color:#B9C6D8">Prefill is compute-bound; decode is memory-bandwidth-bound.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;border-top:4px solid #F2A65A;padding:24px 0 0 0">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2EFE8">KV cache rules</h3>
+<p style="font-size:26px;line-height:1.4;color:#B9C6D8">At long context or high concurrency it, not the weights, limits how many users fit.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;border-top:4px solid #F2A65A;padding:24px 0 0 0">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2EFE8">Batch smartly</h3>
+<p style="font-size:26px;line-height:1.4;color:#B9C6D8">Continuous batching, paging and prefix caching turn idle compute into throughput.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;border-top:4px solid #F2A65A;padding:24px 0 0 0">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2EFE8">Fewer bytes</h3>
+<p style="font-size:26px;line-height:1.4;color:#B9C6D8">Quantization speeds decode almost in proportion to the bytes it removes.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;border-top:4px solid #F2A65A;padding:24px 0 0 0">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2EFE8">Speculate</h3>
+<p style="font-size:26px;line-height:1.4;color:#B9C6D8">Spare compute buys lower latency with identical outputs — if drafts are accepted.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;border-top:4px solid #F2A65A;padding:24px 0 0 0">
+<h3 style="font-size:32px;font-weight:600;line-height:1.2;color:#F2EFE8">Measure</h3>
+<p style="font-size:26px;line-height:1.4;color:#B9C6D8">Every trick is workload-dependent. Benchmark against SLOs, on your own traffic.</p>
+</div>
+</div>
+<aside>Close by connecting back to the roofline: nearly every technique either raises arithmetic intensity, by batching and speculation, or reduces bytes, by quantization, paging and KV compression. Invite questions, then introduce the lab.</aside>
+</section>
+<section id="refs" data-transition="fade" style="background:#F7F6F2;color:#1B2433;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#B4531A">Further reading</p>
+<h2 style="font-size:60px;font-weight:600;line-height:1.1;color:#14213D">References</h2>
+</div>
+<div style="display:flex;gap:56px">
+<div style="flex:1;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:24px;line-height:1.4;color:#1B2433">Pope et al., “Efficiently Scaling Transformer Inference,” MLSys 2023</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">Yuan et al., “LLM Inference Unveiled: Survey and Roofline Model Insights,” arXiv 2402.16363, 2024</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">Yu et al., “Orca: A Distributed Serving System for Transformer-Based Generative Models,” OSDI 2022</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">Kwon et al., “Efficient Memory Management for LLM Serving with PagedAttention,” SOSP 2023</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">Zheng et al., “SGLang: Efficient Execution of Structured Language Model Programs,” NeurIPS 2024</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">Agrawal et al., “Sarathi-Serve,” OSDI 2024 · Zhong et al., “DistServe,” OSDI 2024</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">NVIDIA Dynamo documentation: disaggregated serving, 2026</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:24px;line-height:1.4;color:#1B2433">Dao et al., FlashAttention (2022), FlashAttention-2 (2023); Shah et al., FlashAttention-3 (2024)</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">Frantar et al., GPTQ, ICLR 2023 · Lin et al., AWQ, MLSys 2024 · Xiao et al., SmoothQuant, ICML 2023</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">NVIDIA, “Introducing NVFP4 for Efficient and Accurate Low-Precision Inference,” 2025</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">Leviathan et al., “Fast Inference from Transformers via Speculative Decoding,” ICML 2023</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">Li et al., “EAGLE-3: Scaling up Inference Acceleration via Training-Time Test,” arXiv 2503.01840, 2025</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">LMSYS blog, “Accelerate OSS LLM with EAGLE-3 on Vertex,” Dec 2025</p>
+<p style="font-size:24px;line-height:1.4;color:#1B2433">DeepSeek-AI, “DeepSeek-V3 Technical Report,” 2024</p>
+</div>
+</div>
+<aside>Suggested reading order for students: the Pope et al. paper for the cost model, the vLLM paper for serving, then FlashAttention and the speculative decoding paper. The survey by Yuan et al. is a good map of the whole field.</aside>
+</section>
+
+</div></div>
+<div id="bar"><a href="pres.htm">← Presentations</a><button onclick="go(i-1)">‹ Prev</button><span id="n"></span><button onclick="go(i+1)">Next ›</button><span>← → keys · F for full screen</span></div>
+<script>
+const S=[...document.querySelectorAll('section')],f=document.getElementById('frame'),n=document.getElementById('n');let i=0;
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);f.style.transform='scale('+s+')'}
+function go(k){i=Math.max(0,Math.min(S.length-1,k));S.forEach((s,j)=>s.classList.toggle('on',j===i));n.textContent=(i+1)+' / '+S.length;history.replaceState(null,'','#'+(i+1))}
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){go(i+1);e.preventDefault()}else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){go(i-1);e.preventDefault()}else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);else if(e.key==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}});
+document.getElementById('stage').addEventListener('click',e=>{if(e.target.closest('a'))return;go(e.clientX<innerWidth/3?i-1:i+1)});
+let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX);addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>40)go(d<0?i+1:i-1);tx=null});
+fit();go((parseInt(location.hash.slice(1))||1)-1);
+</script></body></html>

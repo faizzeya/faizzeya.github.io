@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantum Computing: Qubits &amp; Architecture — Faiz ul haque Zeya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#111;overflow:hidden;font-family:Arial,sans-serif}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#frame{width:1920px;height:1080px;position:relative;transform-origin:center center;flex:none;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+section{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden}
+section:not(.on){display:none!important}
+section *{margin:0}
+section aside{display:none!important}
+section ul,section ol{padding-left:1.3em}
+section table{border-collapse:collapse;width:100%}
+section th,section td{padding:.45em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(127,127,127,.25)}
+section div,section p,section h1,section h2,section h3{position:relative}
+section [style*="position:absolute"],section [style*="position: absolute"]{position:absolute}
+x-shape{display:block;flex:none}
+x-shape[kind=ellipse]{border-radius:50%}
+x-shape[kind=rounded]{border-radius:16px}
+x-shape[kind=arrow-right]{clip-path:polygon(0 30%,65% 30%,65% 0,100% 50%,65% 100%,65% 70%,0 70%)}
+x-shape[kind=arrow-left]{clip-path:polygon(100% 30%,35% 30%,35% 0,0 50%,35% 100%,35% 70%,100% 70%)}
+x-connector{display:block;flex:none;align-self:center;height:0;border-top-style:solid;border-top-color:currentColor;position:relative}
+x-connector::after{content:"";position:absolute;right:-2px;top:-11px;border:9px solid transparent;border-left:14px solid currentColor;border-right:0}
+x-connector[from=tr]::after{right:auto;left:-2px;border-left:0;border-right:14px solid currentColor}
+x-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;line-height:1}
+#bar{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:16px;padding:8px;background:rgba(0,0,0,.55);color:#eee;font:14px Arial,sans-serif;opacity:.15;transition:opacity .2s}
+#bar:hover{opacity:1}
+#bar button{background:#333;color:#eee;border:1px solid #555;border-radius:6px;padding:6px 14px;cursor:pointer;font:inherit}
+#bar a{color:#9cf}
+</style></head><body>
+<div id="stage"><div id="frame">
+<section id="cover" data-transition="fade" style="background:#0F1B2D; color:#F5F4EF; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:40px">
+  <svg aria-label="Stylised atom-like orbits around a glowing qubit" style="position:absolute; left:1000px; top:140px; width:800px; height:800px" width="800" height="800" viewBox="0 0 800 800">
+    <circle cx="400" cy="400" r="330" fill="none" stroke="#1F3452" stroke-width="2"/>
+    <circle cx="400" cy="400" r="240" fill="none" stroke="#1F3452" stroke-width="2"/>
+    <ellipse cx="400" cy="400" rx="330" ry="90" fill="none" stroke="#2A4A6E" stroke-width="3"/>
+    <ellipse cx="400" cy="400" rx="330" ry="90" fill="none" stroke="#2A4A6E" stroke-width="3" transform="rotate(60 400 400)"/>
+    <ellipse cx="400" cy="400" rx="330" ry="90" fill="none" stroke="#2A4A6E" stroke-width="3" transform="rotate(-60 400 400)"/>
+    <circle cx="400" cy="400" r="46" fill="#5FD3E0"/>
+    <circle cx="400" cy="400" r="80" fill="none" stroke="#5FD3E0" stroke-width="2" opacity="0.5"/>
+    <circle cx="730" cy="400" r="14" fill="#E8833A"/>
+    <circle cx="235" cy="115" r="14" fill="#5FD3E0"/>
+    <circle cx="235" cy="685" r="14" fill="#F5F4EF"/>
+  </svg>
+  <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:28px; color:#5FD3E0; letter-spacing:3px; text-transform:uppercase">A lecture in six parts</p>
+  <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1.05; color:#F5F4EF; width:900px">Quantum Computing</h1>
+  <p style="font-size:40px; line-height:1.3; color:#B9C4D4; width:880px">Qubits and quantum computer architecture</p>
+  <p style="position:absolute; left:128px; bottom:96px; width:1000px; font-size:28px; color:#B9C4D4">Prof. Engr. Faiz ul Haque Zeya</p>
+  <aside>Welcome. This lecture moves from why quantum computing matters, through the qubit itself, gates and algorithms, into the full architecture of a quantum computer, the competing hardware platforms and where the field stands in 2026.</aside>
+</section>
+<section id="agenda" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:48px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Roadmap for today</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Six parts, from physics to machines</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px 64px">
+    <div style="display:flex; gap:24px; align-items:start; border-top:2px solid #0F1B2D; padding:24px 0px 0px 0px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; color:#0B6E7F; font-weight:600">01</p>
+      <div style="display:flex; flex-direction:column; gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Why quantum?</h3><p style="font-size:28px; color:#3E4A5C">Limits of classical computing, history, principles</p></div>
+    </div>
+    <div style="display:flex; gap:24px; align-items:start; border-top:2px solid #0F1B2D; padding:24px 0px 0px 0px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; color:#0B6E7F; font-weight:600">02</p>
+      <div style="display:flex; flex-direction:column; gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">The qubit</h3><p style="font-size:28px; color:#3E4A5C">State, measurement, entanglement, noise</p></div>
+    </div>
+    <div style="display:flex; gap:24px; align-items:start; border-top:2px solid #0F1B2D; padding:24px 0px 0px 0px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; color:#0B6E7F; font-weight:600">03</p>
+      <div style="display:flex; flex-direction:column; gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Gates &amp; algorithms</h3><p style="font-size:28px; color:#3E4A5C">Circuits, interference, Shor, Grover, VQE</p></div>
+    </div>
+    <div style="display:flex; gap:24px; align-items:start; border-top:2px solid #0F1B2D; padding:24px 0px 0px 0px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; color:#0B6E7F; font-weight:600">04</p>
+      <div style="display:flex; flex-direction:column; gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Architecture</h3><p style="font-size:28px; color:#3E4A5C">Full stack, control, cryogenics, error correction</p></div>
+    </div>
+    <div style="display:flex; gap:24px; align-items:start; border-top:2px solid #0F1B2D; padding:24px 0px 0px 0px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; color:#0B6E7F; font-weight:600">05</p>
+      <div style="display:flex; flex-direction:column; gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Hardware platforms</h3><p style="font-size:28px; color:#3E4A5C">Superconducting, ions, atoms, photons, spins</p></div>
+    </div>
+    <div style="display:flex; gap:24px; align-items:start; border-top:2px solid #0F1B2D; padding:24px 0px 0px 0px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; color:#0B6E7F; font-weight:600">06</p>
+      <div style="display:flex; flex-direction:column; gap:8px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Software &amp; outlook</h3><p style="font-size:28px; color:#3E4A5C">SDKs, roadmaps, open challenges</p></div>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">02</p>
+  <aside>Parts 1–3 build the conceptual model; part 4 is the core of the lecture, the architecture; parts 5–6 connect it to real machines and the state of the field.</aside>
+</section>
+<section id="sec-why" data-transition="fade" style="background:#0F1B2D; color:#F5F4EF; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:end; gap:32px">
+  <p style="position:absolute; right:128px; top:96px; width:900px; text-align:right; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:280px; color:#1D3252">2ⁿ</p>
+  <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#5FD3E0; letter-spacing:3px; text-transform:uppercase">Part 01</p>
+  <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1.05; color:#F5F4EF">Why quantum?</h1>
+  <p style="font-size:40px; line-height:1.3; color:#B9C4D4; width:1200px">Some problems grow exponentially. Nature itself computes them.</p>
+  <aside>We start with motivation: what classical computers find hard, and why a machine built from quantum systems could do better on specific problems.</aside>
+</section>
+<section id="classical-limits" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Why quantum</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Where classical computers hit a wall</h2>
+  </div>
+  <div style="display:flex; gap:32px; flex:1">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1; color:#0B6E7F">18 PB</p>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Exponential state spaces</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Storing the full state of just 50 quantum particles takes 2⁵⁰ complex numbers, about 18 petabytes. Molecules and materials are exactly such systems.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1; color:#0B6E7F">RSA</p>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Hard mathematical problems</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Factoring large integers and discrete logarithms have no known efficient classical algorithm. Internet security relies on that.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1; color:#0B6E7F">nm</p>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Physical limits of scaling</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Transistors now approach atomic dimensions, where quantum effects become a problem. Quantum computing turns them into the resource.</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">04</p>
+  <aside>2^50 ≈ 1.13 × 10^15 amplitudes; at 16 bytes per complex double that is about 18 PB. Quantum computers are not faster at everything — they target problems with this exponential structure.</aside>
+</section>
+<section id="feynman" data-transition="fade" style="background:#0B6E7F; color:#F5F4EF; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 200px; display:flex; flex-direction:column; justify-content:center; gap:48px">
+  <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:200px; line-height:0.6; color:#5FD3E0">“</p>
+  <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:500; line-height:1.2; color:#F5F4EF">Nature isn’t classical, dammit, and if you want to make a simulation of nature, you’d better make it quantum mechanical.</p>
+  <p style="font-size:32px; color:#DDEFF1">Richard Feynman · “Simulating Physics with Computers”, 1981</p>
+  <aside>Feynman's 1981 keynote at MIT (published 1982) is usually cited as the birth of the idea: use controllable quantum systems to simulate other quantum systems.</aside>
+</section>
+<section id="timeline" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:48px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Why quantum</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Four decades from idea to hardware</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:40px 32px">
+    <div style="display:flex; flex-direction:column; gap:8px; border-top:4px solid #0B6E7F; padding:16px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#0B6E7F">1981</p><p style="font-size:28px; line-height:1.35; color:#3E4A5C">Feynman proposes quantum simulation</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; border-top:4px solid #0B6E7F; padding:16px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#0B6E7F">1985</p><p style="font-size:28px; line-height:1.35; color:#3E4A5C">Deutsch defines a universal quantum computer</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; border-top:4px solid #0B6E7F; padding:16px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#0B6E7F">1994</p><p style="font-size:28px; line-height:1.35; color:#3E4A5C">Shor: polynomial-time factoring</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; border-top:4px solid #0B6E7F; padding:16px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#0B6E7F">1995</p><p style="font-size:28px; line-height:1.35; color:#3E4A5C">First quantum error-correcting code</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; border-top:4px solid #0B6E7F; padding:16px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#0B6E7F">1996</p><p style="font-size:28px; line-height:1.35; color:#3E4A5C">Grover: quadratic-speedup search</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; border-top:4px solid #E8833A; padding:16px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#B25A18">1998</p><p style="font-size:28px; line-height:1.35; color:#3E4A5C">First 2-qubit algorithm demos (NMR)</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; border-top:4px solid #E8833A; padding:16px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#B25A18">2019</p><p style="font-size:28px; line-height:1.35; color:#3E4A5C">Google Sycamore sampling experiment</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; border-top:4px solid #E8833A; padding:16px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#B25A18">2023</p><p style="font-size:28px; line-height:1.35; color:#3E4A5C">IBM Condor passes 1,000 qubits</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; border-top:4px solid #E8833A; padding:16px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#B25A18">2024</p><p style="font-size:28px; line-height:1.35; color:#3E4A5C">Google Willow: error falls as code grows</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; border-top:4px dashed #E8833A; padding:16px 0px 0px 0px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#B25A18">2029</p><p style="font-size:28px; line-height:1.35; color:#3E4A5C">IBM Starling target: fault tolerance</p></div>
+  </div>
+  <p style="font-size:24px; color:#5E6878">Top row: theory. Bottom row: hardware. Dashed: announced target.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">06</p>
+  <aside>The theory arrived first (1981–1996); hardware spent the next 25 years catching up. The 2024 Willow result mattered because logical error rates dropped as the surface code got bigger — the first clear below-threshold demonstration. Condor had 1,121 qubits but IBM then shifted focus to quality over count.</aside>
+</section>
+<section id="bit-vs-qubit" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Why quantum</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Classical bit vs qubit</h2>
+  </div>
+  <table style="font-size:28px; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif">
+    <tr style="background:#0F1B2D"><th style="width:24%; color:#F5F4EF">Property</th><th style="width:34%; color:#F5F4EF">Classical bit</th><th style="width:42%; color:#5FD3E0">Qubit</th></tr>
+    <tr><td>State</td><td>0 or 1</td><td>α|0⟩ + β|1⟩, a superposition</td></tr>
+    <tr style="background:#ECEAE2"><td>Reading it</td><td>Non-destructive</td><td>Measurement collapses it to 0 or 1</td></tr>
+    <tr><td>Copying</td><td>Free and exact</td><td>Impossible (no-cloning theorem)</td></tr>
+    <tr style="background:#ECEAE2"><td>n units describe</td><td>One of 2ⁿ values</td><td>2ⁿ complex amplitudes at once</td></tr>
+    <tr><td>Correlations</td><td>Classical only</td><td>Entanglement</td></tr>
+    <tr style="background:#ECEAE2"><td>Errors</td><td>Rare bit flips</td><td>Frequent bit and phase flips</td></tr>
+    <tr><td>Physical form</td><td>Transistor voltage</td><td>Circuit, ion, atom, photon, spin</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">07</p>
+  <aside>Key message: a qubit is richer than a bit, but also far more fragile and harder to read out. Every row on the right creates an engineering challenge we meet later in the architecture section.</aside>
+</section>
+<section id="principles" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Why quantum</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Four principles do all the work</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px">
+    <div style="display:flex; gap:32px; align-items:start; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <x-icon name="Globe" style="color:#0B6E7F; width:64px; height:64px;font-size:51px">🌐</x-icon>
+      <div style="display:flex; flex-direction:column; gap:12px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Superposition</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">A qubit holds a weighted combination of 0 and 1 until it is measured.</p></div>
+    </div>
+    <div style="display:flex; gap:32px; align-items:start; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <x-icon name="Link" style="color:#0B6E7F; width:64px; height:64px;font-size:51px">🔗</x-icon>
+      <div style="display:flex; flex-direction:column; gap:12px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Entanglement</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Qubits share one joint state that cannot be split into individual parts.</p></div>
+    </div>
+    <div style="display:flex; gap:32px; align-items:start; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <x-icon name="Activity" style="color:#0B6E7F; width:64px; height:64px;font-size:51px">📈</x-icon>
+      <div style="display:flex; flex-direction:column; gap:12px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Interference</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Amplitudes add or cancel like waves; algorithms steer them toward answers.</p></div>
+    </div>
+    <div style="display:flex; gap:32px; align-items:start; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <x-icon name="Search" style="color:#0B6E7F; width:64px; height:64px;font-size:51px">🔍</x-icon>
+      <div style="display:flex; flex-direction:column; gap:12px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Measurement</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Reading a qubit returns a single classical bit, chosen with a probability.</p></div>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">08</p>
+  <aside>Every quantum algorithm is a choreography of these four: create superposition, entangle, interfere, then measure. Superposition alone gives no speedup — interference is what makes it useful.</aside>
+</section>
+<section id="sec-qubit" data-transition="fade" style="background:#0F1B2D; color:#F5F4EF; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:end; gap:32px">
+  <p style="position:absolute; right:128px; top:96px; width:900px; text-align:right; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:280px; color:#1D3252">|ψ⟩</p>
+  <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#5FD3E0; letter-spacing:3px; text-transform:uppercase">Part 02</p>
+  <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1.05; color:#F5F4EF">The qubit</h1>
+  <p style="font-size:40px; line-height:1.3; color:#B9C4D4; width:1200px">From a single two-level system to entangled registers, and why they are so fragile.</p>
+  <aside>Part 2 builds the mathematical and physical picture of the qubit, which everything in the architecture section depends on.</aside>
+</section>
+<section id="qubit-state" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">The qubit</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">A qubit is a unit vector in two dimensions</h2>
+  </div>
+  <div style="display:flex; justify-content:center; background:#0F1B2D; border-radius:16px; padding:48px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:64px; color:#F5F4EF; text-align:center">|ψ⟩ = <span style="color:#5FD3E0">α</span>|0⟩ + <span style="color:#F0A060">β</span>|1⟩</p>
+  </div>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Amplitudes</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">α and β are complex numbers. |0⟩ and |1⟩ are the computational basis states.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Normalisation</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">|α|² + |β|² = 1, because the two outcome probabilities must sum to one.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Two real angles</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Dropping global phase: |ψ⟩ = cos(θ/2)|0⟩ + e^(iφ) sin(θ/2)|1⟩.</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">10</p>
+  <aside>Dirac (bra-ket) notation: |0⟩ = [1, 0]ᵀ, |1⟩ = [0, 1]ᵀ. A global phase e^(iγ) has no observable effect, so a single qubit state has two real degrees of freedom θ and φ — which leads directly to the Bloch sphere.</aside>
+</section>
+<section id="bloch" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">The qubit</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">The Bloch sphere: every state is a point</h2>
+  </div>
+  <div style="display:flex; gap:96px; align-items:center">
+    <div style="position:relative; width:600px; height:600px">
+      <svg aria-label="Bloch sphere with the state vector psi at polar angle theta and azimuth phi" style="position:absolute; left:0px; top:0px; width:600px; height:600px" width="600" height="600" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="230" fill="#E4F2F4" stroke="#0F1B2D" stroke-width="3"/>
+        <ellipse cx="300" cy="300" rx="230" ry="62" fill="none" stroke="#5E6878" stroke-width="2" stroke-dasharray="8 8"/>
+        <line x1="300" y1="50" x2="300" y2="550" stroke="#5E6878" stroke-width="2"/>
+        <line x1="60" y1="300" x2="540" y2="300" stroke="#5E6878" stroke-width="2"/>
+        <line x1="210" y1="380" x2="390" y2="220" stroke="#5E6878" stroke-width="2"/>
+        <line x1="300" y1="300" x2="420" y2="130" stroke="#0B6E7F" stroke-width="6"/>
+        <polygon points="420,130 398,146 414,158" fill="#0B6E7F"/>
+        <circle cx="420" cy="130" r="10" fill="#E8833A"/>
+        <line x1="420" y1="130" x2="420" y2="336" stroke="#E8833A" stroke-width="2" stroke-dasharray="6 6"/>
+        <line x1="300" y1="300" x2="420" y2="336" stroke="#E8833A" stroke-width="2" stroke-dasharray="6 6"/>
+        <path d="M300 220 A80 80 0 0 1 346 234" fill="none" stroke="#0F1B2D" stroke-width="3"/>
+        <path d="M262 334 A60 30 0 0 0 360 318" fill="none" stroke="#0F1B2D" stroke-width="3"/>
+        <circle cx="300" cy="70" r="8" fill="#0F1B2D"/>
+        <circle cx="300" cy="530" r="8" fill="#0F1B2D"/>
+      </svg>
+      <p style="position:absolute; left:320px; top:10px; width:120px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#0F1B2D">|0⟩</p>
+      <p style="position:absolute; left:320px; top:540px; width:120px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#0F1B2D">|1⟩</p>
+      <p style="position:absolute; left:436px; top:84px; width:120px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#0B6E7F">|ψ⟩</p>
+      <p style="position:absolute; left:318px; top:170px; width:60px; font-size:28px; color:#0F1B2D">θ</p>
+      <p style="position:absolute; left:250px; top:340px; width:60px; font-size:28px; color:#0F1B2D">φ</p>
+      <p style="position:absolute; left:544px; top:280px; width:56px; font-size:28px; color:#5E6878">y</p>
+      <p style="position:absolute; left:176px; top:376px; width:56px; font-size:28px; color:#5E6878">x</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:32px">
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Poles</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">North is |0⟩, south is |1⟩: the classical states.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Equator</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Equal superpositions such as |+⟩ and |−⟩, differing only in phase φ.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Gates are rotations</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Every single-qubit gate rotates the vector around some axis.</p></div>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">11</p>
+  <aside>θ is the angle from the |0⟩ pole and sets the measurement probabilities; φ is the phase around the equator and is invisible to a Z-basis measurement but crucial for interference. Pure states lie on the surface; noisy (mixed) states fall inside the sphere — decoherence literally shrinks the vector.</aside>
+</section>
+<section id="measurement" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">The qubit</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Measurement: probabilities, then collapse</h2>
+  </div>
+  <div style="display:flex; gap:80px; flex:1">
+    <div style="flex:1; display:flex; flex-direction:column; gap:32px">
+      <div style="background:#0F1B2D; border-radius:16px; padding:32px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; color:#F5F4EF">P(0) = |α|²   P(1) = |β|²</p></div>
+      <ul style="font-size:32px; line-height:1.5; color:#3E4A5C; display:flex; flex-direction:column; gap:16px">
+        <li>The Born rule turns amplitudes into outcome probabilities.</li>
+        <li>After measurement the qubit <b>is</b> |0⟩ or |1⟩; the superposition is gone.</li>
+        <li>So circuits are run many times (“shots”) to estimate a distribution.</li>
+        <li>The measurement basis matters: phase is invisible unless you rotate first.</li>
+      </ul>
+    </div>
+    <div style="width:560px; display:flex; flex-direction:column; gap:24px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">|+⟩, 1,000 shots</h3>
+      <p style="font-size:28px; color:#3E4A5C">(|0⟩ + |1⟩)/√2 gives each outcome with probability ½</p>
+      <div style="display:flex; gap:48px; align-items:end; height:300px; padding:0px 40px">
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px; align-items:center"><p style="font-size:28px; color:#0F1B2D">≈ 503</p><div style="width:140px; height:220px; background:#0B6E7F; border-radius:8px"></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#0F1B2D">0</p></div>
+        <div style="flex:1; display:flex; flex-direction:column; gap:8px; align-items:center"><p style="font-size:28px; color:#0F1B2D">≈ 497</p><div style="width:140px; height:217px; background:#E8833A; border-radius:8px"></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#0F1B2D">1</p></div>
+      </div>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">12</p>
+  <aside>The counts on the right are an illustrative sample: shot noise means you never see exactly 500/500. This is why quantum results are statistical and why readout fidelity is a key hardware metric.</aside>
+</section>
+<section id="multi-qubit" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">The qubit</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">n qubits need 2ⁿ amplitudes</h2>
+  </div>
+  <div style="display:flex; gap:64px">
+    <table style="flex:1; width:1000px; font-size:28px; color:#172033">
+      <tr style="background:#0F1B2D"><th style="width:18%; color:#F5F4EF">Qubits</th><th style="width:34%; color:#F5F4EF">Amplitudes</th><th style="width:48%; color:#F5F4EF">Classical memory (16 B each)</th></tr>
+      <tr><td>1</td><td>2</td><td>32 bytes</td></tr>
+      <tr style="background:#ECEAE2"><td>10</td><td>1,024</td><td>16 KB</td></tr>
+      <tr><td>30</td><td>≈ 1.07 billion</td><td>≈ 17 GB, a laptop</td></tr>
+      <tr style="background:#ECEAE2"><td>50</td><td>≈ 1.1 × 10¹⁵</td><td>≈ 18 PB, a supercomputer</td></tr>
+      <tr><td>300</td><td>≈ 2 × 10⁹⁰</td><td>More than atoms in the universe</td></tr>
+    </table>
+    <div style="width:520px; display:flex; flex-direction:column; gap:16px; background:#0B6E7F; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#F5F4EF">The catch</h3>
+      <p style="font-size:28px; line-height:1.45; color:#F5F4EF">Measuring n qubits returns only n bits. You cannot read the 2ⁿ amplitudes out. Speedups come from arranging interference so the answer is likely.</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">13</p>
+  <aside>The joint state of n qubits lives in the tensor product space of dimension 2^n. This is why around 50 qubits is roughly the frontier of brute-force classical state-vector simulation, although tensor-network methods can go further for low-entanglement circuits.</aside>
+</section>
+<section id="entanglement" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">The qubit</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Entanglement: one state, many qubits</h2>
+  </div>
+  <div style="display:flex; justify-content:center; background:#0F1B2D; border-radius:16px; padding:48px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:64px; color:#F5F4EF; text-align:center">|Φ⁺⟩ = ( <span style="color:#5FD3E0">|00⟩</span> + <span style="color:#F0A060">|11⟩</span> ) / √2</p>
+  </div>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Not separable</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">It cannot be written as (state of A) ⊗ (state of B). Neither qubit has a state of its own.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Perfect correlation</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Measure one: 0 or 1 at random. The other always matches, yet no signal travels.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">A resource</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Powers teleportation, superdense coding, error correction and algorithmic speedups.</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">14</p>
+  <aside>|Φ+⟩ is one of four Bell states. Entanglement correlations violate Bell inequalities — they cannot be explained by hidden classical variables — but they cannot transmit information faster than light because each individual outcome is random.</aside>
+</section>
+<section id="no-cloning" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">The qubit</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">The no-cloning theorem</h2>
+  </div>
+  <div style="display:flex; gap:64px; flex:1; align-items:center">
+    <div style="flex:1; display:flex; flex-direction:column; gap:24px">
+      <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:500; line-height:1.15; color:#0F1B2D">No operation can copy an <span style="color:#0B6E7F">unknown</span> quantum state.</p>
+      <p style="font-size:32px; line-height:1.45; color:#3E4A5C">Proved by Wootters, Zurek and Dieks in 1982. It follows directly from the linearity of quantum mechanics.</p>
+    </div>
+    <div style="width:720px; display:flex; flex-direction:column; gap:24px">
+      <div style="display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">No backup copies</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Classical redundancy (store it 3×, vote) does not apply.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Cleverer error correction</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">QEC spreads information through entanglement instead.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Secure communication</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Eavesdroppers cannot copy qubits unnoticed, the basis of QKD.</p></div>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">15</p>
+  <aside>Sketch of proof: if U|ψ⟩|0⟩ = |ψ⟩|ψ⟩ for all ψ, linearity applied to a superposition gives a contradiction. Teleportation moves a state but destroys the original, so it does not violate no-cloning.</aside>
+</section>
+<section id="decoherence" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">The qubit</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Decoherence: the environment is always listening</h2>
+  </div>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#0F1B2D; border-radius:16px; padding:40px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:64px; font-weight:600; color:#5FD3E0">T₁</p>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#F5F4EF">Energy relaxation</h3>
+      <p style="font-size:28px; line-height:1.4; color:#B9C4D4">|1⟩ decays to |0⟩ as the qubit leaks energy to its surroundings.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#0F1B2D; border-radius:16px; padding:40px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:64px; font-weight:600; color:#F0A060">T₂</p>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#F5F4EF">Dephasing</h3>
+      <p style="font-size:28px; line-height:1.4; color:#B9C4D4">The phase φ randomises and superpositions fade. Always T₂ ≤ 2T₁.</p>
+    </div>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Sources of noise</h3>
+    <div style="display:flex; gap:16px; flex-wrap:wrap">
+      <p style="font-size:28px; color:#0F1B2D; background:#DDEFF1; padding:12px 24px; border-radius:40px">Thermal photons</p>
+      <p style="font-size:28px; color:#0F1B2D; background:#DDEFF1; padding:12px 24px; border-radius:40px">Stray EM fields</p>
+      <p style="font-size:28px; color:#0F1B2D; background:#DDEFF1; padding:12px 24px; border-radius:40px">Material defects (TLS)</p>
+      <p style="font-size:28px; color:#0F1B2D; background:#DDEFF1; padding:12px 24px; border-radius:40px">Imperfect control pulses</p>
+      <p style="font-size:28px; color:#0F1B2D; background:#DDEFF1; padding:12px 24px; border-radius:40px">Vibration</p>
+      <p style="font-size:28px; color:#0F1B2D; background:#DDEFF1; padding:12px 24px; border-radius:40px">Cosmic rays</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">16</p>
+  <aside>Typical orders of magnitude: superconducting qubits have coherence times around 100 microseconds to a millisecond; trapped ions and neutral atoms can hold coherence for seconds. What matters is coherence time divided by gate time — how many operations fit before the state degrades.</aside>
+</section>
+<section id="error-types" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">The qubit</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Kinds of quantum error</h2>
+  </div>
+  <table style="font-size:28px; color:#172033">
+    <tr style="background:#0F1B2D"><th style="width:26%; color:#F5F4EF">Error</th><th style="width:40%; color:#F5F4EF">What happens</th><th style="width:34%; color:#F5F4EF">Typical cause</th></tr>
+    <tr><td><b>Bit flip</b> (X)</td><td>|0⟩ ↔ |1⟩</td><td>Energy exchange, T₁ decay</td></tr>
+    <tr style="background:#ECEAE2"><td><b>Phase flip</b> (Z)</td><td>|+⟩ ↔ |−⟩, sign of |1⟩ flips</td><td>Frequency noise, T₂</td></tr>
+    <tr><td><b>Gate error</b></td><td>Rotation slightly off target</td><td>Pulse miscalibration, drift</td></tr>
+    <tr style="background:#ECEAE2"><td><b>Leakage</b></td><td>State escapes to |2⟩ or beyond</td><td>Weakly anharmonic qubits</td></tr>
+    <tr><td><b>Crosstalk</b></td><td>Driving one qubit disturbs another</td><td>Frequency crowding, coupling</td></tr>
+    <tr style="background:#ECEAE2"><td><b>SPAM</b></td><td>Wrong preparation or readout</td><td>Short or noisy measurement</td></tr>
+  </table>
+  <p style="font-size:28px; color:#3E4A5C">Any single-qubit error can be written as a mix of X, Z and XZ, so correcting those two is enough.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">17</p>
+  <aside>Error discretisation is the key insight that makes quantum error correction possible: although errors are continuous, measuring a syndrome projects them onto a discrete set of Pauli errors that can be corrected.</aside>
+</section>
+<section id="metrics" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">The qubit</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">How qubit quality is measured</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0B6E7F">Gate fidelity</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">How close a gate is to ideal. Leading 2-qubit gates reach about 99.9%.</p></div>
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0B6E7F">Coherence</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">T₁ and T₂: how long the state survives.</p></div>
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0B6E7F">Gate speed</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Nanoseconds for circuits, microseconds for ions and atoms.</p></div>
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0B6E7F">Connectivity</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Which pairs can interact directly without SWAPs.</p></div>
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0B6E7F">Readout fidelity</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">How often a measurement reports the right bit.</p></div>
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0B6E7F">Holistic scores</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Quantum volume, #AQ, logical error rate per cycle.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">18</p>
+  <aside>Qubit count alone is a poor measure. A useful rule of thumb: the number of gates you can run reliably is roughly 1 / error rate. At 99.9% fidelity that is about a thousand operations — far short of what serious algorithms need, which is why error correction matters.</aside>
+</section>
+<section id="physical-logical" data-transition="fade" style="background:#0B6E7F; color:#F5F4EF; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 200px; display:flex; flex-direction:column; justify-content:center; gap:48px">
+  <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:28px; color:#DDEFF1; letter-spacing:3px; text-transform:uppercase">Quality over quantity</p>
+  <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:72px; font-weight:600; line-height:1.15; color:#F5F4EF">A <u>logical</u> qubit is built from many noisy <u>physical</u> qubits. Useful machines need hundreds to thousands of logical ones.</p>
+  <p style="font-size:32px; line-height:1.45; color:#DDEFF1">Physical qubits: the hardware you fabricate. Logical qubits: the error-corrected qubits your algorithm uses.</p>
+  <aside>This distinction is the thread through the architecture section. Today's "100+ qubit" chips count physical qubits. IBM's Starling target, for example, is about 200 logical qubits running 100 million gates.</aside>
+</section>
+<section id="sec-gates" data-transition="fade" style="background:#0F1B2D; color:#F5F4EF; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:end; gap:32px">
+  <p style="position:absolute; right:128px; top:96px; width:900px; text-align:right; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:280px; color:#1D3252">H</p>
+  <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#5FD3E0; letter-spacing:3px; text-transform:uppercase">Part 03</p>
+  <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1.05; color:#F5F4EF">Gates, circuits &amp; algorithms</h1>
+  <p style="font-size:40px; line-height:1.3; color:#B9C4D4; width:1200px">How we program qubits, and where the speedups come from.</p>
+  <aside>Part 3 is the programming model: the gate-based circuit model used by almost all general-purpose quantum computers today.</aside>
+</section>
+<section id="single-gates" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Gates &amp; circuits</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Single-qubit gates rotate the Bloch vector</h2>
+  </div>
+  <table style="font-size:28px; color:#172033">
+    <tr style="background:#0F1B2D"><th style="width:16%; color:#F5F4EF">Gate</th><th style="width:44%; color:#F5F4EF">Action on basis states</th><th style="width:40%; color:#F5F4EF">On the Bloch sphere</th></tr>
+    <tr><td><b>X</b></td><td>|0⟩ → |1⟩, |1⟩ → |0⟩ (quantum NOT)</td><td>180° about x</td></tr>
+    <tr style="background:#ECEAE2"><td><b>Y</b></td><td>|0⟩ → i|1⟩, |1⟩ → −i|0⟩</td><td>180° about y</td></tr>
+    <tr><td><b>Z</b></td><td>|0⟩ → |0⟩, |1⟩ → −|1⟩</td><td>180° about z (phase flip)</td></tr>
+    <tr style="background:#ECEAE2"><td><b>H</b></td><td>|0⟩ → |+⟩, |1⟩ → |−⟩</td><td>Swaps z and x axes</td></tr>
+    <tr><td><b>S</b></td><td>|1⟩ → i|1⟩</td><td>90° about z</td></tr>
+    <tr style="background:#ECEAE2"><td><b>T</b></td><td>|1⟩ → e^(iπ/4)|1⟩</td><td>45° about z</td></tr>
+    <tr><td><b>Rx, Ry, Rz(θ)</b></td><td>Continuous rotations</td><td>θ about x, y or z</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">21</p>
+  <aside>All quantum gates are unitary matrices, so they are reversible — unlike classical AND or OR. H is the workhorse for creating superposition. The T gate is special: it is the expensive non-Clifford gate in fault-tolerant machines, often produced by magic-state distillation.</aside>
+</section>
+<section id="two-gates" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Gates &amp; circuits</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Two-qubit gates create entanglement</h2>
+  </div>
+  <div style="display:flex; gap:64px">
+    <div style="width:620px; display:flex; flex-direction:column; gap:24px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">CNOT truth table</h3>
+      <table style="font-size:32px; color:#172033; font-family:'JetBrains Mono', 'Courier New', monospace">
+        <tr style="background:#0F1B2D"><th style="width:50%; color:#F5F4EF">Control, target in</th><th style="width:50%; color:#F5F4EF">Out</th></tr>
+        <tr><td>|00⟩</td><td>|00⟩</td></tr>
+        <tr style="background:#ECEAE2"><td>|01⟩</td><td>|01⟩</td></tr>
+        <tr><td>|10⟩</td><td><b>|11⟩</b></td></tr>
+        <tr style="background:#ECEAE2"><td>|11⟩</td><td><b>|10⟩</b></td></tr>
+      </table>
+      <p style="font-size:28px; color:#3E4A5C">Flips the target only when the control is 1.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:24px">
+      <div style="display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">CZ</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Adds a minus sign to |11⟩. Native on many superconducting chips.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">SWAP</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Exchanges two qubits' states. Costs three CNOTs.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; background:#0B6E7F; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#F5F4EF">Universality</h3><p style="font-size:28px; line-height:1.4; color:#F5F4EF">{H, S, T, CNOT} can approximate any quantum computation to any accuracy.</p></div>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">22</p>
+  <aside>Two-qubit gates are typically 5–10× more error-prone than single-qubit gates and dominate circuit error budgets. The Solovay–Kitaev theorem guarantees that a finite universal set approximates any unitary efficiently.</aside>
+</section>
+<section id="circuit" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Gates &amp; circuits</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Reading a circuit: the Bell pair</h2>
+  </div>
+  <div style="position:relative; width:1664px; height:340px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px">
+    <hr style="position:absolute; left:220px; top:100px; width:1100px; height:0px; border-top:3px solid #0F1B2D">
+    <hr style="position:absolute; left:220px; top:240px; width:1100px; height:0px; border-top:3px solid #0F1B2D">
+    <p style="position:absolute; left:48px; top:76px; width:160px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#0F1B2D">q₀ |0⟩</p>
+    <p style="position:absolute; left:48px; top:216px; width:160px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#0F1B2D">q₁ |0⟩</p>
+    <div style="position:absolute; left:360px; top:50px; width:100px; height:100px; background:#0B6E7F; border-radius:12px; display:flex; align-items:center; justify-content:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:44px; font-weight:600; color:#F5F4EF">H</p></div>
+    <div style="position:absolute; left:678px; top:100px; width:4px; height:176px; background:#0F1B2D"></div>
+    <x-shape kind="ellipse" style="position:absolute; left:664px; top:86px; width:32px; height:32px; background:#0F1B2D"></x-shape>
+    <x-shape kind="ellipse" style="position:absolute; left:640px; top:202px; width:80px; height:80px; background:#FDFCF9; border:4px solid #0F1B2D"></x-shape>
+    <div style="position:absolute; left:640px; top:240px; width:80px; height:4px; background:#0F1B2D"></div>
+    <div style="position:absolute; left:678px; top:202px; width:4px; height:80px; background:#0F1B2D"></div>
+    <div style="position:absolute; left:960px; top:50px; width:110px; height:100px; background:#E8833A; border-radius:12px; display:flex; align-items:center; justify-content:center"><p style="font-size:32px; font-weight:600; color:#0F1B2D">M</p></div>
+    <div style="position:absolute; left:960px; top:190px; width:110px; height:100px; background:#E8833A; border-radius:12px; display:flex; align-items:center; justify-content:center"><p style="font-size:32px; font-weight:600; color:#0F1B2D">M</p></div>
+    <p style="position:absolute; left:1350px; top:120px; width:280px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#0B6E7F">00 or 11</p>
+    <p style="position:absolute; left:1350px; top:170px; width:280px; font-size:28px; color:#3E4A5C">50% each</p>
+  </div>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">1 · Hadamard</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">q₀ becomes (|0⟩ + |1⟩)/√2</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">2 · CNOT</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Pair becomes (|00⟩ + |11⟩)/√2</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; border-left:4px solid #E8833A; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">3 · Measure</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Outcomes always agree</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">23</p>
+  <aside>Circuits are read left to right as time. Horizontal lines are qubits, boxes are gates, the dot-and-plus is a CNOT (dot = control, ⊕ = target), and M is measurement into a classical bit. This three-gate circuit is the "hello world" of quantum computing.</aside>
+</section>
+<section id="interference" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Gates &amp; circuits</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">It is not “trying every answer at once”</h2>
+  </div>
+  <div style="display:flex; gap:64px; flex:1">
+    <div style="flex:1; display:flex; flex-direction:column; gap:24px">
+      <p style="font-size:32px; line-height:1.5; color:#3E4A5C">Amplitudes can be negative or complex. When computational paths meet, they <b>add</b> (constructive) or <b>cancel</b> (destructive).</p>
+      <p style="font-size:32px; line-height:1.5; color:#3E4A5C">A quantum algorithm is designed so wrong answers cancel and the right answer is amplified before measurement.</p>
+    </div>
+    <div style="width:760px; display:flex; flex-direction:column; gap:24px; background:#0F1B2D; border-radius:16px; padding:48px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#5FD3E0">Example: H then H</h3>
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; line-height:1.6; color:#F5F4EF">|0⟩<br>→ H → (|0⟩ + |1⟩)/√2<br>→ H → ½(|0⟩+|1⟩) + ½(|0⟩−|1⟩)<br>= <span style="color:#5FD3E0">|0⟩</span></p>
+      <p style="font-size:28px; line-height:1.4; color:#B9C4D4">The two |1⟩ paths have opposite signs and cancel exactly.</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">24</p>
+  <aside>This is the most common misconception about quantum computing. If you simply superpose all inputs and measure, you get one random answer — no better than guessing. Speedup requires problem structure (periodicity, symmetry) that interference can exploit.</aside>
+</section>
+<section id="algorithms" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Algorithms</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">The main quantum algorithms</h2>
+  </div>
+  <table style="font-size:26px; color:#172033">
+    <tr style="background:#0F1B2D"><th style="width:22%; color:#F5F4EF">Algorithm</th><th style="width:30%; color:#F5F4EF">Problem</th><th style="width:28%; color:#F5F4EF">Speedup</th><th style="width:20%; color:#F5F4EF">Needs</th></tr>
+    <tr><td><b>Shor</b></td><td>Factoring, discrete logs</td><td>Super-polynomial</td><td>Fault tolerance</td></tr>
+    <tr style="background:#ECEAE2"><td><b>Grover</b></td><td>Unstructured search</td><td>Quadratic (√N)</td><td>Fault tolerance</td></tr>
+    <tr><td><b>Phase estimation</b></td><td>Eigenvalues; key subroutine</td><td>Exponential</td><td>Fault tolerance</td></tr>
+    <tr style="background:#ECEAE2"><td><b>Hamiltonian sim.</b></td><td>Chemistry, materials</td><td>Exponential (many cases)</td><td>Early fault tolerance</td></tr>
+    <tr><td><b>HHL</b></td><td>Linear systems</td><td>Exponential, strict conditions</td><td>Fault tolerance</td></tr>
+    <tr style="background:#ECEAE2"><td><b>VQE</b></td><td>Ground-state energy</td><td>Heuristic</td><td>NISQ</td></tr>
+    <tr><td><b>QAOA</b></td><td>Combinatorial optimisation</td><td>Heuristic</td><td>NISQ</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">25</p>
+  <aside>The algorithms with proven large speedups (top rows) all need error-corrected hardware. The NISQ-friendly ones (bottom rows) run on today's machines but have no proven advantage. HHL's "exponential" speedup has important caveats about loading data and reading answers.</aside>
+</section>
+<section id="shor" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Algorithms</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Shor’s algorithm and the crypto clock</h2>
+  </div>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">How it works</h3>
+      <ol style="font-size:28px; line-height:1.45; color:#3E4A5C; display:flex; flex-direction:column; gap:12px">
+        <li>Reduce factoring N to finding the period of aˣ mod N</li>
+        <li>Quantum Fourier transform reveals the period</li>
+        <li>Classical number theory turns the period into factors</li>
+      </ol>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">What it threatens</h3>
+      <p style="font-size:28px; line-height:1.45; color:#3E4A5C">RSA, Diffie–Hellman and elliptic-curve crypto. A 2025 estimate (Gidney) puts RSA-2048 at under 1 million noisy qubits in under a week.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#0B6E7F; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#F5F4EF">The response</h3>
+      <p style="font-size:28px; line-height:1.45; color:#F5F4EF">NIST post-quantum standards (2024): FIPS 203 ML-KEM, 204 ML-DSA, 205 SLH-DSA. Migrate now: “harvest now, decrypt later”.</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Source: C. Gidney, arXiv:2505.15917 (2025); NIST FIPS 203–205 (Aug 2024)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">26</p>
+  <aside>Resource estimates for breaking RSA-2048 have fallen from about 20 million qubits (2019) to under a million (2025) through better algorithms and error-correction tricks — not bigger hardware. That trend is why organisations are migrating to post-quantum cryptography now.</aside>
+</section>
+<section id="grover" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Algorithms</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Grover’s search: a quadratic speedup</h2>
+  </div>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <p style="font-size:28px; color:#5E6878">Classical, 1 million items</p>
+      <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1.05; color:#0F1B2D">500,000</p>
+      <p style="font-size:28px; color:#3E4A5C">queries on average (N/2)</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#0F1B2D; border-radius:16px; padding:40px">
+      <p style="font-size:28px; color:#B9C4D4">Grover, 1 million items</p>
+      <p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1.05; color:#5FD3E0">≈ 785</p>
+      <p style="font-size:28px; color:#B9C4D4">queries, about (π/4)·√N</p>
+    </div>
+  </div>
+  <div style="display:flex; gap:48px">
+    <p style="flex:1; font-size:28px; line-height:1.45; color:#3E4A5C"><b>Mechanism:</b> an oracle flips the sign of the marked item; a diffusion step reflects about the mean. Repeating amplifies the target amplitude.</p>
+    <p style="flex:1; font-size:28px; line-height:1.45; color:#3E4A5C"><b>Crypto impact:</b> halves the effective key length of symmetric ciphers. AES-256 remains safe.</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">27</p>
+  <aside>Grover's speedup is provably optimal for unstructured search — no quantum algorithm can do better than √N. In practice the quadratic gain can be eaten by error-correction overheads, so real-world advantage needs very large problems.</aside>
+</section>
+<section id="nisq-hybrid" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Algorithms</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">NISQ era: hybrid quantum–classical loops</h2>
+  </div>
+  <div style="display:flex; gap:0px; align-items:center">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:16px; padding:28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Classical optimiser</h3><p style="font-size:24px; color:#3E4A5C">CPU or GPU picks θ</p></div>
+    <x-connector head="end" style="width:64px; color:#0B6E7F; border-width:4px"></x-connector>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:16px; padding:28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Circuit U(θ)</h3><p style="font-size:24px; color:#3E4A5C">Parameterised ansatz</p></div>
+    <x-connector head="end" style="width:64px; color:#0B6E7F; border-width:4px"></x-connector>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#0F1B2D; border-radius:16px; padding:28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#5FD3E0">QPU</h3><p style="font-size:24px; color:#B9C4D4">Thousands of shots</p></div>
+    <x-connector head="end" style="width:64px; color:#0B6E7F; border-width:4px"></x-connector>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:16px; padding:28px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Cost ⟨H⟩</h3><p style="font-size:24px; color:#3E4A5C">Estimate, feed back ↺</p></div>
+  </div>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">VQE</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Minimise energy to find molecular ground states.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">QAOA</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Alternating layers approximate combinatorial optima.</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; border-left:4px solid #E8833A; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Error mitigation</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Zero-noise extrapolation, readout correction, PEC.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">28</p>
+  <aside>NISQ = Noisy Intermediate-Scale Quantum (Preskill, 2018). Short circuits keep noise manageable; the classical computer does the heavy lifting of optimisation. Error mitigation reduces bias in results by post-processing, at the cost of many more shots — it is not error correction.</aside>
+</section>
+<section id="sec-arch" data-transition="fade" style="background:#0F1B2D; color:#F5F4EF; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:end; gap:32px">
+  <p style="position:absolute; right:128px; top:96px; width:900px; text-align:right; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:280px; color:#1D3252">QPU</p>
+  <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#5FD3E0; letter-spacing:3px; text-transform:uppercase">Part 04</p>
+  <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1.05; color:#F5F4EF">Quantum computer architecture</h1>
+  <p style="font-size:40px; line-height:1.3; color:#B9C4D4; width:1200px">The full stack, from the application down to a chip at ten millikelvin.</p>
+  <aside>Part 4 is the heart of the lecture. A quantum computer is mostly classical engineering — electronics, software, cryogenics — wrapped around a small quantum core.</aside>
+</section>
+<section id="full-stack" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">The quantum computing stack</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:8px">
+    <div style="display:flex; align-items:center; gap:32px; background:#DDEFF1; border-radius:12px; padding:16px 32px"><p style="width:460px; font-size:28px; font-weight:600; color:#0F1B2D">Applications</p><p style="flex:1; font-size:28px; color:#172033">Chemistry, materials, optimisation, finance, ML</p></div>
+    <div style="display:flex; align-items:center; gap:32px; background:#C6E5E9; border-radius:12px; padding:16px 32px"><p style="width:460px; font-size:28px; font-weight:600; color:#0F1B2D">Algorithms &amp; SDKs</p><p style="flex:1; font-size:28px; color:#172033">Qiskit, Cirq, PennyLane, CUDA-Q, Q#</p></div>
+    <div style="display:flex; align-items:center; gap:32px; background:#A9D8DF; border-radius:12px; padding:16px 32px"><p style="width:460px; font-size:28px; font-weight:600; color:#0F1B2D">Compiler / transpiler</p><p style="flex:1; font-size:28px; color:#172033">Native gates, qubit mapping, routing, optimisation</p></div>
+    <div style="display:flex; align-items:center; gap:32px; background:#0B6E7F; border-radius:12px; padding:16px 32px"><p style="width:460px; font-size:28px; font-weight:600; color:#F5F4EF">Runtime &amp; QEC decoding</p><p style="flex:1; font-size:28px; color:#F5F4EF">Scheduling, mitigation, real-time decoders</p></div>
+    <div style="display:flex; align-items:center; gap:32px; background:#0C5566; border-radius:12px; padding:16px 32px"><p style="width:460px; font-size:28px; font-weight:600; color:#F5F4EF">Control electronics</p><p style="flex:1; font-size:28px; color:#F5F4EF">FPGAs, DACs/ADCs, microwave or laser pulses</p></div>
+    <div style="display:flex; align-items:center; gap:32px; background:#12304A; border-radius:12px; padding:16px 32px"><p style="width:460px; font-size:28px; font-weight:600; color:#5FD3E0">Quantum processor (QPU)</p><p style="flex:1; font-size:28px; color:#F5F4EF">Physical qubits, couplers, readout</p></div>
+    <div style="display:flex; align-items:center; gap:32px; background:#0F1B2D; border-radius:12px; padding:16px 32px"><p style="width:460px; font-size:28px; font-weight:600; color:#F5F4EF">Cryogenics &amp; environment</p><p style="flex:1; font-size:28px; color:#F5F4EF">Dilution fridge ~10 mK, shielding, vacuum</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">30</p>
+  <aside>Map this to the classical stack students know: applications, languages, compiler, OS/runtime, microarchitecture, devices. The QPU is only one layer; the rest is classical hardware and software. The next slides walk down this stack.</aside>
+</section>
+<section id="qpu-accelerator" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">The QPU is an accelerator, like a GPU</h2>
+  </div>
+  <div style="display:flex; gap:0px; align-items:center">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Classical host</h3>
+      <p style="font-size:28px; color:#5E6878">CPU · GPU · HPC cluster</p>
+      <ul style="font-size:28px; line-height:1.45; color:#3E4A5C; display:flex; flex-direction:column; gap:8px">
+        <li>Pre- and post-processing</li>
+        <li>Compilation and scheduling</li>
+        <li>Optimisation loops</li>
+        <li>Error decoding and mitigation</li>
+      </ul>
+    </div>
+    <div style="width:240px; display:flex; flex-direction:column; gap:16px; align-items:center">
+      <p style="font-size:24px; color:#0B6E7F">circuits</p>
+      <x-connector head="end" style="width:160px; color:#0B6E7F; border-width:4px"></x-connector>
+      <x-connector head="end" from="tr" style="width:160px; color:#B25A18; border-width:4px"></x-connector>
+      <p style="font-size:24px; color:#B25A18">bitstrings</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#0F1B2D; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#5FD3E0">Quantum processing unit</h3>
+      <p style="font-size:28px; color:#B9C4D4">Plus its dedicated control system</p>
+      <ul style="font-size:28px; line-height:1.45; color:#F5F4EF; display:flex; flex-direction:column; gap:8px">
+        <li>Prepares and evolves the quantum state</li>
+        <li>Returns measurement samples</li>
+        <li>No persistent quantum memory yet</li>
+      </ul>
+    </div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Trend: “quantum-centric supercomputing”, with QPUs sitting next to CPUs and GPUs in HPC centres.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">31</p>
+  <aside>Quantum computers will not replace classical ones. Every useful workload is hybrid. Latency between host and QPU matters: tight loops such as error decoding must run in the control system itself, not over a network.</aside>
+</section>
+<section id="qpu-chip" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Inside a superconducting QPU chip</h2>
+  </div>
+  <div style="display:flex; gap:64px; align-items:center">
+    <svg aria-label="Schematic chip: a grid of qubits joined by couplers, each with a readout resonator and control line" style="width:620px; height:560px" width="620" height="560" viewBox="0 0 620 560">
+      <rect x="10" y="10" width="600" height="540" rx="24" fill="#0F1B2D"/>
+      <g stroke="#5E6878" stroke-width="6">
+        <line x1="130" y1="150" x2="490" y2="150"/><line x1="130" y1="280" x2="490" y2="280"/><line x1="130" y1="410" x2="490" y2="410"/>
+        <line x1="130" y1="150" x2="130" y2="410"/><line x1="310" y1="150" x2="310" y2="410"/><line x1="490" y1="150" x2="490" y2="410"/>
+      </g>
+      <g fill="#E8833A"><rect x="208" y="140" width="20" height="20"/><rect x="392" y="140" width="20" height="20"/><rect x="208" y="270" width="20" height="20"/><rect x="392" y="270" width="20" height="20"/><rect x="208" y="400" width="20" height="20"/><rect x="392" y="400" width="20" height="20"/><rect x="120" y="205" width="20" height="20"/><rect x="300" y="205" width="20" height="20"/><rect x="480" y="205" width="20" height="20"/><rect x="120" y="335" width="20" height="20"/><rect x="300" y="335" width="20" height="20"/><rect x="480" y="335" width="20" height="20"/></g>
+      <g fill="#5FD3E0"><circle cx="130" cy="150" r="26"/><circle cx="310" cy="150" r="26"/><circle cx="490" cy="150" r="26"/><circle cx="130" cy="280" r="26"/><circle cx="310" cy="280" r="26"/><circle cx="490" cy="280" r="26"/><circle cx="130" cy="410" r="26"/><circle cx="310" cy="410" r="26"/><circle cx="490" cy="410" r="26"/></g>
+      <g fill="none" stroke="#B9C4D4" stroke-width="3"><path d="M130 124 v-30 h20 v-20 h-40 v-20 h40 v-20"/><path d="M310 124 v-30 h20 v-20 h-40 v-20 h40 v-20"/><path d="M490 124 v-30 h20 v-20 h-40 v-20 h40 v-20"/></g>
+    </svg>
+    <div style="flex:1; display:flex; flex-direction:column; gap:24px">
+      <div style="display:flex; gap:24px; align-items:start"><x-shape kind="ellipse" style="width:36px; height:36px; background:#5FD3E0"></x-shape><div style="flex:1; display:flex; flex-direction:column; gap:4px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Qubits</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Transmons: capacitor plus Josephson junction.</p></div></div>
+      <div style="display:flex; gap:24px; align-items:start"><div style="width:36px; height:36px; background:#E8833A"></div><div style="flex:1; display:flex; flex-direction:column; gap:4px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Tunable couplers</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Switch interactions on for 2-qubit gates, off to cut crosstalk.</p></div></div>
+      <div style="display:flex; gap:24px; align-items:start"><div style="width:36px; height:36px; border:3px solid #5E6878"></div><div style="flex:1; display:flex; flex-direction:column; gap:4px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Readout resonators &amp; lines</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Microwave drive, flux bias and dispersive readout per qubit.</p></div></div>
+      <p style="font-size:28px; line-height:1.4; color:#0B6E7F; background:#DDEFF1; border-radius:12px; padding:20px 24px">IBM Nighthawk (2025): 120 qubits, 218 tunable couplers, square lattice.</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Schematic, not to scale. Source: IBM, Nov 2025</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">32</p>
+  <aside>Modern chips are multi-layer: qubits on one die, with routing, bump bonds and through-silicon vias carrying hundreds of control and readout lines. IBM's 2025 move to 300 mm wafer fabrication shows how much this has become a semiconductor-manufacturing problem.</aside>
+</section>
+<section id="cryogenics" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Cryogenics: colder than outer space</h2>
+  </div>
+  <div style="display:flex; gap:64px">
+    <table style="flex:1; width:1000px; font-size:26px; color:#172033">
+      <tr style="background:#0F1B2D"><th style="width:28%; color:#F5F4EF">Stage</th><th style="width:22%; color:#F5F4EF">Temperature</th><th style="width:50%; color:#F5F4EF">What sits there</th></tr>
+      <tr><td>Room</td><td>300 K</td><td>Control racks, FPGAs, AWGs</td></tr>
+      <tr style="background:#ECEAE2"><td>Pulse tube 1</td><td>≈ 50 K</td><td>Radiation shields, filtering</td></tr>
+      <tr><td>Pulse tube 2</td><td>≈ 4 K</td><td>HEMT amplifiers, attenuators</td></tr>
+      <tr style="background:#ECEAE2"><td>Still</td><td>≈ 0.7 K</td><td>Helium-3 circulation</td></tr>
+      <tr><td>Cold plate</td><td>≈ 100 mK</td><td>More attenuation, filters</td></tr>
+      <tr style="background:#DDEFF1"><td><b>Mixing chamber</b></td><td><b>≈ 10 mK</b></td><td><b>QPU, quantum-limited amplifiers</b></td></tr>
+    </table>
+    <div style="width:500px; display:flex; flex-direction:column; gap:16px; background:#0F1B2D; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#5FD3E0">Why so cold?</h3>
+      <p style="font-size:28px; line-height:1.45; color:#F5F4EF">At 10 mK thermal energy is about 0.2 GHz, far below a ~5 GHz qubit, so stray heat cannot flip it. Deep space is 2.7 K.</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">33</p>
+  <aside>The "chandelier" is a dilution refrigerator using a helium-3/helium-4 mixture. Its cooling power at 10 mK is only microwatts, so every wire brought down adds heat — one of the hardest scaling limits for superconducting machines. Ion and atom systems use lasers and ultra-high vacuum instead, and photonic systems can run largely at room temperature apart from detectors.</aside>
+</section>
+<section id="control" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Control and readout: gates are pulses</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:24px">
+    <p style="font-size:24px; color:#0B6E7F; font-family:'JetBrains Mono', 'Courier New', monospace">DRIVE PATH →</p>
+    <div style="display:flex; align-items:center">
+      <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:20px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">Host</p><p style="font-size:24px; color:#3E4A5C">Compiled pulses</p></div>
+      <x-connector head="end" style="width:48px; color:#0B6E7F; border-width:4px"></x-connector>
+      <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:20px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">FPGA</p><p style="font-size:24px; color:#3E4A5C">Sequencing</p></div>
+      <x-connector head="end" style="width:48px; color:#0B6E7F; border-width:4px"></x-connector>
+      <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:20px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">DAC / AWG</p><p style="font-size:24px; color:#3E4A5C">Waveforms</p></div>
+      <x-connector head="end" style="width:48px; color:#0B6E7F; border-width:4px"></x-connector>
+      <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:20px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">Mixers</p><p style="font-size:24px; color:#3E4A5C">Up to ~5 GHz</p></div>
+      <x-connector head="end" style="width:48px; color:#0B6E7F; border-width:4px"></x-connector>
+      <div style="flex:1; background:#0F1B2D; border-radius:12px; padding:20px"><p style="font-size:28px; font-weight:600; color:#5FD3E0">Qubit</p><p style="font-size:24px; color:#B9C4D4">Via coax, 10 mK</p></div>
+    </div>
+    <p style="font-size:24px; color:#B25A18; font-family:'JetBrains Mono', 'Courier New', monospace">← READOUT PATH</p>
+    <div style="display:flex; align-items:center">
+      <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:20px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">Host</p><p style="font-size:24px; color:#3E4A5C">Bitstrings</p></div>
+      <x-connector head="end" from="tr" style="width:48px; color:#B25A18; border-width:4px"></x-connector>
+      <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:20px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">FPGA</p><p style="font-size:24px; color:#3E4A5C">Classify 0 / 1</p></div>
+      <x-connector head="end" from="tr" style="width:48px; color:#B25A18; border-width:4px"></x-connector>
+      <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:20px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">ADC</p><p style="font-size:24px; color:#3E4A5C">Digitise</p></div>
+      <x-connector head="end" from="tr" style="width:48px; color:#B25A18; border-width:4px"></x-connector>
+      <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:20px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">Amplifiers</p><p style="font-size:24px; color:#3E4A5C">TWPA, HEMT</p></div>
+      <x-connector head="end" from="tr" style="width:48px; color:#B25A18; border-width:4px"></x-connector>
+      <div style="flex:1; background:#0F1B2D; border-radius:12px; padding:20px"><p style="font-size:28px; font-weight:600; color:#5FD3E0">Resonator</p><p style="font-size:24px; color:#B9C4D4">Dispersive shift</p></div>
+    </div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Gate pulses last tens of nanoseconds; feedback must finish well inside coherence time (~100 µs).</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">34</p>
+  <aside>This is the superconducting version; ion and atom systems replace microwaves with laser pulses and read out via fluorescence onto cameras or photodetectors. A growing research area is cryo-CMOS: moving control electronics into the fridge to cut the wiring bottleneck.</aside>
+</section>
+<section id="compiler" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">The quantum compiler pipeline</h2>
+  </div>
+  <div style="display:flex; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#0B6E7F">1</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Decompose</h3><p style="font-size:26px; line-height:1.4; color:#3E4A5C">Rewrite into the chip’s native gates</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#0B6E7F">2</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Map</h3><p style="font-size:26px; line-height:1.4; color:#3E4A5C">Assign program qubits to the best physical qubits</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#0B6E7F">3</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Route</h3><p style="font-size:26px; line-height:1.4; color:#3E4A5C">Insert SWAPs so interacting qubits are neighbours</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#0B6E7F">4</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Optimise</h3><p style="font-size:26px; line-height:1.4; color:#3E4A5C">Cancel, merge and commute gates</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#0B6E7F">5</p><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Schedule</h3><p style="font-size:26px; line-height:1.4; color:#3E4A5C">Turn gates into timed control pulses</p></div>
+  </div>
+  <div style="display:flex; gap:32px; background:#0F1B2D; border-radius:16px; padding:40px; align-items:center">
+    <x-icon name="Lightbulb" style="color:#E8833A; width:64px; height:64px;font-size:51px">💡</x-icon>
+    <p style="flex:1; font-size:32px; line-height:1.45; color:#F5F4EF">Why it matters: one SWAP costs three CNOTs. On sparse layouts routing can multiply circuit depth, and every extra gate adds error.</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">35</p>
+  <aside>For a software engineering audience: this is a classical compiler problem with a twist — the target hardware is noisy and its calibration changes daily, so good compilers are noise-aware. Qubit mapping and routing are NP-hard in general and heavily researched.</aside>
+</section>
+<section id="topology" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Connectivity: who can talk to whom</h2>
+  </div>
+  <div style="display:flex; gap:24px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px">
+      <svg aria-label="Heavy-hex lattice cell: qubits on hexagon vertices and edges" style="width:240px; height:180px" width="240" height="180" viewBox="0 0 240 180">
+        <polygon points="190,90 155,29 85,29 50,90 85,151 155,151" fill="none" stroke="#5E6878" stroke-width="4"/>
+        <line x1="190" y1="90" x2="232" y2="90" stroke="#5E6878" stroke-width="4"/><line x1="50" y1="90" x2="8" y2="90" stroke="#5E6878" stroke-width="4"/>
+        <g fill="#0B6E7F"><circle cx="190" cy="90" r="10"/><circle cx="155" cy="29" r="10"/><circle cx="85" cy="29" r="10"/><circle cx="50" cy="90" r="10"/><circle cx="85" cy="151" r="10"/><circle cx="155" cy="151" r="10"/></g>
+        <g fill="#E8833A"><circle cx="172" cy="60" r="8"/><circle cx="120" cy="29" r="8"/><circle cx="68" cy="60" r="8"/><circle cx="68" cy="120" r="8"/><circle cx="120" cy="151" r="8"/><circle cx="172" cy="120" r="8"/></g>
+      </svg>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Heavy-hex</h3>
+      <p style="font-size:26px; line-height:1.4; color:#3E4A5C">2–3 neighbours; low crosstalk. IBM Eagle, Heron.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px">
+      <svg aria-label="Square lattice: each qubit linked to four neighbours" style="width:240px; height:180px" width="240" height="180" viewBox="0 0 240 180">
+        <g stroke="#5E6878" stroke-width="4"><line x1="30" y1="30" x2="210" y2="30"/><line x1="30" y1="90" x2="210" y2="90"/><line x1="30" y1="150" x2="210" y2="150"/><line x1="30" y1="30" x2="30" y2="150"/><line x1="90" y1="30" x2="90" y2="150"/><line x1="150" y1="30" x2="150" y2="150"/><line x1="210" y1="30" x2="210" y2="150"/></g>
+        <g fill="#0B6E7F"><circle cx="30" cy="30" r="10"/><circle cx="90" cy="30" r="10"/><circle cx="150" cy="30" r="10"/><circle cx="210" cy="30" r="10"/><circle cx="30" cy="90" r="10"/><circle cx="90" cy="90" r="10"/><circle cx="150" cy="90" r="10"/><circle cx="210" cy="90" r="10"/><circle cx="30" cy="150" r="10"/><circle cx="90" cy="150" r="10"/><circle cx="150" cy="150" r="10"/><circle cx="210" cy="150" r="10"/></g>
+      </svg>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Square lattice</h3>
+      <p style="font-size:26px; line-height:1.4; color:#3E4A5C">4 neighbours; fits the surface code. Google Willow, IBM Nighthawk.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px">
+      <svg aria-label="All-to-all graph: six qubits each linked to every other" style="width:240px; height:180px" width="240" height="180" viewBox="0 0 240 180">
+        <g stroke="#5E6878" stroke-width="2"><line x1="190" y1="90" x2="155" y2="151"/><line x1="190" y1="90" x2="85" y2="151"/><line x1="190" y1="90" x2="50" y2="90"/><line x1="190" y1="90" x2="85" y2="29"/><line x1="190" y1="90" x2="155" y2="29"/><line x1="155" y1="151" x2="85" y2="151"/><line x1="155" y1="151" x2="50" y2="90"/><line x1="155" y1="151" x2="85" y2="29"/><line x1="155" y1="151" x2="155" y2="29"/><line x1="85" y1="151" x2="50" y2="90"/><line x1="85" y1="151" x2="85" y2="29"/><line x1="85" y1="151" x2="155" y2="29"/><line x1="50" y1="90" x2="85" y2="29"/><line x1="50" y1="90" x2="155" y2="29"/><line x1="85" y1="29" x2="155" y2="29"/></g>
+        <g fill="#0B6E7F"><circle cx="190" cy="90" r="11"/><circle cx="155" cy="151" r="11"/><circle cx="85" cy="151" r="11"/><circle cx="50" cy="90" r="11"/><circle cx="85" cy="29" r="11"/><circle cx="155" cy="29" r="11"/></g>
+      </svg>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">All-to-all</h3>
+      <p style="font-size:26px; line-height:1.4; color:#3E4A5C">Any pair interacts; no SWAPs. Trapped ions.</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px">
+      <svg aria-label="Reconfigurable array: atoms moved by optical tweezers to new neighbours" style="width:240px; height:180px" width="240" height="180" viewBox="0 0 240 180">
+        <g fill="#C9CDD4"><circle cx="30" cy="30" r="9"/><circle cx="90" cy="30" r="9"/><circle cx="150" cy="30" r="9"/><circle cx="210" cy="30" r="9"/><circle cx="30" cy="90" r="9"/><circle cx="150" cy="90" r="9"/><circle cx="30" cy="150" r="9"/><circle cx="90" cy="150" r="9"/><circle cx="210" cy="150" r="9"/></g>
+        <g fill="#0B6E7F"><circle cx="90" cy="90" r="11"/><circle cx="210" cy="90" r="11"/><circle cx="150" cy="150" r="11"/></g>
+        <g stroke="#E8833A" stroke-width="4" stroke-dasharray="6 5"><line x1="200" y1="90" x2="118" y2="90"/><line x1="146" y1="140" x2="104" y2="106"/></g>
+        <polygon points="104,90 120,82 120,98" fill="#E8833A"/><polygon points="98,100 114,100 106,114" fill="#E8833A"/>
+      </svg>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Reconfigurable</h3>
+      <p style="font-size:26px; line-height:1.4; color:#3E4A5C">Atoms physically moved mid-circuit. Neutral atoms.</p>
+    </div>
+  </div>
+  <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Richer connectivity means fewer SWAPs and enables more efficient codes such as qLDPC, at the cost of more crosstalk or slower operations.</p>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">36</p>
+  <aside>Topology is an architectural choice with trade-offs, just like interconnect topologies in classical multiprocessors. IBM's roadmap adds long-range "c-couplers" on chip precisely to get the non-local connections qLDPC codes need.</aside>
+</section>
+<section id="qec-concept" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Error correction</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Quantum error correction in one picture</h2>
+  </div>
+  <div style="display:flex; gap:48px; align-items:center">
+    <div style="display:flex; align-items:center; gap:24px">
+      <div style="display:grid; grid-template-columns:repeat(5, 40px); gap:16px; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:16px; padding:32px">
+        <x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape>
+        <x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape>
+        <x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape>
+        <x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape>
+        <x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:40px; height:40px; background:#0B6E7F"></x-shape>
+      </div>
+      <x-connector head="end" style="width:96px; color:#0F1B2D; border-width:5px"></x-connector>
+      <div style="width:180px; height:180px; background:#0F1B2D; border-radius:90px; display:flex; align-items:center; justify-content:center"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:44px; font-weight:600; color:#5FD3E0">|ψ⟩L</p></div>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:24px">
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Encode</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Spread one logical qubit over many <span style="color:#0B6E7F"><b>data qubits</b></span> via entanglement.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #E8833A; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Measure syndromes</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C"><span style="color:#B25A18"><b>Ancilla qubits</b></span> check parities, revealing errors without reading the data.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #0F1B2D; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Threshold theorem</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">If physical error p &lt; p_th, logical error falls as (p/p_th)^((d+1)/2) with code distance d.</p></div>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">37</p>
+  <aside>This is how QEC gets around no-cloning: information is not copied but encoded non-locally. The threshold theorem is the reason fault-tolerant quantum computing is possible at all — below threshold, adding more qubits makes things better, not worse.</aside>
+</section>
+<section id="surface-code" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Error correction</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Surface code and the qLDPC alternative</h2>
+  </div>
+  <div style="display:flex; gap:64px; align-items:center">
+    <svg aria-label="Distance-5 surface code patch: 25 data qubits on a grid, with alternating X-check and Z-check plaquettes" style="width:520px; height:520px" width="520" height="520" viewBox="0 0 520 520">
+      <rect x="60" y="60" width="100" height="100" fill="#BFE7EC"/><rect x="160" y="60" width="100" height="100" fill="#F6D2B5"/><rect x="260" y="60" width="100" height="100" fill="#BFE7EC"/><rect x="360" y="60" width="100" height="100" fill="#F6D2B5"/>
+      <rect x="60" y="160" width="100" height="100" fill="#F6D2B5"/><rect x="160" y="160" width="100" height="100" fill="#BFE7EC"/><rect x="260" y="160" width="100" height="100" fill="#F6D2B5"/><rect x="360" y="160" width="100" height="100" fill="#BFE7EC"/>
+      <rect x="60" y="260" width="100" height="100" fill="#BFE7EC"/><rect x="160" y="260" width="100" height="100" fill="#F6D2B5"/><rect x="260" y="260" width="100" height="100" fill="#BFE7EC"/><rect x="360" y="260" width="100" height="100" fill="#F6D2B5"/>
+      <rect x="60" y="360" width="100" height="100" fill="#F6D2B5"/><rect x="160" y="360" width="100" height="100" fill="#BFE7EC"/><rect x="260" y="360" width="100" height="100" fill="#F6D2B5"/><rect x="360" y="360" width="100" height="100" fill="#BFE7EC"/>
+      <g stroke="#0F1B2D" stroke-width="2" fill="none"><rect x="60" y="60" width="400" height="400"/><line x1="160" y1="60" x2="160" y2="460"/><line x1="260" y1="60" x2="260" y2="460"/><line x1="360" y1="60" x2="360" y2="460"/><line x1="60" y1="160" x2="460" y2="160"/><line x1="60" y1="260" x2="460" y2="260"/><line x1="60" y1="360" x2="460" y2="360"/></g>
+      <g fill="#0F1B2D">
+        <circle cx="60" cy="60" r="16"/><circle cx="160" cy="60" r="16"/><circle cx="260" cy="60" r="16"/><circle cx="360" cy="60" r="16"/><circle cx="460" cy="60" r="16"/>
+        <circle cx="60" cy="160" r="16"/><circle cx="160" cy="160" r="16"/><circle cx="260" cy="160" r="16"/><circle cx="360" cy="160" r="16"/><circle cx="460" cy="160" r="16"/>
+        <circle cx="60" cy="260" r="16"/><circle cx="160" cy="260" r="16"/><circle cx="260" cy="260" r="16"/><circle cx="360" cy="260" r="16"/><circle cx="460" cy="260" r="16"/>
+        <circle cx="60" cy="360" r="16"/><circle cx="160" cy="360" r="16"/><circle cx="260" cy="360" r="16"/><circle cx="360" cy="360" r="16"/><circle cx="460" cy="360" r="16"/>
+        <circle cx="60" cy="460" r="16"/><circle cx="160" cy="460" r="16"/><circle cx="260" cy="460" r="16"/><circle cx="360" cy="460" r="16"/><circle cx="460" cy="460" r="16"/>
+      </g>
+      <circle cx="260" cy="260" r="22" fill="none" stroke="#C0392B" stroke-width="5"/>
+    </svg>
+    <div style="flex:1; display:flex; flex-direction:column; gap:24px">
+      <div style="display:flex; gap:24px; align-items:center"><div style="width:40px; height:40px; background:#BFE7EC; border:1px solid #0F1B2D"></div><p style="font-size:28px; color:#3E4A5C">X-type checks</p><div style="width:40px; height:40px; background:#F6D2B5; border:1px solid #0F1B2D"></div><p style="font-size:28px; color:#3E4A5C">Z-type checks</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Surface code</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Only nearest-neighbour checks; tolerates ~1% error. Needs ~2d² physical qubits per logical. Google Willow showed error falling from d = 3 to 7.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #E8833A; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">qLDPC codes</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">IBM’s bivariate-bicycle (“gross”) code: 12 logical qubits in 288 physical, about 10× fewer, but needs long-range links.</p></div>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Distance-5 patch shown; red ring = an error the neighbouring checks detect. Sources: Google (2024), IBM (2025)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">38</p>
+  <aside>In the picture, black dots are data qubits; each coloured square is a stabiliser measured by an ancilla qubit at its centre (not drawn). An error on the ringed qubit flips the four surrounding checks, which the decoder uses to locate it. The gross code's 288 physical qubits include both data and check qubits.</aside>
+</section>
+<section id="decoding" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Error correction</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Real-time decoding: a classical race</h2>
+  </div>
+  <div style="display:flex; align-items:center">
+    <div style="flex:1; background:#0F1B2D; border-radius:12px; padding:24px"><p style="font-size:28px; font-weight:600; color:#5FD3E0">Measure</p><p style="font-size:24px; color:#B9C4D4">Syndrome bits every cycle</p></div>
+    <x-connector head="end" style="width:56px; color:#0B6E7F; border-width:4px"></x-connector>
+    <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:24px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">Stream</p><p style="font-size:24px; color:#3E4A5C">To FPGA or ASIC decoder</p></div>
+    <x-connector head="end" style="width:56px; color:#0B6E7F; border-width:4px"></x-connector>
+    <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:24px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">Decode</p><p style="font-size:24px; color:#3E4A5C">Infer the likeliest error</p></div>
+    <x-connector head="end" style="width:56px; color:#0B6E7F; border-width:4px"></x-connector>
+    <div style="flex:1; background:#FDFCF9; border:2px solid #0F1B2D; border-radius:12px; padding:24px"><p style="font-size:28px; font-weight:600; color:#0F1B2D">Correct</p><p style="font-size:24px; color:#3E4A5C">Update Pauli frame, repeat ↺</p></div>
+  </div>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; color:#0B6E7F">~1 µs</p><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Syndrome cycle on superconducting chips</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; color:#0B6E7F">&lt; 480 ns</p><p style="font-size:28px; line-height:1.4; color:#3E4A5C">IBM real-time qLDPC decoding (2025)</p></div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:8px; background:#0F1B2D; border-radius:16px; padding:32px"><p style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; color:#F0A060">Backlog</p><p style="font-size:28px; line-height:1.4; color:#F5F4EF">If decoding is slower than the cycle, errors pile up and computation stalls</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Source: IBM Quantum, Nov 2025</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">39</p>
+  <aside>A fault-tolerant quantum computer is also a real-time classical system producing terabits of syndrome data per second. Decoders include minimum-weight perfect matching, union-find, belief propagation and increasingly neural-network decoders. This is a great area for computer scientists.</aside>
+</section>
+<section id="modular" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Architecture</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Scaling out: modular architectures</h2>
+  </div>
+  <p style="font-size:32px; line-height:1.45; color:#3E4A5C">One chip cannot hold a million qubits: wiring, fridge space and fabrication yield all run out. So machines are becoming networks of modules.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">On-chip long-range couplers</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Non-local links inside one die (IBM Loon c-couplers).</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Chip-to-chip links</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Microwave couplers join modules in one fridge.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Photonic interconnects</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Entangle distant modules or fridges with light.</p></div>
+    <div style="display:flex; flex-direction:column; gap:8px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Ion shuttling (QCCD)</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Move ions between trap zones on one chip.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">40</p>
+  <aside>This mirrors classical history: from one big processor to multicore to clusters. IBM Quantum System Two is designed as a modular housing; the Kookaburra and Cockatoo milestones test module-to-module links on the way to Starling.</aside>
+</section>
+<section id="sec-hardware" data-transition="fade" style="background:#0F1B2D; color:#F5F4EF; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:end; gap:32px">
+  <p style="position:absolute; right:128px; top:96px; width:900px; text-align:right; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:280px; color:#1D3252">10 mK</p>
+  <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; color:#5FD3E0; letter-spacing:3px; text-transform:uppercase">Part 05</p>
+  <h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:120px; font-weight:600; line-height:1.05; color:#F5F4EF">Hardware platforms</h1>
+  <p style="font-size:40px; line-height:1.3; color:#B9C4D4; width:1200px">Six ways to build a qubit, and who is building them.</p>
+  <aside>There is no winning qubit technology yet. Each platform makes different trade-offs across speed, fidelity, connectivity and scalability.</aside>
+</section>
+<section id="modalities" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Hardware</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Qubit platforms compared</h2>
+  </div>
+  <table style="font-size:24px; color:#172033">
+    <tr style="background:#0F1B2D"><th style="width:17%; color:#F5F4EF">Platform</th><th style="width:29%; color:#F5F4EF">Qubit is…</th><th style="width:27%; color:#5FD3E0">Strengths</th><th style="width:27%; color:#F0A060">Challenges</th></tr>
+    <tr><td><b>Superconducting</b></td><td>Josephson-junction circuit at ~10 mK</td><td>Fast gates, chip fabrication</td><td>Short coherence, wiring, cooling</td></tr>
+    <tr style="background:#ECEAE2"><td><b>Trapped ions</b></td><td>Electronic states of single ions</td><td>Top fidelity, all-to-all</td><td>Slow gates, scaling traps</td></tr>
+    <tr><td><b>Neutral atoms</b></td><td>Atoms in optical tweezers, Rydberg gates</td><td>Large arrays, reconfigurable</td><td>Slow cycles, atom loss</td></tr>
+    <tr style="background:#ECEAE2"><td><b>Photonic</b></td><td>States of single photons</td><td>Room temperature, networking</td><td>Photon loss, probabilistic gates</td></tr>
+    <tr><td><b>Spin / silicon</b></td><td>Electron spin in a quantum dot</td><td>CMOS-compatible, tiny</td><td>Device variability</td></tr>
+    <tr style="background:#ECEAE2"><td><b>Topological</b></td><td>Majorana modes in nanowires</td><td>Built-in error protection (in theory)</td><td>Still prototype-stage</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">42</p>
+  <aside>A useful way to frame the comparison: superconducting qubits are fast but short-lived; ions and atoms are slow but long-lived and well connected. Photonics and spins bet on manufacturability; topological qubits bet on physics doing the error protection.</aside>
+</section>
+<section id="superconducting" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Hardware</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Superconducting qubits: artificial atoms</h2>
+  </div>
+  <div style="display:flex; gap:64px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:24px">
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Josephson junction</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">A thin insulator between superconductors acts as a lossless, non-linear inductor.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Anharmonic oscillator</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Unequal energy levels let us address just the lowest two: |0⟩ and |1⟩, ~4–6 GHz apart.</p></div>
+      <div style="display:flex; flex-direction:column; gap:8px; border-left:4px solid #0B6E7F; padding:0px 0px 0px 24px"><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Controlled by microwaves</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Shaped pulses drive gates; couplers mediate two-qubit gates.</p></div>
+    </div>
+    <div style="width:620px; display:flex; flex-direction:column; gap:24px; background:#0F1B2D; border-radius:16px; padding:40px">
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#5FD3E0">Representative chips</h3>
+      <table style="font-size:28px; color:#F5F4EF">
+        <tr><th style="width:60%; color:#B9C4D4">Chip</th><th style="width:40%; color:#B9C4D4">Qubits</th></tr>
+        <tr><td>Google Willow (2024)</td><td>105</td></tr>
+        <tr><td>IBM Heron r2 / r3</td><td>156</td></tr>
+        <tr><td>IBM Nighthawk (2025)</td><td>120</td></tr>
+        <tr><td>IBM Loon (2025)</td><td>112</td></tr>
+      </table>
+      <p style="font-size:24px; line-height:1.4; color:#B9C4D4">Also: Rigetti, IQM, AWS (Ocelot, cat qubits), Alice &amp; Bob.</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Sources: Google, IBM, The Quantum Insider (2026)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">43</p>
+  <aside>The transmon, developed at Yale in 2007, reduced sensitivity to charge noise and became the dominant design. Note the qubit counts are deliberately modest: vendors now optimise for fidelity and connectivity rather than raw count. Loon is an experimental chip demonstrating all hardware elements for fault tolerance.</aside>
+</section>
+<section id="ions-atoms" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Hardware</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Trapped ions and neutral atoms</h2>
+  </div>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <div style="display:flex; gap:16px"><x-shape kind="ellipse" style="width:36px; height:36px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:36px; height:36px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:36px; height:36px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:36px; height:36px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:36px; height:36px; background:#0B6E7F"></x-shape><x-shape kind="ellipse" style="width:36px; height:36px; background:#0B6E7F"></x-shape></div>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Trapped ions</h3>
+      <ul style="font-size:28px; line-height:1.45; color:#3E4A5C; display:flex; flex-direction:column; gap:8px">
+        <li>Charged atoms held by electric fields in vacuum</li>
+        <li>Laser or microwave gates; ions interact via shared motion</li>
+        <li>Identical by nature; very long coherence</li>
+        <li>Quantinuum (Helios), IonQ (Tempo)</li>
+      </ul>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <div style="display:grid; grid-template-columns:repeat(6, 36px); gap:12px 16px"><x-shape kind="ellipse" style="width:36px; height:36px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:36px; height:36px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:36px; height:36px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:36px; height:36px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:36px; height:36px; background:#E8833A"></x-shape><x-shape kind="ellipse" style="width:36px; height:36px; background:#E8833A"></x-shape></div>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Neutral atoms</h3>
+      <ul style="font-size:28px; line-height:1.45; color:#3E4A5C; display:flex; flex-direction:column; gap:8px">
+        <li>Uncharged atoms held in arrays of optical tweezers</li>
+        <li>Rydberg excitation switches interactions on</li>
+        <li>Hundreds of qubits; atoms can be moved mid-circuit</li>
+        <li>QuEra, Atom Computing, Pasqal, Infleqtion</li>
+      </ul>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">44</p>
+  <aside>Both are "atomic" platforms: every qubit is a perfect copy of every other, unlike fabricated circuits. Gates take microseconds rather than nanoseconds, but coherence lasts seconds. Neutral atoms have been central to several recent logical-qubit demonstrations, including Microsoft with Atom Computing and QuEra with Harvard.</aside>
+</section>
+<section id="photonic-spin-topo" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Hardware</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Photons, spins and topological qubits</h2>
+  </div>
+  <div style="display:flex; gap:32px">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <x-icon name="Lightning" style="color:#0B6E7F; width:56px; height:56px;font-size:44px">⚡</x-icon>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Photonic</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Qubits in light on silicon-photonic chips. Measurement-based computing on large entangled cluster states. Natural fit for networking.</p>
+      <p style="font-size:24px; color:#5E6878">PsiQuantum, Xanadu, Quandela</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <x-icon name="Settings" style="color:#0B6E7F; width:56px; height:56px;font-size:44px">⚙</x-icon>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Spin qubits</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Single electrons trapped in silicon quantum dots, built with transistor-style fabrication. Could pack millions per chip.</p>
+      <p style="font-size:24px; color:#5E6878">Intel, Diraq, Quantum Motion</p>
+    </div>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:40px">
+      <x-icon name="Lock" style="color:#0B6E7F; width:56px; height:56px;font-size:44px">🔒</x-icon>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Topological</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Information stored non-locally in Majorana modes, protected by physics. Majorana 2 (2026) reports parity lifetimes over 20 s.</p>
+      <p style="font-size:24px; color:#5E6878">Microsoft</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Source: The Quantum Insider, June 2026</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">45</p>
+  <aside>These are the longer-horizon bets. Photonics and spins aim to reuse the semiconductor industry's manufacturing base. Microsoft's topological approach remains a prototype; the 2026 Majorana 2 results reported a doubled topological gap and much longer parity lifetimes, but scaling is still ahead.</aside>
+</section>
+<section id="landscape" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Hardware</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">The landscape in 2026</h2>
+  </div>
+  <table style="font-size:24px; color:#172033">
+    <tr style="background:#0F1B2D"><th style="width:20%; color:#F5F4EF">Company</th><th style="width:18%; color:#F5F4EF">Platform</th><th style="width:28%; color:#F5F4EF">Recent system</th><th style="width:34%; color:#F5F4EF">Headline</th></tr>
+    <tr><td><b>IBM</b></td><td>Superconducting</td><td>Nighthawk 120 q, Loon 112 q</td><td>Starling: 200 logical qubits by 2029</td></tr>
+    <tr style="background:#ECEAE2"><td><b>Google</b></td><td>Superconducting</td><td>Willow, 105 q</td><td>Below-threshold surface code</td></tr>
+    <tr><td><b>Quantinuum</b></td><td>Trapped ion</td><td>Helios</td><td>Listed on Nasdaq, June 2026</td></tr>
+    <tr style="background:#ECEAE2"><td><b>IonQ</b></td><td>Trapped ion</td><td>Tempo, #AQ 64</td><td>First quantum firm over $100M revenue</td></tr>
+    <tr><td><b>Microsoft</b></td><td>Topological</td><td>Majorana 2 prototype</td><td>Roadmap to scalable machine by 2029</td></tr>
+    <tr style="background:#ECEAE2"><td><b>QuEra, Atom, Infleqtion</b></td><td>Neutral atom</td><td>100+ atom arrays</td><td>Logical-qubit demonstrations</td></tr>
+    <tr><td><b>PsiQuantum, Xanadu</b></td><td>Photonic</td><td>Modular photonic systems</td><td>Xanadu listed via SPAC, 2026</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; width:1400px; font-size:24px; color:#5E6878">As of Sept 2026; fast-moving. Sources: IBM, Google, The Quantum Insider, Entangled Future (2026)</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">46</p>
+  <aside>Treat this slide as a snapshot and refresh it before each delivery. Headline qubit counts are not comparable across platforms — quality, connectivity and logical-qubit results matter more. Notable 2026 trends: several public listings (Infleqtion, Xanadu, Quantinuum), and multiple vendors reporting logical-qubit milestones.</aside>
+</section>
+<section id="software" data-section="Software, roadmap, open challenges and takeaways" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Part 06 · Software</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Programming a quantum computer today</h2>
+  </div>
+  <div style="display:flex; gap:48px">
+    <table style="flex:1; width:880px; font-size:26px; color:#172033">
+      <tr style="background:#0F1B2D"><th style="width:32%; color:#F5F4EF">SDK</th><th style="width:26%; color:#F5F4EF">From</th><th style="width:42%; color:#F5F4EF">Focus</th></tr>
+      <tr><td><b>Qiskit</b></td><td>IBM</td><td>Circuits, runtime, transpiler</td></tr>
+      <tr style="background:#ECEAE2"><td><b>Cirq</b></td><td>Google</td><td>NISQ circuits, research</td></tr>
+      <tr><td><b>PennyLane</b></td><td>Xanadu</td><td>Differentiable quantum ML</td></tr>
+      <tr style="background:#ECEAE2"><td><b>CUDA-Q</b></td><td>NVIDIA</td><td>Hybrid GPU–QPU workflows</td></tr>
+      <tr><td><b>Q#</b></td><td>Microsoft</td><td>Fault-tolerant programs</td></tr>
+      <tr style="background:#ECEAE2"><td><b>Braket</b></td><td>AWS</td><td>Cloud access, many vendors</td></tr>
+    </table>
+    <div style="width:680px; display:flex; flex-direction:column; gap:16px; background:#0F1B2D; border-radius:16px; padding:40px">
+      <p style="font-size:24px; color:#5FD3E0; font-family:'JetBrains Mono', 'Courier New', monospace">bell.py · Qiskit</p>
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:28px; line-height:1.6; color:#F5F4EF">from qiskit import QuantumCircuit<br><br>qc = QuantumCircuit(2, 2)<br>qc.h(0)<br>qc.cx(0, 1)<br>qc.measure([0, 1], [0, 1])<br>print(qc.draw())</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">47</p>
+  <aside>The code on the right builds exactly the Bell circuit from slide 23. Most SDKs are open-source Python libraries with free simulators, and cloud access to real hardware is available through IBM Quantum, Amazon Braket and Azure Quantum — ideal for student labs.</aside>
+</section>
+<section id="roadmap" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Outlook</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Three eras, and what each unlocks</h2>
+  </div>
+  <div style="display:flex; align-items:stretch">
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:36px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F">NOW</p>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">NISQ &amp; utility</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">100–1,000+ noisy qubits, error mitigation, hybrid HPC workflows.</p>
+      <p style="font-size:26px; line-height:1.4; color:#0F1B2D"><b>Unlocks:</b> physics simulation, first advantage claims (IBM target: 2026).</p>
+    </div>
+    <x-connector head="end" style="width:56px; color:#0B6E7F; border-width:4px; align-self:center"></x-connector>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#DDEFF1; border-radius:16px; padding:36px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F">~2026–2030</p>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#0F1B2D">Early fault tolerance</h3>
+      <p style="font-size:28px; line-height:1.4; color:#3E4A5C">Tens to hundreds of logical qubits. IBM Starling (2029): 200 logical, 100M gates.</p>
+      <p style="font-size:26px; line-height:1.4; color:#0F1B2D"><b>Unlocks:</b> chemistry and materials beyond classical reach.</p>
+    </div>
+    <x-connector head="end" style="width:56px; color:#0B6E7F; border-width:4px; align-self:center"></x-connector>
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#0F1B2D; border-radius:16px; padding:36px">
+      <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#5FD3E0">2030s</p>
+      <h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:40px; font-weight:600; color:#F5F4EF">Scaled fault tolerance</h3>
+      <p style="font-size:28px; line-height:1.4; color:#B9C4D4">Thousands of logical qubits. IBM Blue Jay (2033+): 2,000 logical, 1B gates.</p>
+      <p style="font-size:26px; line-height:1.4; color:#F5F4EF"><b>Unlocks:</b> Shor-scale cryptanalysis, broad optimisation.</p>
+    </div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Dates are vendor targets, not guarantees. Source: IBM Quantum roadmap</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">48</p>
+  <aside>Other roadmaps point the same way: Microsoft targets a scalable machine by 2029, and DARPA runs a programme to validate utility-scale quantum computing by 2033. Be sceptical of any specific date — but note the consensus that the late 2020s is the transition to error-corrected machines.</aside>
+</section>
+<section id="challenges" data-transition="fade" style="background:#F5F4EF; color:#172033; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#0B6E7F; letter-spacing:2px; text-transform:uppercase">Outlook</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#0F1B2D">Open challenges</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px">
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><x-icon name="Warning" style="color:#B25A18; width:48px; height:48px;font-size:38px">⚠</x-icon><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Error rates</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Fidelity must keep improving as systems grow.</p></div>
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><x-icon name="Wrench" style="color:#B25A18; width:48px; height:48px;font-size:38px">🔧</x-icon><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Scale and wiring</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Millions of physical qubits need new I/O and cooling.</p></div>
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><x-icon name="Clock" style="color:#B25A18; width:48px; height:48px;font-size:38px">⏱</x-icon><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Real-time decoding</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Classical compute that keeps pace with the QPU.</p></div>
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><x-icon name="Verified" style="color:#B25A18; width:48px; height:48px;font-size:38px">✔</x-icon><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Verification</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Trusting answers no classical machine can check.</p></div>
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><x-icon name="Lightbulb" style="color:#B25A18; width:48px; height:48px;font-size:38px">💡</x-icon><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Killer applications</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Proven, practical advantage beyond cryptanalysis.</p></div>
+    <div style="display:flex; flex-direction:column; gap:12px; background:#FDFCF9; border:1px solid #DAD8CF; border-radius:16px; padding:32px"><x-icon name="Users" style="color:#B25A18; width:48px; height:48px;font-size:38px">👥</x-icon><h3 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:32px; font-weight:600; color:#0F1B2D">Skills and tooling</h3><p style="font-size:28px; line-height:1.4; color:#3E4A5C">Quantum software engineering is still young.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; width:1200px; font-size:24px; color:#5E6878">Quantum Computing · Qubits &amp; Architecture</p>
+  <p style="position:absolute; right:128px; bottom:64px; width:200px; font-size:24px; color:#5E6878; text-align:right">49</p>
+  <aside>Several of these are software and systems problems, not physics: compilers, decoders, verification, testing and debugging quantum programs. That is where software engineers can contribute right now.</aside>
+</section>
+<section id="summary" data-transition="fade" style="background:#0F1B2D; color:#F5F4EF; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:48px">
+  <div style="display:flex; flex-direction:column; gap:16px">
+    <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#5FD3E0; letter-spacing:2px; text-transform:uppercase">Key takeaways</p>
+    <h2 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; line-height:1.1; color:#F5F4EF">What to remember</h2>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:24px">
+    <div style="display:flex; gap:32px; align-items:baseline"><p style="width:80px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#5FD3E0">01</p><p style="flex:1; font-size:32px; line-height:1.4; color:#F5F4EF">Qubits use superposition, entanglement and interference; measurement returns only bits.</p></div>
+    <div style="display:flex; gap:32px; align-items:baseline"><p style="width:80px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#5FD3E0">02</p><p style="flex:1; font-size:32px; line-height:1.4; color:#F5F4EF">Speedups come from structured problems, not from “trying everything”.</p></div>
+    <div style="display:flex; gap:32px; align-items:baseline"><p style="width:80px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#5FD3E0">03</p><p style="flex:1; font-size:32px; line-height:1.4; color:#F5F4EF">A quantum computer is a full stack: mostly classical engineering around a fragile core.</p></div>
+    <div style="display:flex; gap:32px; align-items:baseline"><p style="width:80px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#5FD3E0">04</p><p style="flex:1; font-size:32px; line-height:1.4; color:#F5F4EF">Error correction turns many physical qubits into few logical ones; it is the path to scale.</p></div>
+    <div style="display:flex; gap:32px; align-items:baseline"><p style="width:80px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:40px; font-weight:600; color:#5FD3E0">05</p><p style="flex:1; font-size:32px; line-height:1.4; color:#F5F4EF">Several platforms compete; fault-tolerant machines are targeted for the late 2020s.</p></div>
+  </div>
+  <p style="position:absolute; right:128px; bottom:96px; width:600px; text-align:right; font-family:'Space Grotesk', Arial, sans-serif; font-size:64px; font-weight:600; color:#E8833A">Questions?</p>
+  <aside>Close by inviting questions. Suggested lab follow-up: build and run the Bell circuit in Qiskit on a simulator, then on real hardware through IBM Quantum, and compare the noisy results with the ideal 50/50 distribution.</aside>
+</section>
+
+</div></div>
+<div id="bar"><a href="pres.htm">← Presentations</a><button onclick="go(i-1)">‹ Prev</button><span id="n"></span><button onclick="go(i+1)">Next ›</button><span>← → keys · F for full screen</span></div>
+<script>
+const S=[...document.querySelectorAll('section')],f=document.getElementById('frame'),n=document.getElementById('n');let i=0;
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);f.style.transform='scale('+s+')'}
+function go(k){i=Math.max(0,Math.min(S.length-1,k));S.forEach((s,j)=>s.classList.toggle('on',j===i));n.textContent=(i+1)+' / '+S.length;history.replaceState(null,'','#'+(i+1))}
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){go(i+1);e.preventDefault()}else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){go(i-1);e.preventDefault()}else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);else if(e.key==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}});
+document.getElementById('stage').addEventListener('click',e=>{if(e.target.closest('a'))return;go(e.clientX<innerWidth/3?i-1:i+1)});
+let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX);addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>40)go(d<0?i+1:i-1);tx=null});
+fit();go((parseInt(location.hash.slice(1))||1)-1);
+</script></body></html>

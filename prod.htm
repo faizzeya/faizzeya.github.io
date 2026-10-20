@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Production Python for AI Engineers — Faiz ul haque Zeya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400..600&amp;display=swap">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#111;overflow:hidden;font-family:Arial,sans-serif}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#frame{width:1920px;height:1080px;position:relative;transform-origin:center center;flex:none;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+section{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden}
+section:not(.on){display:none!important}
+section *{margin:0}
+section aside{display:none!important}
+section ul,section ol{padding-left:1.3em}
+section table{border-collapse:collapse;width:100%}
+section th,section td{padding:.45em .6em;text-align:left;vertical-align:top;border-bottom:1px solid rgba(127,127,127,.25)}
+section div,section p,section h1,section h2,section h3{position:relative}
+section [style*="position:absolute"],section [style*="position: absolute"]{position:absolute}
+x-shape{display:block;flex:none}
+x-shape[kind=ellipse]{border-radius:50%}
+x-shape[kind=rounded]{border-radius:16px}
+x-shape[kind=arrow-right]{clip-path:polygon(0 30%,65% 30%,65% 0,100% 50%,65% 100%,65% 70%,0 70%)}
+x-shape[kind=arrow-left]{clip-path:polygon(100% 30%,35% 30%,35% 0,0 50%,35% 100%,35% 70%,100% 70%)}
+x-connector{display:block;flex:none;align-self:center;height:0;border-top-style:solid;border-top-color:currentColor;position:relative}
+x-connector::after{content:"";position:absolute;right:-2px;top:-11px;border:9px solid transparent;border-left:14px solid currentColor;border-right:0}
+x-connector[from=tr]::after{right:auto;left:-2px;border-left:0;border-right:14px solid currentColor}
+x-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;line-height:1}
+#bar{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:16px;padding:8px;background:rgba(0,0,0,.55);color:#eee;font:14px Arial,sans-serif;opacity:.15;transition:opacity .2s}
+#bar:hover{opacity:1}
+#bar button{background:#333;color:#eee;border:1px solid #555;border-radius:6px;padding:6px 14px;cursor:pointer;font:inherit}
+#bar a{color:#9cf}
+</style></head><body>
+<div id="stage"><div id="frame">
+<section id="cover" style="background:#16191d; color:#f2f0ec; font-family:Inter, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:36px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#d98a5f">A hands-on tutorial</p>
+  <h1 style="font-family:'Space Grotesk', sans-serif; font-size:112px; font-weight:600; line-height:1.05; width:1500px">Production Python for AI Engineers</h1>
+  <p style="font-size:38px; line-height:1.4; color:#b6bcc4; width:1400px">uv, type hints and Pydantic v2, asyncio, FastAPI, Ruff, pytest — the six things that separate someone who knows Python from someone who ships Python services.</p>
+  <p style="position:absolute; left:128px; bottom:96px; font-size:26px; color:#8b929b">134 slides · Prof. Engr. Faiz ul Haque Zeya</p>
+  <aside>Frame the deck: this is not a Python course. It is the production layer on top of Python that clients pay senior rates for.</aside>
+</section>
+<section id="who-for" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Who this is for, and what it assumes</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px">
+      <h3 style="font-size:30px; font-weight:600; line-height:1.25">Assumed</h3>
+      <p style="font-size:26px; line-height:1.45; color:#4a5058">You write Python comfortably. Functions, classes, decorators, modules, exceptions, comprehensions and the standard library are not new.</p>
+    </div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px">
+      <h3 style="font-size:30px; font-weight:600; line-height:1.25">Taught here</h3>
+      <p style="font-size:26px; line-height:1.45; color:#4a5058">The layer above the language: reproducible environments, validated data, concurrency, HTTP services, automated quality, automated tests.</p>
+    </div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px">
+      <h3 style="font-size:30px; font-weight:600; line-height:1.25">Goal</h3>
+      <p style="font-size:26px; line-height:1.45; color:#4a5058">By the last slide you can build, test and deploy a Python service that an AI client would pay a senior contract rate to have built.</p>
+    </div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Every example is small enough to type and run. Nothing here is theoretical.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Introduction</p>
+  <aside>Set expectations. Skip nothing in Modules 2 and 6 even if the rest feels familiar.</aside>
+</section>
+<section id="roadmap" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Six modules</h2>
+  <table style="font-family:Inter, sans-serif; font-size:29px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:8%">#</th><th style="width:26%">Module</th><th style="width:44%">What you will be able to do</th><th style="width:22%">Slides</th></tr>
+    <tr><td>1</td><td>uv</td><td>Create reproducible, lockfile-backed Python projects</td><td>15</td></tr>
+    <tr><td>2</td><td>Typing and Pydantic v2</td><td>Validate every boundary of your system</td><td>25</td></tr>
+    <tr><td>3</td><td>asyncio</td><td>Handle hundreds of concurrent model calls</td><td>24</td></tr>
+    <tr><td>4</td><td>FastAPI</td><td>Expose your work as a real HTTP service</td><td>27</td></tr>
+    <tr><td>5</td><td>Ruff</td><td>Enforce quality automatically</td><td>10</td></tr>
+    <tr><td>6</td><td>pytest</td><td>Prove your system works, in CI</td><td>21</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Introduction</p>
+  <aside>The order is deliberate: each module depends on the one before it.</aside>
+</section>
+<section id="how-to-use" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">How to work through this</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px">
+      <h3 style="font-size:30px; font-weight:600; line-height:1.25">One project, six passes</h3>
+      <p style="font-size:26px; line-height:1.45; color:#4a5058">Do not make six toy projects. Make one service and add each module to it. By Module 6 you have a portfolio piece.</p>
+    </div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px">
+      <h3 style="font-size:30px; font-weight:600; line-height:1.25">Type the code</h3>
+      <p style="font-size:26px; line-height:1.45; color:#4a5058">Read-only study of this material produces nothing. Every code slide is meant to be typed into a terminal or editor.</p>
+    </div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px">
+      <h3 style="font-size:30px; font-weight:600; line-height:1.25">Break things deliberately</h3>
+      <p style="font-size:26px; line-height:1.45; color:#4a5058">Slides marked <b>Failure mode</b> show what goes wrong in production. Reproduce each one on purpose so you recognise it later.</p>
+    </div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Suggested pace: one module per week, roughly six hours each.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Introduction</p>
+  <aside>Emphasise the single-project approach. It is the difference between learning and having something to show.</aside>
+</section>
+<section id="uv-divider" data-transition="push" style="background:#16191d; color:#f2f0ec; font-family:Inter, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:28px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#d98a5f">Module 1 — 15 slides</p>
+  <h1 style="font-family:'Space Grotesk', sans-serif; font-size:104px; font-weight:600; line-height:1.05">uv</h1>
+  <p style="font-size:38px; line-height:1.4; color:#b6bcc4; width:1300px">Environments, dependencies and lockfiles — the part everyone skips and everyone regrets skipping.</p>
+  <aside>docs.astral.sh/uv</aside>
+</section>
+<section id="uv-problem" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">The problem uv solves</h2>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">A typical Python project has used four tools to do one job.</p>
+  <div style="display:flex; gap:24px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">venv</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Creates an isolated environment. Knows nothing about your dependencies.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">pip</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Installs packages. Resolves them loosely and does not record what it actually installed.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">pip-tools / poetry</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Adds locking, slowly, with its own config format and its own opinions.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">pyenv</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Manages interpreter versions, separately again, with a separate install step.</p></div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">uv is one binary that does all four, written in Rust, typically 10 to 100 times faster.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>The pain point is reproducibility: "it works on my machine" is a dependency resolution problem 90 percent of the time.</aside>
+</section>
+<section id="uv-what" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">What uv gives you</h2>
+  <ul style="font-size:30px; line-height:1.6; color:#3b4149">
+    <li>A project scaffold with a standards-compliant pyproject.toml</li>
+    <li>A resolver that produces a cross-platform lockfile, uv.lock</li>
+    <li>Automatic environment creation — you never activate a venv again</li>
+    <li>Interpreter downloads: it fetches Python 3.12 for you if you do not have it</li>
+    <li>A global tool installer, so linters and CLIs do not pollute project environments</li>
+    <li>A drop-in pip interface (uv pip) for migrating existing work gradually</li>
+  </ul>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>Astral, the company behind uv, also makes Ruff — Module 5. Same performance philosophy.</aside>
+</section>
+<section id="uv-install" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Install</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># macOS and Linux</span><br>curl -LsSf https://astral.sh/uv/install.sh | sh<br><br><span style="color:#8b939d"># Windows PowerShell</span><br>powershell -c "irm https://astral.sh/uv/install.ps1 | iex"<br><br><span style="color:#8b939d"># or, if you already have pipx</span><br>pipx install uv</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Verify with <b>uv --version</b>. Update later with <b>uv self update</b>.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">uv is a single static binary with no Python dependency of its own, which is why it can bootstrap interpreters.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>On locked-down corporate machines the pipx route is usually the one that works.</aside>
+</section>
+<section id="uv-init" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Starting a project</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv init rag-service<br>cd rag-service</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">That creates:</p>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">rag-service/<br>  .python-version    <span style="color:#8b939d"># interpreter pin</span><br>  pyproject.toml     <span style="color:#8b939d"># project metadata and dependencies</span><br>  README.md<br>  main.py<br>  .git/</p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Use <b>uv init --lib</b> for an importable package with a src/ layout, or <b>uv init --app</b> (the default) for a service.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>For anything you will import from tests, prefer --lib and the src/ layout.</aside>
+</section>
+<section id="uv-pyproject" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">pyproject.toml is the single source of truth</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">[project]<br>name = "rag-service"<br>version = "0.1.0"<br>requires-python = "&gt;=3.12"<br>dependencies = [<br>    "fastapi&gt;=0.115",<br>    "pydantic&gt;=2.9",<br>    "httpx&gt;=0.27",<br>]<br><br>[dependency-groups]<br>dev = ["pytest&gt;=8.3", "ruff&gt;=0.7"]</p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">This file replaces setup.py, setup.cfg, requirements.txt and requirements-dev.txt. It is a standard (PEP 621), not a uv invention, so other tools read it too.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>Point out requires-python: uv enforces it when resolving, which catches a whole class of deployment surprises.</aside>
+</section>
+<section id="uv-add" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Adding and removing dependencies</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv add fastapi pydantic httpx<br>uv add --dev pytest ruff pytest-asyncio<br>uv add "langchain&gt;=0.3,&lt;0.4"<br>uv add --optional gpu torch<br><br>uv remove httpx</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Each command edits pyproject.toml, re-resolves, updates uv.lock and syncs the environment — in one step.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">You do not run pip install. You do not activate anything. If the resolve fails, nothing is changed.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>Atomicity matters: a failed uv add leaves the project exactly as it was.</aside>
+</section>
+<section id="uv-lock" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">uv.lock — why it is the important file</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Exact versions</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Every direct and transitive dependency, pinned, with hashes for integrity verification.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Cross-platform</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">One lockfile covers Linux, macOS and Windows. Not one lockfile per machine, as pip freeze produces.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Commit it</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">uv.lock belongs in git for applications and services. Libraries usually do not commit it.</p></div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">The lockfile is what makes your deployment identical to your laptop. Without it you have a suggestion, not a build.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>This is the single most common gap in freelance Python work: no lockfile, so staging and production drift.</aside>
+</section>
+<section id="uv-sync" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">uv sync — make the environment match the lockfile</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv sync                 <span style="color:#8b939d"># install everything, including dev group</span><br>uv sync --no-dev        <span style="color:#8b939d"># production install</span><br>uv sync --frozen        <span style="color:#8b939d"># fail if the lockfile is out of date</span><br>uv sync --locked        <span style="color:#8b939d"># verify the lockfile matches pyproject</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">sync is destructive in the right way: it removes packages that are not in the lockfile, so environments cannot drift.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">In a Dockerfile or CI job, always use <b>--frozen</b>. It turns a stale lockfile into a build failure instead of a silent version change.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>--frozen in CI is the habit to build. It is how you catch a teammate who edited pyproject without re-locking.</aside>
+</section>
+<section id="uv-run" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">uv run — never activate again</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv run python main.py<br>uv run pytest<br>uv run uvicorn app.main:app --reload<br>uv run ruff check .</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Every uv run checks the lockfile, syncs if needed, then executes inside the project environment.</p>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">No activation state</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">No forgetting which shell has which venv active. The command carries its own context.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Safe in scripts</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Makefiles, CI jobs and cron entries become one line with no sourcing dance.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>The environment still lives at .venv/ if a tool needs the path — editors pick it up automatically.</aside>
+</section>
+<section id="uv-python" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Interpreter management</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv python list              <span style="color:#8b939d"># what is available and installed</span><br>uv python install 3.12<br>uv python pin 3.12          <span style="color:#8b939d"># writes .python-version</span><br><br>uv venv --python 3.11       <span style="color:#8b939d"># explicit venv on a chosen version</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">uv downloads a standalone CPython build. It does not touch your system Python, and it does not need pyenv, Homebrew or a compiler.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Pinning matters for AI work: several ML packages lag the newest interpreter by months. Pin to what your dependencies actually support.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>Real example: a project pinned to 3.13 that cannot install a package still building wheels for 3.12.</aside>
+</section>
+<section id="uv-tools" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Tools: global CLIs without polluting projects</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uvx ruff check .            <span style="color:#8b939d"># run once, no install</span><br>uv tool install ruff        <span style="color:#8b939d"># install globally</span><br>uv tool install "huggingface-hub[cli]"<br>uv tool list<br>uv tool upgrade --all</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">uvx is the equivalent of npx: fetch, cache, run, forget.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Rule of thumb: if the tool is part of your test or lint pipeline, add it to the dev group so its version is locked. If it is a personal convenience, install it as a tool.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>Version-locking the linter matters — a linter upgrade that changes rules should be a deliberate commit, not a surprise.</aside>
+</section>
+<section id="uv-groups" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Dependency groups</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">[dependency-groups]<br>dev = ["pytest&gt;=8.3", "ruff&gt;=0.7", "mypy&gt;=1.11"]<br>docs = ["mkdocs-material&gt;=9.5"]<br>eval = ["ragas&gt;=0.2", "datasets&gt;=3.0"]</p>
+  </div>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv sync --group eval<br>uv sync --only-group docs<br>uv sync --no-default-groups     <span style="color:#8b939d"># production</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Groups keep your production image small. An evaluation harness pulling in datasets and pandas has no business in a serving container.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>Concrete payoff: image size. Separating the eval group commonly cuts hundreds of megabytes.</aside>
+</section>
+<section id="uv-migrate" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Migrating an existing project</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># 1. keep working immediately — pip interface</span><br>uv venv<br>uv pip install -r requirements.txt<br><br><span style="color:#8b939d"># 2. then move properly to a project</span><br>uv init --no-readme<br>uv add -r requirements.txt<br>uv add --dev -r requirements-dev.txt<br>uv lock</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Step 1 is a same-day speed win with zero structural change. Step 2 is the real migration.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Delete requirements.txt only after CI is green on the new setup. Generate one for consumers who need it with <b>uv export --format requirements-txt</b>.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 1 — uv: environments and packaging</p>
+  <aside>Good consulting pattern: deliver step 1 in the first hour so the client sees value, then propose step 2.</aside>
+</section>
+<section id="uv-recap" style="background:#1f5f5b; color:#f1f5f4; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#9fd0c9">Module 1 recap</p>
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Six commands cover ninety percent of the work</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv init      uv add      uv remove<br>uv sync      uv run      uv lock</p>
+  </div>
+  <p style="font-size:34px; line-height:1.45; color:#cfe3e0; width:1500px">Commit pyproject.toml and uv.lock. Use --frozen in CI. Keep dev and eval dependencies in groups. You now have a reproducible project — Module 2 makes the data flowing through it trustworthy.</p>
+  <aside>Ask learners to convert one existing project before moving on.</aside>
+</section>
+<section id="py-divider" data-transition="push" style="background:#16191d; color:#f2f0ec; font-family:Inter, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:28px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#d98a5f">Module 2 — 25 slides</p>
+  <h1 style="font-family:'Space Grotesk', sans-serif; font-size:104px; font-weight:600; line-height:1.05">Typing and Pydantic v2</h1>
+  <p style="font-size:38px; line-height:1.4; color:#b6bcc4; width:1300px">Making every boundary of your system — request, config, model output, database row — provably the shape you think it is.</p>
+  <aside>docs.pydantic.dev</aside>
+</section>
+<section id="py-why" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Why types matter more in AI systems</h2>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Ordinary software fails loudly. LLM-backed software fails quietly.</p>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">The model returns prose</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">You asked for JSON. You received JSON wrapped in an explanation. Unvalidated, that propagates three layers before anything crashes.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Fields drift</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">A prompt change renames a field. Nothing errors; a downstream feature silently starts producing None.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Config is remote</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Missing API keys, wrong model names and bad base URLs should fail at startup, not on the first user request.</p></div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">A validation layer turns all three into an immediate, located, readable error.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>This slide is the argument for the whole module. Quiet failure is the defining hazard of LLM systems.</aside>
+</section>
+<section id="py-basics" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Annotations: the refresher</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">def chunk(text: str, size: int = 512) -&gt; list[str]:<br>    ...<br><br>scores: dict[str, float] = {}<br>doc_ids: tuple[int, ...] = (1, 2, 3)<br><br><span style="color:#8b939d"># built-in generics since 3.9 — no typing.List, typing.Dict</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Annotations are not enforced at runtime by Python itself. They are read by type checkers, editors, and — critically — by Pydantic and FastAPI, which <b>do</b> enforce them.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Stress the distinction: Python ignores annotations; the libraries in this deck act on them.</aside>
+</section>
+<section id="py-optional" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Unions, optionals and modern syntax</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># modern (3.10+)</span><br>def find(id: str) -&gt; Document | None: ...<br>score: int | float<br><br><span style="color:#8b939d"># legacy equivalents — still seen in older code</span><br>from typing import Optional, Union<br>def find(id: str) -&gt; Optional[Document]: ...</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Optional[X] means X | None. It does not mean "this argument may be omitted" — that is a default value, a separate idea.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Confusing the two is the most common annotation error in review.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Emphasise: Optional is about the value, not about the call signature.</aside>
+</section>
+<section id="py-collections" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Beyond the basics</h2>
+  <table style="font-family:Inter, sans-serif; font-size:28px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:26%">Construct</th><th style="width:38%">Use it for</th><th style="width:36%">Example</th></tr>
+    <tr><td>Literal</td><td>A fixed set of allowed strings</td><td>Literal["gpt", "claude"]</td></tr>
+    <tr><td>TypedDict</td><td>A dict with known keys</td><td>class Msg(TypedDict)</td></tr>
+    <tr><td>Protocol</td><td>Structural typing — duck typing, checked</td><td>class Retriever(Protocol)</td></tr>
+    <tr><td>TypeVar / Generic</td><td>Reusable containers and functions</td><td>def first(xs: list[T]) -&gt; T</td></tr>
+    <tr><td>Annotated</td><td>Attaching metadata to a type</td><td>Annotated[int, Field(gt=0)]</td></tr>
+    <tr><td>Self</td><td>Fluent methods returning the class</td><td>def with_top_k(self) -&gt; Self</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Annotated is the bridge to Pydantic and FastAPI — flag it now, it reappears throughout.</aside>
+</section>
+<section id="py-protocol" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Protocol: the interface you need for swappable components</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from typing import Protocol<br><br>class Retriever(Protocol):<br>    def search(self, query: str, k: int) -&gt; list[str]: ...<br><br>class QdrantRetriever:<br>    def search(self, query: str, k: int) -&gt; list[str]:<br>        ...<br><br>def answer(q: str, retriever: Retriever) -&gt; str: ...</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">QdrantRetriever never imports or subclasses Retriever. It satisfies the protocol by shape alone.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">This is how you let a client swap a vector store, or how you inject a fake retriever in tests, without an inheritance hierarchy.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Protocols are the cleanest answer to "can we switch from Pinecone to pgvector later".</aside>
+</section>
+<section id="py-checker" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Running a type checker</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv add --dev mypy<br>uv run mypy src/<br><br><span style="color:#8b939d"># pyproject.toml</span><br>[tool.mypy]<br>python_version = "3.12"<br>strict = true<br>ignore_missing_imports = true</p>
+  </div>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">mypy</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">The reference implementation. Slower, very mature, best documented.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">pyright / basedpyright</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Much faster, powers the Pylance editor experience. Often the better daily driver.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Adopt gradually: start without strict, fix what appears, then turn strict on per-package.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Turning on strict for a large legacy codebase at once is how teams abandon type checking.</aside>
+</section>
+<section id="pd-what" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Pydantic: annotations that actually run</h2>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Pydantic reads your type hints and generates a validator in Rust that enforces them at runtime.</p>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Parse</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Take untrusted input — JSON, form data, an env var, a model response — and produce a typed object or a precise error.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Validate</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Enforce constraints beyond the type: ranges, lengths, patterns, cross-field rules.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Serialize</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Turn the object back into JSON or a dict, with control over aliases, exclusions and formats.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">v2 rewrote the core in Rust — roughly five to fifty times faster than v1, which is why it can sit on every request.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Pydantic is the dependency underneath FastAPI, LangChain and most agent frameworks. Learning it once pays everywhere.</aside>
+</section>
+<section id="pd-first" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Your first model</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from pydantic import BaseModel<br><br>class Chunk(BaseModel):<br>    doc_id: str<br>    text: str<br>    page: int<br>    score: float = 0.0<br><br>c = Chunk(doc_id="a1", text="hello", page="3")<br>print(c.page)        <span style="color:#8b939d"># 3  — an int, not "3"</span><br>print(c.score)       <span style="color:#8b939d"># 0.0</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Three things happened: unknown input was checked, "3" was coerced to an integer, and the missing score took its default.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Type the example live. The coercion of "3" to 3 is the moment it clicks for most people.</aside>
+</section>
+<section id="pd-errors" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Errors that tell you exactly what is wrong</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from pydantic import ValidationError<br><br>try:<br>    Chunk(doc_id="a1", text="hi", page="three")<br>except ValidationError as e:<br>    print(e.errors())</p>
+  </div>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">[{"type": "int_parsing",<br>  "loc": ("page",),<br>  "msg": "Input should be a valid integer...",<br>  "input": "three"}]</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Structured, machine-readable, and it names the field. This is what you log, and what FastAPI returns to a client as a 422.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>The loc tuple is the path into nested data — indispensable for debugging deep model output.</aside>
+</section>
+<section id="pd-coercion" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Coercion: lax mode and strict mode</h2>
+  <table style="font-family:Inter, sans-serif; font-size:28px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:26%">Input</th><th style="width:20%">Annotation</th><th style="width:27%">Lax (default)</th><th style="width:27%">Strict</th></tr>
+    <tr><td>"3"</td><td>int</td><td>3</td><td>error</td></tr>
+    <tr><td>3.0</td><td>int</td><td>3</td><td>error</td></tr>
+    <tr><td>3.5</td><td>int</td><td>error</td><td>error</td></tr>
+    <tr><td>"true"</td><td>bool</td><td>True</td><td>error</td></tr>
+    <tr><td>"2026-01-30"</td><td>date</td><td>date object</td><td>error</td></tr>
+  </table>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">class Chunk(BaseModel):<br>    model_config = ConfigDict(strict=True)</p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Lax is right for HTTP and LLM input, where everything arrives as a string. Strict is right for internal boundaries where sloppiness signals a bug.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Note the 3.5 row: lossy conversions are refused even in lax mode.</aside>
+</section>
+<section id="pd-field" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Field: constraints and documentation</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from pydantic import BaseModel, Field<br><br>class SearchRequest(BaseModel):<br>    query: str = Field(min_length=1, max_length=2000)<br>    top_k: int = Field(default=5, ge=1, le=50)<br>    threshold: float = Field(default=0.0, ge=0.0, le=1.0)<br>    collection: str = Field(pattern=r"^[a-z0-9_]+$")</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Constraints live with the data, not scattered through handler code. FastAPI turns them into OpenAPI documentation automatically.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Use <b>description=</b> on fields you will expose in an API or in an LLM tool schema — the model reads it.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Field descriptions become tool-call documentation. That is a real accuracy lever in agent work.</aside>
+</section>
+<section id="pd-defaults" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Failure mode: the mutable default</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># wrong in plain Python, and a bug you will meet</span><br>def add(item, bucket=[]): ...<br><br><span style="color:#8b939d"># Pydantic: use default_factory</span><br>class Session(BaseModel):<br>    id: str<br>    messages: list[str] = Field(default_factory=list)<br>    created: datetime = Field(default_factory=datetime.now)<br>    meta: dict = Field(default_factory=dict)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Pydantic actually protects you here — it deep-copies mutable defaults — but default_factory states the intent and is required for computed defaults like a timestamp or a UUID.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Always default_factory for list, dict, set, datetime and uuid4.</aside>
+</section>
+<section id="pd-validators" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Custom validators</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from pydantic import field_validator, model_validator<br><br>class Query(BaseModel):<br>    text: str<br>    start: int<br>    end: int<br><br>    @field_validator("text")<br>    @classmethod<br>    def strip_it(cls, v: str) -&gt; str:<br>        return v.strip()<br><br>    @model_validator(mode="after")<br>    def check_range(self):<br>        if self.end &lt;= self.start:<br>            raise ValueError("end must exceed start")<br>        return self</p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058"><b>field_validator</b> sees one field. <b>model_validator(mode="after")</b> sees the whole validated object and is where cross-field rules belong.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>mode="before" runs on raw input — useful for reshaping malformed LLM output before validation.</aside>
+</section>
+<section id="pd-computed" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Computed fields</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from pydantic import computed_field<br><br>class Usage(BaseModel):<br>    input_tokens: int<br>    output_tokens: int<br><br>    @computed_field<br>    @property<br>    def total(self) -&gt; int:<br>        return self.input_tokens + self.output_tokens<br><br>Usage(input_tokens=100, output_tokens=40).model_dump()<br><span style="color:#8b939d"># {"input_tokens": 100, "output_tokens": 40, "total": 140}</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">A plain property is invisible to serialization. computed_field includes it in model_dump and in the JSON schema.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Handy for cost fields: derive dollars from tokens once, in the model.</aside>
+</section>
+<section id="pd-nested" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Nested models</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">class Citation(BaseModel):<br>    doc_id: str<br>    page: int<br><br>class Answer(BaseModel):<br>    text: str<br>    citations: list[Citation]<br>    confidence: float = Field(ge=0, le=1)<br><br>raw = {"text": "...", "citations": [{"doc_id": "a", "page": 2}],<br>       "confidence": 0.8}<br>a = Answer.model_validate(raw)<br>a.citations[0].page      <span style="color:#8b939d"># 2, typed, editor-completed</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Nesting is recursive and free. This is exactly the shape of a grounded RAG answer, and validating it is how you guarantee every claim carries a citation.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Tie back to Module 2 opening: this model makes "answer without citations" impossible to represent.</aside>
+</section>
+<section id="pd-config" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">model_config — the knobs worth knowing</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from pydantic import ConfigDict<br><br>class Strictish(BaseModel):<br>    model_config = ConfigDict(<br>        extra="forbid",           <span style="color:#8b939d"># reject unknown keys</span><br>        frozen=True,              <span style="color:#8b939d"># immutable, hashable</span><br>        str_strip_whitespace=True,<br>        validate_assignment=True, <span style="color:#8b939d"># check on attribute set too</span><br>        populate_by_name=True,<br>    )</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149"><b>extra="forbid"</b> is the highest-value setting in this deck: it catches a renamed field or a typo in config the moment it appears, instead of leaving you with a silently ignored key.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Default is extra="ignore". Many silent production bugs trace to that default.</aside>
+</section>
+<section id="pd-serialize" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Serialization</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">a.model_dump()                       <span style="color:#8b939d"># dict</span><br>a.model_dump(mode="json")            <span style="color:#8b939d"># JSON-safe types</span><br>a.model_dump_json(indent=2)          <span style="color:#8b939d"># str</span><br><br>a.model_dump(exclude={"confidence"})<br>a.model_dump(include={"text"})<br>a.model_dump(exclude_none=True)<br>a.model_dump(by_alias=True)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">mode="json" is the one people miss: it converts datetimes, UUIDs and Decimals into JSON-compatible values, which plain model_dump leaves as Python objects.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">v1 names .dict() and .json() still work but are deprecated. Use the model_ prefixed methods.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>exclude_none is useful when building request payloads for APIs that reject nulls.</aside>
+</section>
+<section id="pd-alias" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Aliases: when the wire format is not your format</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">class Message(BaseModel):<br>    model_config = ConfigDict(populate_by_name=True)<br><br>    role: str<br>    content: str<br>    tool_call_id: str | None = Field(default=None,<br>                                     alias="toolCallId")<br><br>Message.model_validate({"role": "user", "content": "hi",<br>                        "toolCallId": "x"})<br>m.model_dump(by_alias=True)   <span style="color:#8b939d"># emits toolCallId</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Use aliases to keep snake_case inside your codebase while speaking camelCase to a JavaScript client or a third-party API.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058"><b>validation_alias</b> and <b>serialization_alias</b> let the two directions differ.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Common in AI work: provider APIs disagree about casing; aliases absorb that at the edge.</aside>
+</section>
+<section id="pd-settings" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">pydantic-settings: configuration that fails at startup</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from pydantic_settings import BaseSettings, SettingsConfigDict<br><br>class Settings(BaseSettings):<br>    model_config = SettingsConfigDict(env_file=".env",<br>                                      env_prefix="APP_")<br><br>    anthropic_api_key: str<br>    model_name: str = "claude-sonnet-4-6"<br>    top_k: int = 5<br>    qdrant_url: str = "http://localhost:6333"<br><br>settings = Settings()   <span style="color:#8b939d"># raises now if the key is missing</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Reads environment variables and .env, coerces to the declared types, and refuses to start without required values.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Never call os.environ.get in business logic again. One Settings object, constructed once, injected where needed.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Failing at import time is the point: a container that cannot serve should not report healthy.</aside>
+</section>
+<section id="pd-union" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Discriminated unions</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from typing import Literal, Annotated<br>from pydantic import Field<br><br>class TextBlock(BaseModel):<br>    type: Literal["text"]<br>    text: str<br><br>class ToolUse(BaseModel):<br>    type: Literal["tool_use"]<br>    name: str<br>    input: dict<br><br>Block = Annotated[TextBlock | ToolUse,<br>                  Field(discriminator="type")]</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">This is exactly how modern LLM APIs shape their content blocks. The discriminator makes validation fast and the error messages precise instead of "failed to match any variant".</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Without a discriminator Pydantic tries every member and reports a confusing combined error.</aside>
+</section>
+<section id="pd-adapter" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">TypeAdapter: validation without a model</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from pydantic import TypeAdapter<br><br>Chunks = TypeAdapter(list[Chunk])<br>chunks = Chunks.validate_json(raw_json_string)<br><br>Scores = TypeAdapter(dict[str, float])<br>Scores.validate_python({"a": "0.5"})   <span style="color:#8b939d"># {"a": 0.5}</span><br><br>Chunks.json_schema()</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">When the thing you need to validate is a list, a dict or a union rather than an object, TypeAdapter gives you the full validator without inventing a wrapper model.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Build the adapter once at module level — construction is the expensive part, validation is cheap.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Common mistake: creating a TypeAdapter inside a request handler.</aside>
+</section>
+<section id="pd-llm" style="background:#1f5f5b; color:#f1f5f4; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:32px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#9fd0c9">The payoff</p>
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:56px; font-weight:600; line-height:1.1">Pydantic is how you get structured output from a model</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">class Extraction(BaseModel):<br>    company: str<br>    amount_usd: float = Field(ge=0)<br>    signed_on: date<br><br>schema = Extraction.model_json_schema()<br><span style="color:#8b939d"># send schema as a tool definition, then:</span><br>result = Extraction.model_validate_json(model_output)</p>
+  </div>
+  <p style="font-size:32px; line-height:1.45; color:#cfe3e0; width:1560px">One class defines the prompt contract, the runtime check and the downstream type. If the model drifts, you get a ValidationError with a field path — not a corrupted record.</p>
+  <aside>This slide connects the module to the job. Instructor frameworks are thin wrappers over exactly this loop.</aside>
+</section>
+<section id="pd-schema" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">JSON Schema generation and the retry loop</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">for attempt in range(3):<br>    out = call_model(prompt, schema=Extraction.model_json_schema())<br>    try:<br>        return Extraction.model_validate_json(out)<br>    except ValidationError as e:<br>        prompt = repair_prompt(out, e.errors())<br>else:<br>    raise ExtractionFailed()</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Feed the validation errors back to the model as the repair instruction. Two attempts recover the large majority of malformed responses.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Cap the retries and record how often you needed them — that rate is a quality metric worth a dashboard.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 2 — Typing and Pydantic v2</p>
+  <aside>Instrument the retry counter; a rising rate usually means a prompt or model change.</aside>
+</section>
+<section id="pd-recap" style="background:#1f5f5b; color:#f1f5f4; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:34px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#9fd0c9">Module 2 recap</p>
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:56px; font-weight:600; line-height:1.1">Validate at every boundary</h2>
+  <ul style="font-size:31px; line-height:1.65; color:#e2eeec">
+    <li>Annotate everything; run mypy or pyright in CI</li>
+    <li>BaseModel for request, response, config and model output</li>
+    <li>Field for constraints, model_validator for cross-field rules</li>
+    <li>extra="forbid" on config models, default_factory for mutables</li>
+    <li>BaseSettings so a missing key kills startup, not a user request</li>
+    <li>model_json_schema plus model_validate_json is your structured-output loop</li>
+  </ul>
+  <aside>Next module: making these validated calls concurrent.</aside>
+</section>
+<section id="as-divider" data-transition="push" style="background:#16191d; color:#f2f0ec; font-family:Inter, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:28px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#d98a5f">Module 3 — 24 slides</p>
+  <h1 style="font-family:'Space Grotesk', sans-serif; font-size:104px; font-weight:600; line-height:1.05">asyncio</h1>
+  <p style="font-size:38px; line-height:1.4; color:#b6bcc4; width:1300px">Concurrency for work that waits. Every AI service is a waiting machine — this module is what makes it fast.</p>
+  <aside>docs.python.org/3/library/asyncio.html</aside>
+</section>
+<section id="as-why" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Why async, in numbers</h2>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">A RAG request: embed the query (120 ms), search three collections (80 ms each), call the model (2400 ms).</p>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Synchronous</h3><p style="font-size:44px; font-weight:600; color:#b8501f">2760 ms</p><p style="font-size:26px; line-height:1.45; color:#4a5058">Every wait is serial. The CPU is idle for 99 percent of it.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Concurrent searches</h3><p style="font-size:44px; font-weight:600; color:#b8501f">2600 ms</p><p style="font-size:26px; line-height:1.45; color:#4a5058">The three searches overlap.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Under load</h3><p style="font-size:44px; font-weight:600; color:#1f5f5b">50x throughput</p><p style="font-size:26px; line-height:1.45; color:#4a5058">One process serves hundreds of waiting requests instead of one at a time.</p></div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Async does not make a single call faster. It stops one slow call from blocking every other user.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>The third card is the real argument — it is about concurrency capacity, not latency.</aside>
+</section>
+<section id="as-model" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">The mental model</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Threads</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">The operating system interrupts your code anywhere. You need locks. Preemptive.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">asyncio</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Your code yields control only at an <b>await</b>. Between awaits nothing else runs. Cooperative.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Processes</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">True parallel CPU work, separate memory, expensive to start and to communicate with.</p></div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Cooperative scheduling is why async code needs far fewer locks — and why one badly-behaved function that never yields freezes the entire server.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Rule: asyncio for I/O-bound work. Processes for CPU-bound work. Threads mostly for wrapping blocking libraries you cannot change.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>The freeze risk on the middle card is the theme of the failure-mode slides later in this module.</aside>
+</section>
+<section id="as-loop" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">The event loop</h2>
+  <ol style="font-size:30px; line-height:1.6; color:#3b4149">
+    <li>The loop holds a queue of ready tasks</li>
+    <li>It runs one until that task hits an await on something unfinished</li>
+    <li>The task is parked; the loop picks the next ready one</li>
+    <li>When the operating system reports the I/O is done, the task becomes ready again</li>
+  </ol>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">One thread, one loop, thousands of parked tasks. The loop is only ever blocked by code that does not await.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">You almost never touch the loop directly. asyncio.run creates it, runs your entry coroutine and shuts it down cleanly.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>Avoid get_event_loop in new code; it is a legacy API with confusing semantics.</aside>
+</section>
+<section id="as-coroutine" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Coroutines: async def and await</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">import asyncio<br><br>async def embed(text: str) -&gt; list[float]:<br>    await asyncio.sleep(0.1)      <span style="color:#8b939d"># yields to the loop</span><br>    return [0.1, 0.2]<br><br>coro = embed("hello")   <span style="color:#8b939d"># nothing has run yet</span><br>vec = await embed("hello")   <span style="color:#8b939d"># now it runs</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Calling an async function returns a coroutine object. It does nothing until awaited or scheduled as a task.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">A forgotten await is the classic beginner bug: you get a coroutine object where you expected data, plus a "never awaited" warning.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>Show the warning live once; it is instantly recognisable afterwards.</aside>
+</section>
+<section id="as-run" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Entering async from sync code</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">async def main():<br>    result = await pipeline("what is RAG?")<br>    print(result)<br><br>if __name__ == "__main__":<br>    asyncio.run(main())</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">One asyncio.run per program, at the very top. It is the single door between the synchronous and asynchronous worlds.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Never call asyncio.run inside an already-running loop — that raises immediately. Inside a FastAPI handler you are already in the loop, so you just await.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>In Jupyter a loop is already running; use await directly at the cell level.</aside>
+</section>
+<section id="as-gather" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">gather: run many things at once</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">vectors = await asyncio.gather(<br>    embed(chunk_a),<br>    embed(chunk_b),<br>    embed(chunk_c),<br>)<br><br><span style="color:#8b939d"># from a list</span><br>vectors = await asyncio.gather(*[embed(c) for c in chunks])<br><br><span style="color:#8b939d"># keep going when one fails</span><br>results = await asyncio.gather(*tasks, return_exceptions=True)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Results come back in the order you passed them in, not the order they finished.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">With return_exceptions=True, exceptions arrive as values in the list — you must check each one, or failures pass silently.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>The silent-failure risk of return_exceptions is worth stating twice.</aside>
+</section>
+<section id="as-taskgroup" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">TaskGroup: the modern replacement (3.11+)</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">async with asyncio.TaskGroup() as tg:<br>    t1 = tg.create_task(search("qdrant", q))<br>    t2 = tg.create_task(search("bm25", q))<br>    t3 = tg.create_task(rerank_warmup())<br><br>dense, sparse = t1.result(), t2.result()</p>
+  </div>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Nothing escapes</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">The block does not exit until every task finishes. No orphaned work.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Fail fast</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">If one task raises, the others are cancelled and you get an ExceptionGroup.</p></div>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Prefer TaskGroup over gather for new code. Use gather when you specifically want a result list and partial failure.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>ExceptionGroup is handled with except* syntax — mention it exists.</aside>
+</section>
+<section id="as-ascompleted" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">as_completed: stream results as they land</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">tasks = [summarize(doc) for doc in docs]<br><br>for coro in asyncio.as_completed(tasks):<br>    summary = await coro<br>    yield summary          <span style="color:#8b939d"># send it to the user now</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">gather waits for the slowest. as_completed gives you each result the moment it is ready.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Use it when the user can consume partial output — progressive search results, a document-by-document summary, or a progress bar over a batch job.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>Perceived latency improvement is large even when total time is identical.</aside>
+</section>
+<section id="as-createtask" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Failure mode: the disappearing task</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># WRONG — the task may be garbage collected mid-flight</span><br>asyncio.create_task(log_to_warehouse(event))<br><br><span style="color:#8b939d"># RIGHT — keep a reference</span><br>background: set[asyncio.Task] = set()<br><br>task = asyncio.create_task(log_to_warehouse(event))<br>background.add(task)<br>task.add_done_callback(background.discard)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">The event loop holds only a weak reference to tasks. Fire-and-forget without a strong reference can vanish silently, and the exception inside it is never seen.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">In a web service, prefer a real queue over background tasks for anything that matters.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>This is a genuinely surprising behaviour and a great interview answer.</aside>
+</section>
+<section id="as-timeout" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Timeouts are not optional</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># 3.11+</span><br>async with asyncio.timeout(30):<br>    answer = await call_model(prompt)<br><br><span style="color:#8b939d"># older style</span><br>answer = await asyncio.wait_for(call_model(prompt), timeout=30)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">A model provider that hangs will hold your connection, your worker slot and your user's patience until something cuts it off. Make that something your code.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Set timeouts at three levels: the HTTP client, the individual operation, and the whole request handler. The outermost should be the shortest thing your user will tolerate.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>Default httpx timeout is 5 seconds; many LLM SDKs default to much longer or none.</aside>
+</section>
+<section id="as-cancel" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Cancellation</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">async def stream_answer():<br>    try:<br>        async for token in model.stream(prompt):<br>            yield token<br>    except asyncio.CancelledError:<br>        await metrics.record_abandoned()<br>        raise            <span style="color:#8b939d"># ALWAYS re-raise</span><br>    finally:<br>        await conn.release()</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">A timeout cancels by raising CancelledError inside the task at its next await. Swallowing it breaks timeouts and shutdown everywhere above you.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Catch it only to clean up, then re-raise. Note that <b>except Exception</b> does not catch it — CancelledError derives from BaseException in 3.8+.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>The BaseException detail saves people a long debugging session.</aside>
+</section>
+<section id="as-semaphore" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Semaphore: respecting rate limits</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">sem = asyncio.Semaphore(10)     <span style="color:#8b939d"># 10 in flight, ever</span><br><br>async def guarded(chunk):<br>    async with sem:<br>        return await embed(chunk)<br><br>vectors = await asyncio.gather(*[guarded(c) for c in chunks])</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Without this, gather over 5000 chunks opens 5000 concurrent requests and you receive 429s, a bill, or both.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Create the semaphore once, outside the loop. Creating one per call limits nothing.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>This single pattern is the most reused snippet in production AI code.</aside>
+</section>
+<section id="as-retry" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Retries with backoff</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from tenacity import retry, stop_after_attempt, wait_exponential<br><br>@retry(stop=stop_after_attempt(4),<br>       wait=wait_exponential(min=1, max=20),<br>       retry=retry_if_exception_type(RateLimitError))<br>async def call_model(prompt: str) -&gt; str:<br>    return await client.messages.create(...)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">tenacity works with async functions directly. Retry only the errors worth retrying: rate limits, timeouts, 5xx. Never retry a 400 — the request is wrong and will stay wrong.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Add jitter when many workers retry together, or they all come back at the same instant.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>Retrying a 401 or a validation error just multiplies the failure.</aside>
+</section>
+<section id="as-ctxmgr" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Async context managers and locks</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from contextlib import asynccontextmanager<br><br>@asynccontextmanager<br>async def db_session():<br>    session = await pool.acquire()<br>    try:<br>        yield session<br>    finally:<br>        await pool.release(session)<br><br>async with db_session() as s:<br>    rows = await s.fetch(query)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149"><b>async with</b> is how you guarantee release even under cancellation. The finally block runs when CancelledError passes through.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">asyncio.Lock protects a shared resource; it is rarely needed, because nothing preempts you between awaits.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>This same decorator shape returns in Module 4 as the FastAPI lifespan.</aside>
+</section>
+<section id="as-iterator" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">async for and async generators</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">async def paginate(url: str):<br>    while url:<br>        page = await client.get(url)<br>        for row in page.json()["items"]:<br>            yield row<br>        url = page.json().get("next")<br><br>async for row in paginate(start):<br>    await index(row)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">An async generator produces values over time without holding them all in memory — the right shape for paginated APIs, database cursors and file streams.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>Memory profile matters when ingesting large corpora.</aside>
+</section>
+<section id="as-stream" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Streaming model tokens</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">async def stream(prompt: str):<br>    async with client.messages.stream(<br>        model=settings.model_name,<br>        max_tokens=1024,<br>        messages=[{"role": "user", "content": prompt}],<br>    ) as s:<br>        async for text in s.text_stream:<br>            yield text</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">This generator is what you hand to FastAPI's StreamingResponse in Module 4. Time-to-first-token drops from seconds to a few hundred milliseconds.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Accumulate the full text as you yield if you need to log or store the complete answer.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>Streaming is the single biggest perceived-quality win in an LLM product.</aside>
+</section>
+<section id="as-httpx" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">httpx: the async HTTP client</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">import httpx<br><br>async with httpx.AsyncClient(timeout=30) as client:<br>    r = await client.post(url, json=payload)<br>    r.raise_for_status()<br>    data = r.json()</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">requests is synchronous and will block your event loop. httpx has a nearly identical API and an async client.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Always call raise_for_status, or a 500 response body becomes a confusing KeyError three functions later.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>aiohttp is the alternative; httpx wins on API familiarity and HTTP/2 support.</aside>
+</section>
+<section id="as-client" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Failure mode: a client per request</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># WRONG — new TCP and TLS handshake every call</span><br>async def handler(q: str):<br>    async with httpx.AsyncClient() as client:<br>        return await client.post(url, json={"q": q})<br><br><span style="color:#8b939d"># RIGHT — one client for the process lifetime</span><br>client = httpx.AsyncClient(<br>    timeout=30,<br>    limits=httpx.Limits(max_connections=100),<br>)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Connection pooling is most of the value of a modern HTTP client. Creating one per request throws it away and adds 50 to 200 ms of handshake to every call.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Create it in the application lifespan, close it on shutdown.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>This is one of the most common real performance bugs in AI service code.</aside>
+</section>
+<section id="as-tothread" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Wrapping blocking libraries</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># a sync-only library: a PDF parser, a tokenizer, an old SDK</span><br>text = await asyncio.to_thread(parse_pdf, path)<br><br><span style="color:#8b939d"># with arguments</span><br>chunks = await asyncio.to_thread(splitter.split_text, doc)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">to_thread hands the blocking call to a worker thread so the event loop keeps serving other requests.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">It does not make the call faster and it is not free — the default thread pool is small. For heavy, frequent work, use a process pool or a separate worker service instead.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>FastAPI does this automatically for sync def endpoints — covered in Module 4.</aside>
+</section>
+<section id="as-cpu" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">What asyncio cannot do</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">CPU-bound work</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Embedding on CPU, large dataframe joins, reranking a thousand candidates. The GIL means one thread; async gives no parallelism.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">The answer</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">A process pool, a dedicated worker with a queue, or a separate inference server the async code calls over HTTP.</p></div>
+  </div>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">loop = asyncio.get_running_loop()<br>with ProcessPoolExecutor() as pool:<br>    vecs = await loop.run_in_executor(pool, embed_batch, texts)</p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">In practice the cleanest production answer is usually the third: put the model behind its own service and keep the API process purely I/O-bound.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>Free-threaded Python is changing this slowly, but the architectural advice still holds.</aside>
+</section>
+<section id="as-fail-blocking" style="background:#b8501f; color:#fdf4ee; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:34px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#f6d5c1">Failure mode</p>
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:56px; font-weight:600; line-height:1.1">One blocking call freezes every user</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">async def handler(req):<br>    time.sleep(2)               <span style="color:#8b939d"># freezes the loop</span><br>    r = requests.get(url)       <span style="color:#8b939d"># freezes the loop</span><br>    open("big.json").read()     <span style="color:#8b939d"># freezes the loop</span><br>    df = pd.read_parquet(path)  <span style="color:#8b939d"># freezes the loop</span></p>
+  </div>
+  <p style="font-size:32px; line-height:1.45; color:#fae5d8; width:1560px">While any of these run, no other request in the process is served — not even a health check. Symptom: latency that is fine in testing and catastrophic under load. Fix: await the async equivalent, or asyncio.to_thread it.</p>
+  <aside>Ask learners to reproduce this deliberately with a load generator. It is unforgettable once seen.</aside>
+</section>
+<section id="as-debug" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Finding the blocking call</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">asyncio.run(main(), debug=True)<br><span style="color:#8b939d"># or</span><br>PYTHONASYNCIODEBUG=1 uv run python main.py</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Debug mode logs any callback that occupies the loop for more than 100 ms, and warns about coroutines that were never awaited.</p>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">asyncio.all_tasks()</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Dump what is currently pending when a request hangs.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">blockbuster / aiomonitor</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Third-party tools that detect blocking calls or give you a live console into the loop.</p></div>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 3 — asyncio</p>
+  <aside>Turn debug on in development only; the overhead is real.</aside>
+</section>
+<section id="as-recap" style="background:#1f5f5b; color:#f1f5f4; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:34px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#9fd0c9">Module 3 recap</p>
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:56px; font-weight:600; line-height:1.1">Wait concurrently, never block</h2>
+  <ul style="font-size:31px; line-height:1.6; color:#e2eeec">
+    <li>TaskGroup for structured concurrency; gather when you want a result list</li>
+    <li>Semaphore in front of every provider call</li>
+    <li>A timeout on every external call, at three levels</li>
+    <li>Re-raise CancelledError, always</li>
+    <li>One HTTP client per process, created in the lifespan</li>
+    <li>asyncio.to_thread for blocking libraries; a separate service for CPU work</li>
+  </ul>
+  <aside>Next module puts all of this behind an HTTP interface.</aside>
+</section>
+<section id="fa-divider" data-transition="push" style="background:#16191d; color:#f2f0ec; font-family:Inter, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:28px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#d98a5f">Module 4 — 27 slides</p>
+  <h1 style="font-family:'Space Grotesk', sans-serif; font-size:104px; font-weight:600; line-height:1.05">FastAPI</h1>
+  <p style="font-size:38px; line-height:1.4; color:#b6bcc4; width:1300px">Turning your pipeline into a service other people can call — with documentation, validation and streaming included.</p>
+  <aside>fastapi.tiangolo.com</aside>
+</section>
+<section id="fa-what" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">What FastAPI gives you for free</h2>
+  <div style="display:flex; gap:24px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Validation</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Your Pydantic models become the request contract. Bad input returns a 422 with field paths, written by nobody.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Documentation</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">An OpenAPI schema and an interactive docs page, always in sync with the code.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Async native</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Built on ASGI. Everything from Module 3 works directly in a handler.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Dependency injection</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">A first-class way to share clients, sessions, settings and auth across routes.</p></div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">It is Starlette for the HTTP layer plus Pydantic for the data layer. Both are worth knowing by name — errors often mention them.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Everything in Module 2 is directly reused here. That is why the order matters.</aside>
+</section>
+<section id="fa-hello" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">The smallest complete app</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from fastapi import FastAPI<br><br>app = FastAPI(title="RAG Service", version="0.1.0")<br><br>@app.get("/health")<br>async def health() -&gt; dict[str, str]:<br>    return {"status": "ok"}</p>
+  </div>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv add fastapi uvicorn<br>uv run uvicorn app.main:app --reload</p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Open http://127.0.0.1:8000/docs and the endpoint is already documented and callable.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>The docs page appearing without effort is the moment FastAPI sells itself.</aside>
+</section>
+<section id="fa-uvicorn" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Running it</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># development</span><br>uv run uvicorn app.main:app --reload --port 8000<br><br><span style="color:#8b939d"># production</span><br>uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4</p>
+  </div>
+  <table style="font-family:Inter, sans-serif; font-size:28px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:28%">Piece</th><th style="width:72%">Role</th></tr>
+    <tr><td>FastAPI</td><td>Your application — routing, validation, docs</td></tr>
+    <tr><td>Starlette</td><td>The ASGI toolkit underneath: requests, responses, middleware</td></tr>
+    <tr><td>Uvicorn</td><td>The ASGI server that speaks HTTP and runs the event loop</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Workers are separate processes. Anything cached in memory exists once per worker — a real consideration for loaded models.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>The per-worker memory point explains a lot of confusing production behaviour.</aside>
+</section>
+<section id="fa-path" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Path parameters</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">@app.get("/documents/{doc_id}")<br>async def get_doc(doc_id: str) -&gt; Document:<br>    ...<br><br>@app.get("/chunks/{index}")<br>async def get_chunk(index: int) -&gt; Chunk:<br>    ...      <span style="color:#8b939d"># /chunks/abc returns 422 automatically</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">The annotation is the parser and the validator. There is no separate schema to keep in sync.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Order matters: a literal route like /documents/search must be declared before /documents/{doc_id}, or the literal is swallowed by the parameter.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Route-ordering bugs are common and produce baffling 422s.</aside>
+</section>
+<section id="fa-query" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Query parameters</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from typing import Annotated<br>from fastapi import Query<br><br>@app.get("/search")<br>async def search(<br>    q: Annotated[str, Query(min_length=1, max_length=500)],<br>    top_k: Annotated[int, Query(ge=1, le=50)] = 5,<br>    collection: str = "default",<br>) -&gt; list[Chunk]:<br>    ...</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Anything not in the path and without a model type is read from the query string. The Annotated form is the current recommended style.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Constraints here flow straight into the OpenAPI schema, so the documentation shows the allowed range.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Annotated replaced the older default-value style; both work, one is recommended.</aside>
+</section>
+<section id="fa-body" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Request bodies are Pydantic models</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">class AskRequest(BaseModel):<br>    question: str = Field(min_length=1, max_length=4000)<br>    top_k: int = Field(default=5, ge=1, le=50)<br>    filters: dict[str, str] = Field(default_factory=dict)<br><br>@app.post("/ask")<br>async def ask(req: AskRequest) -&gt; Answer:<br>    return await pipeline.run(req)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">By the time your function body runs, req is validated, typed and editor-completed. Every rejection happened before it.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Add <b>model_config = ConfigDict(extra="forbid")</b> to catch clients sending misspelled fields.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>This is Module 2 paying off directly.</aside>
+</section>
+<section id="fa-response" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Response models</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">class Answer(BaseModel):<br>    text: str<br>    citations: list[Citation]<br>    latency_ms: int<br><br>@app.post("/ask", response_model=Answer)<br>async def ask(req: AskRequest):<br>    ...</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">The return annotation is enough in modern FastAPI; response_model is the explicit form.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">It is also a filter: fields not declared on the response model are stripped before sending. That is the mechanism that stops an internal object leaking a password hash or a raw prompt to a client.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>The filtering behaviour is a security feature worth stating plainly.</aside>
+</section>
+<section id="fa-status" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Status codes</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from fastapi import status<br><br>@app.post("/documents", status_code=status.HTTP_201_CREATED)<br>async def create(doc: DocumentIn) -&gt; Document: ...<br><br>@app.delete("/documents/{id}",<br>            status_code=status.HTTP_204_NO_CONTENT)<br>async def delete(id: str) -&gt; None: ...</p>
+  </div>
+  <table style="font-family:Inter, sans-serif; font-size:28px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:18%">Code</th><th style="width:82%">Meaning in an AI service</th></tr>
+    <tr><td>422</td><td>Request failed validation — FastAPI returns this for you</td></tr>
+    <tr><td>429</td><td>Your own rate limit, or a provider limit you are passing on</td></tr>
+    <tr><td>502 / 504</td><td>Upstream model provider failed or timed out</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Distinguishing 502 from 500 tells a client whether to retry.</aside>
+</section>
+<section id="fa-docs" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">The documentation you did not write</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">/docs</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Swagger UI. Interactive — a client can try every endpoint from the browser.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">/redoc</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">A cleaner reading view, better for handing to a non-developer stakeholder.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">/openapi.json</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">The machine-readable spec. Generates typed clients in TypeScript, Go or Python.</p></div>
+  </div>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">app = FastAPI(docs_url=None, redoc_url=None)   <span style="color:#8b939d"># disable in prod</span></p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Consulting tip: delivering an /openapi.json a client can generate their frontend types from is a visible, billable deliverable that costs you nothing extra.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Disable public docs on an internet-facing production service unless it is a public API.</aside>
+</section>
+<section id="fa-depends" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Dependency injection</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from fastapi import Depends<br><br>def get_settings() -&gt; Settings:<br>    return settings<br><br>async def get_retriever(<br>    s: Annotated[Settings, Depends(get_settings)],<br>) -&gt; Retriever:<br>    return app.state.retriever<br><br>@app.post("/ask")<br>async def ask(req: AskRequest,<br>              r: Annotated[Retriever, Depends(get_retriever)]):<br>    ...</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Dependencies are resolved per request, cached within that request, and can depend on each other.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">The real payoff is testing: override a dependency and the whole route runs against a fake. Module 6 uses this.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Dependency overrides are the cleanest test seam FastAPI offers.</aside>
+</section>
+<section id="fa-yield" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Dependencies with yield: resources that must be released</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">async def get_session() -&gt; AsyncGenerator[Session, None]:<br>    async with pool.acquire() as session:<br>        yield session<br>        <span style="color:#8b939d"># released after the response is sent</span><br><br>@app.get("/documents")<br>async def list_docs(<br>    s: Annotated[Session, Depends(get_session)],<br>) -&gt; list[Document]:<br>    return await s.fetch_all()</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Code before the yield is setup, code after is teardown, and teardown runs even when the handler raises.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Database sessions, transactions and tracing spans all belong in this shape.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Connects back to the async context manager slide in Module 3.</aside>
+</section>
+<section id="fa-lifespan" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Lifespan: load once, not per request</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from contextlib import asynccontextmanager<br><br>@asynccontextmanager<br>async def lifespan(app: FastAPI):<br>    app.state.http = httpx.AsyncClient(timeout=30)<br>    app.state.retriever = await Retriever.connect(settings)<br>    app.state.encoder = SentenceTransformer(settings.model)<br>    yield<br>    await app.state.http.aclose()<br><br>app = FastAPI(lifespan=lifespan)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Embedding models, HTTP clients and connection pools are expensive to create and cheap to reuse. This is where they belong.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Remember: once per worker process, not once per machine.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Loading a sentence transformer per request is a real bug people ship.</aside>
+</section>
+<section id="fa-settings" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Wiring settings in</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from functools import lru_cache<br><br>@lru_cache<br>def get_settings() -&gt; Settings:<br>    return Settings()<br><br>SettingsDep = Annotated[Settings, Depends(get_settings)]<br><br>@app.post("/ask")<br>async def ask(req: AskRequest, s: SettingsDep) -&gt; Answer:<br>    ...</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">The type alias is the practical trick: declare SettingsDep once and every route stays one line shorter.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">lru_cache makes it a singleton; tests override get_settings to inject a different configuration.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Define these aliases in a deps.py module and import them everywhere.</aside>
+</section>
+<section id="fa-errors" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Raising errors</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from fastapi import HTTPException, status<br><br>@app.get("/documents/{doc_id}")<br>async def get_doc(doc_id: str) -&gt; Document:<br>    doc = await repo.find(doc_id)<br>    if doc is None:<br>        raise HTTPException(<br>            status_code=status.HTTP_404_NOT_FOUND,<br>            detail=f"No document {doc_id}",<br>        )<br>    return doc</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Raise, do not return. Raising unwinds cleanly through dependencies and lets teardown run.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Never put a provider error message or a stack trace in detail — it reaches the client verbatim.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Leaking upstream error text is a common and avoidable information disclosure.</aside>
+</section>
+<section id="fa-handlers" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Exception handlers: one place for domain errors</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">class ProviderUnavailable(Exception): ...<br><br>@app.exception_handler(ProviderUnavailable)<br>async def provider_down(request: Request, exc: ProviderUnavailable):<br>    logger.error("provider_down", exc_info=exc)<br>    return JSONResponse(<br>        status_code=503,<br>        content={"error": "model_unavailable", "retry_after": 30},<br>    )</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Your business code raises a domain exception. The handler decides the HTTP representation. The two concerns stay separate.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Give every error a stable machine-readable code. Clients should branch on a code, not on prose.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Stable error codes are what make a client integration maintainable.</aside>
+</section>
+<section id="fa-middleware" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Middleware: request IDs and timing</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">@app.middleware("http")<br>async def add_request_id(request: Request, call_next):<br>    rid = request.headers.get("x-request-id", str(uuid4()))<br>    start = time.perf_counter()<br>    response = await call_next(request)<br>    ms = (time.perf_counter() - start) * 1000<br>    response.headers["x-request-id"] = rid<br>    logger.info("request", path=request.url.path, ms=round(ms))<br>    return response</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">A request ID that flows from the client through your logs and into your provider calls is what makes a production incident debuggable.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Keep middleware cheap — it runs on every request including health checks.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Pair this with structlog for JSON logs your platform can query.</aside>
+</section>
+<section id="fa-cors" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">CORS</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from fastapi.middleware.cors import CORSMiddleware<br><br>app.add_middleware(<br>    CORSMiddleware,<br>    allow_origins=["https://app.example.com"],<br>    allow_credentials=True,<br>    allow_methods=["GET", "POST"],<br>    allow_headers=["*"],<br>)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">If a browser frontend will call your service, you need this. If only servers call it, you do not.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">allow_origins=["*"] together with allow_credentials=True is rejected by browsers and is a security mistake besides. List real origins.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>CORS confusion accounts for a large share of "the API is broken" reports from frontend teams.</aside>
+</section>
+<section id="fa-bg" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Background tasks</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from fastapi import BackgroundTasks<br><br>@app.post("/ask")<br>async def ask(req: AskRequest, bg: BackgroundTasks) -&gt; Answer:<br>    answer = await pipeline.run(req)<br>    bg.add_task(store_trace, req, answer)<br>    return answer</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">The task runs after the response is sent. Good for logging a trace, warming a cache or firing a webhook.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Not a job queue. It dies with the process, it has no retries and no visibility. Anything that must happen belongs in Celery, RQ, arq or a managed queue.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Draw the line clearly: nice-to-have goes here, must-happen goes to a queue.</aside>
+</section>
+<section id="fa-stream" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Streaming responses</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from fastapi.responses import StreamingResponse<br><br>async def sse(prompt: str):<br>    async for token in model_stream(prompt):<br>        yield f"data: {json.dumps({'t': token})}\n\n"<br>    yield "data: [DONE]\n\n"<br><br>@app.post("/ask/stream")<br>async def ask_stream(req: AskRequest):<br>    return StreamingResponse(sse(req.question),<br>                             media_type="text/event-stream")</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Server-Sent Events is the standard transport for token streaming: one direction, plain HTTP, automatic browser reconnection.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Set <b>x-accel-buffering: no</b> if nginx sits in front, or it will buffer your stream into a single delivery.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>The nginx buffering detail catches almost everyone on first deployment.</aside>
+</section>
+<section id="fa-routers" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Routers: splitting a growing app</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># app/api/search.py</span><br>from fastapi import APIRouter<br><br>router = APIRouter(prefix="/search", tags=["search"])<br><br>@router.post("/")<br>async def search(req: SearchRequest) -&gt; list[Chunk]: ...<br><br><span style="color:#8b939d"># app/main.py</span><br>app.include_router(search.router)<br>app.include_router(documents.router)</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Tags group endpoints in the documentation. Prefixes keep route definitions short and consistent.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Router-level dependencies apply to every route inside, which is where authentication usually belongs.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Split as soon as main.py passes roughly 200 lines.</aside>
+</section>
+<section id="fa-layout" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">A project layout that scales</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">rag-service/<br>  pyproject.toml   uv.lock   .env.example   Dockerfile<br>  src/app/<br>    main.py          <span style="color:#8b939d"># app, lifespan, routers</span><br>    config.py        <span style="color:#8b939d"># Settings</span><br>    deps.py          <span style="color:#8b939d"># Annotated dependency aliases</span><br>    api/             <span style="color:#8b939d"># routers only, thin</span><br>    core/            <span style="color:#8b939d"># retrieval, prompts, pipeline</span><br>    models/          <span style="color:#8b939d"># Pydantic schemas</span><br>    clients/         <span style="color:#8b939d"># provider and vector store wrappers</span><br>  tests/</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Keep api/ thin: parse, call core, return. All logic in core/, which has no FastAPI import and is therefore testable without HTTP.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>The no-FastAPI-import rule for core/ is the most useful architectural constraint on this slide.</aside>
+</section>
+<section id="fa-syncasync" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">async def or def?</h2>
+  <table style="font-family:Inter, sans-serif; font-size:29px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:26%">You write</th><th style="width:36%">FastAPI runs it</th><th style="width:38%">Use when</th></tr>
+    <tr><td>async def</td><td>On the event loop</td><td>Everything inside is awaited</td></tr>
+    <tr><td>def</td><td>In a thread pool</td><td>The body calls blocking libraries</td></tr>
+  </table>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">The dangerous combination is <b>async def</b> containing a blocking call — FastAPI trusts you, and the loop stalls.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">If a route must use a synchronous SDK and you cannot wrap it, plain <b>def</b> is the safer choice. Correct and slightly slower beats fast and frozen.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Callback to the failure-mode slide in Module 3.</aside>
+</section>
+<section id="fa-auth" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">A practical API key dependency</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from fastapi.security import APIKeyHeader<br>import secrets<br><br>header = APIKeyHeader(name="X-API-Key")<br><br>async def require_key(key: Annotated[str, Depends(header)],<br>                      s: SettingsDep) -&gt; None:<br>    if not secrets.compare_digest(key, s.api_key):<br>        raise HTTPException(401, "Invalid API key")<br><br>router = APIRouter(dependencies=[Depends(require_key)])</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">compare_digest, not ==, so comparison time does not leak the key.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Applied at the router, every route inside is protected and none of them mention authentication. For user-facing products use OAuth2 or a JWT provider instead.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Constant-time comparison is a small detail that signals care in a code review.</aside>
+</section>
+<section id="fa-health" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Health and readiness</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">@app.get("/health")            <span style="color:#8b939d"># liveness: is the process alive?</span><br>async def health(): return {"status": "ok"}<br><br>@app.get("/ready")             <span style="color:#8b939d"># readiness: can it serve?</span><br>async def ready():<br>    checks = {"vector_store": await store.ping(),<br>              "model": app.state.encoder is not None}<br>    if not all(checks.values()):<br>        raise HTTPException(503, checks)<br>    return checks</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Liveness failing means restart me. Readiness failing means stop sending me traffic. Kubernetes and most platforms treat them differently.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Keep health cheap — it runs every few seconds forever. Never call a paid model provider from it.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>A health check that calls an LLM is a surprisingly common and expensive mistake.</aside>
+</section>
+<section id="fa-deploy" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Containerising it</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">FROM python:3.12-slim<br>COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv<br><br>WORKDIR /app<br>COPY pyproject.toml uv.lock ./<br>RUN uv sync --frozen --no-dev --no-install-project<br><br>COPY src/ ./src/<br>RUN uv sync --frozen --no-dev<br><br>CMD ["uv", "run", "uvicorn", "app.main:app",<br>     "--host", "0.0.0.0", "--port", "8000"]</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Dependencies are copied and installed before the source, so a code change does not invalidate the dependency layer. Builds drop from minutes to seconds.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">--frozen means a stale lockfile fails the build instead of silently resolving something new.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 4 — FastAPI</p>
+  <aside>Layer ordering is the whole trick; point at the two separate COPY lines.</aside>
+</section>
+<section id="fa-recap" style="background:#1f5f5b; color:#f1f5f4; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:34px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#9fd0c9">Module 4 recap</p>
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:56px; font-weight:600; line-height:1.1">A service, not a script</h2>
+  <ul style="font-size:31px; line-height:1.6; color:#e2eeec">
+    <li>Pydantic models in, Pydantic models out — response_model filters what leaves</li>
+    <li>Expensive objects live in the lifespan, injected with Depends</li>
+    <li>Domain exceptions plus handlers; stable error codes for clients</li>
+    <li>Middleware for request IDs and timing; SSE for token streaming</li>
+    <li>Thin routers, logic in core/ with no FastAPI import</li>
+    <li>Separate liveness and readiness; multi-stage Docker with uv sync --frozen</li>
+  </ul>
+  <aside>Next: making all of this stay correct automatically.</aside>
+</section>
+<section id="rf-divider" data-transition="push" style="background:#16191d; color:#f2f0ec; font-family:Inter, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:28px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#d98a5f">Module 5 — 10 slides</p>
+  <h1 style="font-family:'Space Grotesk', sans-serif; font-size:104px; font-weight:600; line-height:1.05">Ruff</h1>
+  <p style="font-size:38px; line-height:1.4; color:#b6bcc4; width:1300px">Lint and format, one tool, effectively instant. The cheapest quality improvement available to a Python project.</p>
+  <aside>docs.astral.sh/ruff</aside>
+</section>
+<section id="rf-what" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">One tool replacing five</h2>
+  <table style="font-family:Inter, sans-serif; font-size:29px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:34%">Old tool</th><th style="width:66%">Now</th></tr>
+    <tr><td>flake8</td><td>ruff check</td></tr>
+    <tr><td>black</td><td>ruff format</td></tr>
+    <tr><td>isort</td><td>ruff check, rule set I</td></tr>
+    <tr><td>pyupgrade</td><td>ruff check, rule set UP</td></tr>
+    <tr><td>autoflake, pydocstyle, bandit (partly)</td><td>ruff check, rule sets F, D, S</td></tr>
+  </table>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Written in Rust. A codebase that took flake8 thirty seconds takes Ruff under a second, which is what makes running it on every save realistic.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 5 — Ruff</p>
+  <aside>Speed is not a vanity metric here — it changes whether the tool runs continuously or only in CI.</aside>
+</section>
+<section id="rf-install" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Install and first run</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv add --dev ruff<br><br>uv run ruff check .<br>uv run ruff format .<br><br><span style="color:#8b939d"># or, without adding it to the project</span><br>uvx ruff check .</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Add it to the dev group so the version is locked. A linter that upgrades itself silently will fail your CI on a day you changed nothing.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Editor integration: the Ruff extension for VS Code, or ruff-lsp for anything else. Format on save, fix imports on save.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 5 — Ruff</p>
+  <aside>Pin the version. Rule sets change between releases.</aside>
+</section>
+<section id="rf-check" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">ruff check</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv run ruff check .                <span style="color:#8b939d"># report</span><br>uv run ruff check --fix .          <span style="color:#8b939d"># apply safe fixes</span><br>uv run ruff check --watch .        <span style="color:#8b939d"># re-run on save</span><br>uv run ruff check --statistics .   <span style="color:#8b939d"># what fires most</span><br>uv run ruff check --diff .         <span style="color:#8b939d"># preview without writing</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">On an existing codebase start with --statistics. It tells you which rules dominate, so you can fix the top two categories and ignore the long tail for now.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 5 — Ruff</p>
+  <aside>Adoption strategy matters more than rule choice on a legacy project.</aside>
+</section>
+<section id="rf-format" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">ruff format</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv run ruff format .<br>uv run ruff format --check .      <span style="color:#8b939d"># CI: fail if unformatted</span><br>uv run ruff format --diff .</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">A near-exact reimplementation of black. Formatting stops being a matter of opinion, and diffs stop containing whitespace noise.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Adopt it in a single dedicated commit, then add that commit hash to .git-blame-ignore-revs so git blame still shows real authorship.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 5 — Ruff</p>
+  <aside>The blame-ignore file is a small courtesy your team will notice.</aside>
+</section>
+<section id="rf-config" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Configuration</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">[tool.ruff]<br>line-length = 88<br>target-version = "py312"<br>src = ["src", "tests"]<br><br>[tool.ruff.lint]<br>select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF"]<br>ignore = ["E501"]<br><br>[tool.ruff.lint.per-file-ignores]<br>"tests/*" = ["S101"]<br>"__init__.py" = ["F401"]</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">All of it lives in pyproject.toml — no extra config files.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Setting <b>src</b> correctly is what makes import sorting put your own packages in the right block.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 5 — Ruff</p>
+  <aside>Forgetting src is why first-party imports sometimes sort as third-party.</aside>
+</section>
+<section id="rf-rules" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Rule sets worth enabling</h2>
+  <table style="font-family:Inter, sans-serif; font-size:28px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:14%">Code</th><th style="width:30%">Set</th><th style="width:56%">Why it earns its place</th></tr>
+    <tr><td>F</td><td>Pyflakes</td><td>Real errors: undefined names, unused imports</td></tr>
+    <tr><td>E, W</td><td>pycodestyle</td><td>Baseline style</td></tr>
+    <tr><td>I</td><td>isort</td><td>Deterministic import order</td></tr>
+    <tr><td>UP</td><td>pyupgrade</td><td>Modernises syntax to your target version</td></tr>
+    <tr><td>B</td><td>bugbear</td><td>Catches mutable defaults and likely bugs</td></tr>
+    <tr><td>ASYNC</td><td>flake8-async</td><td>Finds blocking calls inside async functions</td></tr>
+    <tr><td>S</td><td>bandit</td><td>Security issues: hardcoded secrets, unsafe calls</td></tr>
+  </table>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">ASYNC is the one to adopt first in an AI codebase — it mechanically catches Module 3's worst failure mode.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 5 — Ruff</p>
+  <aside>Ruff can find the blocking-call bug for you. Say that clearly.</aside>
+</section>
+<section id="rf-fix" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Fixes, safe and unsafe</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv run ruff check --fix .<br>uv run ruff check --fix --unsafe-fixes .<br><br><span style="color:#8b939d"># suppressing, when you must</span><br>import typing  <span style="color:#8b939d"># noqa: F401</span><br>result = eval(expr)  <span style="color:#8b939d"># noqa: S307 - trusted input, see ADR-4</span></p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">A safe fix preserves behaviour. An unsafe fix may change it — run those on a clean working tree and read the diff.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Always use a specific code in noqa. A bare <b>noqa</b> disables every rule on that line, including ones added later.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 5 — Ruff</p>
+  <aside>Requiring a reason after noqa is a good team convention.</aside>
+</section>
+<section id="rf-precommit" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Running it automatically</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># .pre-commit-config.yaml</span><br>repos:<br>  - repo: https://github.com/astral-sh/ruff-pre-commit<br>    rev: v0.7.4<br>    hooks:<br>      - id: ruff<br>        args: [--fix]<br>      - id: ruff-format</p>
+  </div>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># CI — no fixing, just failing</span><br>uv run ruff check --output-format=github .<br>uv run ruff format --check .</p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Fix locally, verify in CI. The github output format annotates the pull request diff directly.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 5 — Ruff</p>
+  <aside>Never let CI rewrite code; it should only report.</aside>
+</section>
+<section id="rf-recap" style="background:#1f5f5b; color:#f1f5f4; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:34px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#9fd0c9">Module 5 recap</p>
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:56px; font-weight:600; line-height:1.1">Twenty minutes, permanently</h2>
+  <p style="font-size:34px; line-height:1.45; color:#cfe3e0; width:1560px">Add ruff to the dev group, configure it in pyproject.toml, select F, E, I, UP, B, SIM, ASYNC and RUF, format the codebase in one commit, wire pre-commit locally and --check in CI. That is the entire module, and it is a one-time cost.</p>
+  <p style="font-size:31px; line-height:1.5; color:#9fd0c9; width:1560px">On a client project, this is often the first visible deliverable: a clean diff, a green pipeline, and a codebase that stops drifting.</p>
+  <aside>Frame it as consulting value, not housekeeping.</aside>
+</section>
+<section id="pt-divider" data-transition="push" style="background:#16191d; color:#f2f0ec; font-family:Inter, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:28px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#d98a5f">Module 6 — 21 slides</p>
+  <h1 style="font-family:'Space Grotesk', sans-serif; font-size:104px; font-weight:600; line-height:1.05">pytest</h1>
+  <p style="font-size:38px; line-height:1.4; color:#b6bcc4; width:1300px">Proving the system works — and, for AI systems, proving how well it works. This is the module that justifies your rate.</p>
+  <aside>docs.pytest.org</aside>
+</section>
+<section id="pt-why" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Two kinds of testing you need</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Deterministic tests</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Does the chunker split correctly? Does the retriever apply the filter? Does the endpoint return 422 on bad input? Same input, same answer, every time. Ordinary unit tests.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Evaluation</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Is the answer faithful to the retrieved context? Did retrieval find the right document? Scored, not asserted. Compared across versions rather than passed or failed.</p></div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Most people building AI systems do neither. Doing both is the clearest possible evidence of seniority — and it is what lets you say "this change improved recall from 0.71 to 0.84" instead of "it seems better".</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>This slide is the commercial argument for the module. Return to it at the end.</aside>
+</section>
+<section id="pt-first" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Your first test</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># tests/test_chunking.py</span><br>from app.core.chunking import chunk_text<br><br>def test_chunk_respects_size():<br>    text = "word " * 1000<br>    chunks = chunk_text(text, size=100)<br>    assert all(len(c) &lt;= 100 for c in chunks)<br>    assert "".join(chunks).replace(" ", "") == text.replace(" ", "")</p>
+  </div>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv add --dev pytest<br>uv run pytest -q</p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">No class, no setUp, no assertEqual. A function named test_something containing plain assert statements.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>The second assertion checks nothing is lost — a real chunker bug.</aside>
+</section>
+<section id="pt-assert" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Assertion introspection</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">def test_scores():<br>    assert retrieve("q") == ["doc-1", "doc-2"]</p>
+  </div>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">E   AssertionError: assert ['doc-1', 'doc-3'] == ['doc-1', 'doc-2']<br>E     At index 1 diff: 'doc-3' != 'doc-2'</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">pytest rewrites your assert statements so a plain equality check produces a full diff. This is why the framework needs no assertion API.</p>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">import pytest<br><br>with pytest.raises(ValidationError, match="top_k"):<br>    SearchRequest(query="x", top_k=999)<br><br>assert score == pytest.approx(0.84, abs=0.01)</p>
+  </div>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>approx is essential for any float comparison, which means most AI testing.</aside>
+</section>
+<section id="pt-layout" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Discovery and layout</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">tests/<br>  conftest.py<br>  unit/<br>    test_chunking.py<br>    test_prompts.py<br>  integration/<br>    test_api.py<br>    test_retrieval.py<br>  evals/<br>    test_rag_quality.py<br>  data/<br>    golden_questions.jsonl</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">pytest collects files named test_*.py, functions named test_*, and classes named Test* with no __init__.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">The src/ layout matters here: tests import your package the way a user would, so a missing export in __init__.py fails in tests instead of in production.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>Testing the installed package, not the source directory, catches packaging bugs.</aside>
+</section>
+<section id="pt-fixtures" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Fixtures: setup as an argument</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">import pytest<br><br>@pytest.fixture<br>def sample_chunks() -&gt; list[Chunk]:<br>    return [Chunk(doc_id="a", text="...", page=1),<br>            Chunk(doc_id="b", text="...", page=2)]<br><br>def test_rerank(sample_chunks):<br>    ranked = rerank("query", sample_chunks)<br>    assert ranked[0].doc_id == "b"</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Request a fixture by naming it as a parameter. pytest builds it, injects it, and tears it down afterwards.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Fixtures can request other fixtures, which is how you compose realistic test environments without inheritance.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>The same dependency-injection idea as FastAPI's Depends.</aside>
+</section>
+<section id="pt-scope" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Fixture scope</h2>
+  <table style="font-family:Inter, sans-serif; font-size:29px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:24%">Scope</th><th style="width:30%">Created</th><th style="width:46%">Use for</th></tr>
+    <tr><td>function</td><td>Every test (default)</td><td>Mutable data, isolation</td></tr>
+    <tr><td>class</td><td>Once per test class</td><td>Grouped setup</td></tr>
+    <tr><td>module</td><td>Once per file</td><td>A shared read-only dataset</td></tr>
+    <tr><td>session</td><td>Once per run</td><td>Containers, embedding models, HTTP clients</td></tr>
+  </table>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">@pytest.fixture(scope="session")<br>def encoder():<br>    return SentenceTransformer("all-MiniLM-L6-v2")</p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Loading a model per test turns a ten-second suite into ten minutes. Scope it to the session.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>Never mutate a session-scoped fixture; one test then breaks the next.</aside>
+</section>
+<section id="pt-conftest" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">conftest.py</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec"><span style="color:#8b939d"># tests/conftest.py — available everywhere below it</span><br>import pytest<br>from app.config import Settings<br><br>@pytest.fixture(scope="session")<br>def settings() -&gt; Settings:<br>    return Settings(anthropic_api_key="test-key",<br>                    model_name="fake-model")<br><br>@pytest.fixture<br>def sample_question() -&gt; str:<br>    return "What is the refund window?"</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Fixtures in conftest.py are discovered automatically by every test below that directory. No imports.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Nest them: a broad conftest.py at tests/ and a narrower one in tests/integration/.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>Unimported-but-available is surprising the first time; say it explicitly.</aside>
+</section>
+<section id="pt-param" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">parametrize: one test, many cases</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">@pytest.mark.parametrize("raw,expected", [<br>    ('{"a": 1}', {"a": 1}),<br>    ('```json\n{"a": 1}\n```', {"a": 1}),<br>    ('Here it is: {"a": 1}', {"a": 1}),<br>    ('{"a": 1,}', {"a": 1}),<br>])<br>def test_json_extraction(raw, expected):<br>    assert extract_json(raw) == expected</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Four separate reported tests from one function. When one fails you know exactly which input broke.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">This example is a real one: every LLM JSON extractor needs precisely this table, and it grows each time a model surprises you.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>Encourage learners to grow this table from real production failures.</aside>
+</section>
+<section id="pt-markers" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Markers: selecting what runs</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">@pytest.mark.slow<br>@pytest.mark.eval<br>def test_retrieval_recall(): ...<br><br>@pytest.mark.skipif(not os.getenv("API_KEY"),<br>                    reason="needs a live key")<br>def test_live_provider(): ...<br><br>@pytest.mark.xfail(reason="known: reranker drops ties")<br>def test_tie_breaking(): ...</p>
+  </div>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv run pytest -m "not slow and not eval"     <span style="color:#8b939d"># fast feedback</span><br>uv run pytest -m eval                        <span style="color:#8b939d"># nightly</span></p>
+  </div>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Register custom markers in pyproject.toml, or pytest warns on every run.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>The split between fast and nightly suites is what keeps CI usable.</aside>
+</section>
+<section id="pt-async" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Testing async code</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv add --dev pytest-asyncio<br><br><span style="color:#8b939d"># pyproject.toml</span><br>[tool.pytest.ini_options]<br>asyncio_mode = "auto"</p>
+  </div>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">async def test_pipeline_runs():<br>    answer = await pipeline.run("what is RAG?")<br>    assert answer.citations</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">With asyncio_mode set to auto, any async test function just works — no decorator on every test.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Async fixtures work the same way. An alternative, anyio, tests against both asyncio and trio if your library must support both.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>Without asyncio_mode, async tests are silently skipped — a nasty false green.</aside>
+</section>
+<section id="pt-testclient" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Testing FastAPI endpoints</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">from fastapi.testclient import TestClient<br>from app.main import app<br><br>@pytest.fixture(scope="session")<br>def client():<br>    with TestClient(app) as c:      <span style="color:#8b939d"># runs the lifespan</span><br>        yield c<br><br>def test_ask_validates_input(client):<br>    r = client.post("/ask", json={"question": ""})<br>    assert r.status_code == 422</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">TestClient calls your app in-process. No server, no ports, no network — and it is fast enough to run on every save.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Using it as a context manager is what triggers startup and shutdown, so your lifespan resources exist.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>Forgetting the with block means app.state is empty and tests fail confusingly.</aside>
+</section>
+<section id="pt-asyncclient" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">An async test client</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">import httpx<br>from httpx import ASGITransport<br><br>@pytest.fixture<br>async def aclient():<br>    transport = ASGITransport(app=app)<br>    async with httpx.AsyncClient(transport=transport,<br>                                 base_url="http://test") as c:<br>        yield c<br><br>async def test_stream(aclient):<br>    async with aclient.stream("POST", "/ask/stream",<br>                              json={"question": "hi"}) as r:<br>        chunks = [c async for c in r.aiter_text()]<br>    assert chunks</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">TestClient is synchronous underneath. For testing streaming endpoints or concurrency, use httpx with an ASGI transport.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>This is the only reliable way to test SSE endpoints.</aside>
+</section>
+<section id="pt-override" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Overriding dependencies</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">class FakeRetriever:<br>    async def search(self, q: str, k: int) -&gt; list[Chunk]:<br>        return [Chunk(doc_id="fixed", text="known text", page=1)]<br><br>@pytest.fixture<br>def client():<br>    app.dependency_overrides[get_retriever] = lambda: FakeRetriever()<br>    with TestClient(app) as c:<br>        yield c<br>    app.dependency_overrides.clear()</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">The whole route runs — validation, handler, response model — against a retriever you control. No network, no vector store, deterministic output.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Always clear the overrides afterwards, or they leak into the next test.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>Note that FakeRetriever satisfies the Protocol from Module 2 without inheriting anything.</aside>
+</section>
+<section id="pt-mock" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Faking the model provider</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">@pytest.fixture<br>def fake_model(monkeypatch):<br>    async def fake_call(prompt: str, **kw) -&gt; str:<br>        return '{"company": "Acme", "amount_usd": 5000,<br>                 "signed_on": "2026-01-30"}'<br>    monkeypatch.setattr("app.clients.llm.call_model", fake_call)<br><br>async def test_extraction(fake_model):<br>    out = await extract(contract_text)<br>    assert out.company == "Acme"</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Patch where the name is <b>used</b>, not where it is defined. This is the single most common mocking mistake in Python.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">monkeypatch undoes itself after the test. Prefer it to unittest.mock.patch in pytest code.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>Say the patch-where-used rule twice; it costs people hours.</aside>
+</section>
+<section id="pt-coverage" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Coverage</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">uv add --dev pytest-cov<br>uv run pytest --cov=src/app --cov-report=term-missing<br>uv run pytest --cov=src/app --cov-fail-under=80</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">term-missing prints the exact uncovered line numbers, which is the only part of a coverage report anyone should act on.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Coverage measures which lines ran, not whether they are correct. Eighty percent on the code that matters beats ninety-five percent padded with trivial getters. Use it to find untested paths, never as a goal in itself.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>Push back on coverage targets as a quality proxy — but do use the missing-lines report.</aside>
+</section>
+<section id="pt-config" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Configuring pytest</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">[tool.pytest.ini_options]<br>testpaths = ["tests"]<br>asyncio_mode = "auto"<br>addopts = "-q --strict-markers --cov=src/app"<br>markers = [<br>    "slow: takes more than a second",<br>    "eval: scores quality, needs a provider key",<br>    "integration: needs external services",<br>]</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149"><b>--strict-markers</b> turns a typo like @pytest.mark.slwo into an error instead of a silently ignored decorator.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Keep addopts short. Anything a developer might want to switch off belongs on the command line, not in permanent config.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>The strict-markers typo failure is worth demonstrating.</aside>
+</section>
+<section id="pt-snapshot" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Golden files for prompts</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">def test_prompt_is_stable(snapshot):<br>    rendered = build_prompt(question="What is the refund window?",<br>                            chunks=FIXED_CHUNKS)<br>    assert rendered == snapshot</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Prompts are code, and a one-word edit can change behaviour across every request. A snapshot test makes that edit appear in the diff of a pull request, where someone can see it.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Use syrupy or inline-snapshot. Review every snapshot update deliberately; blindly regenerating them defeats the purpose.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>This is the cheapest guard against accidental prompt drift.</aside>
+</section>
+<section id="pt-evals" style="background:#b8501f; color:#fdf4ee; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:30px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#f6d5c1">The differentiator</p>
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:56px; font-weight:600; line-height:1.1">An evaluation harness, run like a test suite</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">@pytest.mark.eval<br>async def test_retrieval_recall(golden_questions):<br>    hits = 0<br>    for q in golden_questions:<br>        chunks = await retriever.search(q.question, k=5)<br>        if q.expected_doc_id in {c.doc_id for c in chunks}:<br>            hits += 1<br>    recall = hits / len(golden_questions)<br>    record_metric("recall_at_5", recall)<br>    assert recall &gt;= 0.75      <span style="color:#8b939d"># regression gate</span></p>
+  </div>
+  <p style="font-size:30px; line-height:1.45; color:#fae5d8; width:1600px">Fifty hand-labelled questions is enough to start. Assert a floor to catch regressions; record the number to show improvement. Ragas supplies faithfulness and context-precision metrics for the generation half.</p>
+  <aside>This slide is the deck's commercial argument. Fifty labelled questions, one afternoon, and you can quote numbers no competing freelancer has.</aside>
+</section>
+<section id="pt-ci" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">In continuous integration</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">jobs:<br>  test:<br>    runs-on: ubuntu-latest<br>    steps:<br>      - uses: actions/checkout@v4<br>      - uses: astral-sh/setup-uv@v3<br>        with:<br>          enable-cache: true<br>      - run: uv sync --frozen<br>      - run: uv run ruff check --output-format=github .<br>      - run: uv run ruff format --check .<br>      - run: uv run pytest -m "not eval" --cov=src/app</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Fast checks on every pull request. The eval suite runs nightly or on a release branch, where a provider key and a few minutes are acceptable.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Module 6 — pytest</p>
+  <aside>Showing a green pipeline badge on a portfolio repo does a lot of work in a client conversation.</aside>
+</section>
+<section id="pt-recap" style="background:#1f5f5b; color:#f1f5f4; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:34px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#9fd0c9">Module 6 recap</p>
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:56px; font-weight:600; line-height:1.1">Prove it, then prove it stayed true</h2>
+  <ul style="font-size:31px; line-height:1.6; color:#e2eeec">
+    <li>Plain functions, plain asserts, fixtures for setup</li>
+    <li>parametrize every parser and extractor against real failures</li>
+    <li>asyncio_mode auto; TestClient for routes, httpx ASGI for streams</li>
+    <li>dependency_overrides and monkeypatch instead of network calls</li>
+    <li>Snapshot your prompts so edits show up in review</li>
+    <li>Mark evals separately, assert a floor, record the score</li>
+  </ul>
+  <aside>The last two lines are the ones almost nobody does.</aside>
+</section>
+<section id="end-divider" data-transition="push" style="background:#16191d; color:#f2f0ec; font-family:Inter, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:28px">
+  <p style="font-size:28px; letter-spacing:2px; text-transform:uppercase; color:#d98a5f">Closing — 8 slides</p>
+  <h1 style="font-family:'Space Grotesk', sans-serif; font-size:96px; font-weight:600; line-height:1.05">Putting it together</h1>
+  <p style="font-size:38px; line-height:1.4; color:#b6bcc4; width:1300px">Six tools, one service, and a plan for turning this into something you can show a client.</p>
+  <aside>The remaining slides are the transferable output.</aside>
+</section>
+<section id="end-arch" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Where each tool sits</h2>
+  <table style="font-family:Inter, sans-serif; font-size:29px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:26%">Layer</th><th style="width:36%">What happens</th><th style="width:38%">Tool</th></tr>
+    <tr><td>Build</td><td>Resolve, lock, install, containerise</td><td>uv</td></tr>
+    <tr><td>Configuration</td><td>Read env, fail fast on startup</td><td>pydantic-settings</td></tr>
+    <tr><td>Edge</td><td>Route, validate, document, stream</td><td>FastAPI</td></tr>
+    <tr><td>Data</td><td>Every boundary typed and checked</td><td>Pydantic v2</td></tr>
+    <tr><td>Execution</td><td>Concurrent provider calls, timeouts, limits</td><td>asyncio, httpx</td></tr>
+    <tr><td>Quality</td><td>Lint, format, catch blocking calls</td><td>Ruff</td></tr>
+    <tr><td>Proof</td><td>Unit tests, route tests, scored evals</td><td>pytest</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Putting it together</p>
+  <aside>Use this table as the summary slide if you teach this as a short workshop.</aside>
+</section>
+<section id="end-checklist" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">What "production" actually means here</h2>
+  <div style="display:flex; gap:24px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Reproducible</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">uv.lock committed. Docker builds with --frozen. The same bytes install on every machine.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Fails fast and loud</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Missing config kills startup. Bad input returns 422. Bad model output raises ValidationError with a field path.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Bounded</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Timeouts on every external call. A semaphore on every provider. Retries capped, with backoff.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Observable</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">Request IDs in logs. Latency recorded. Retry and failure rates visible.</p></div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px"><h3 style="font-size:30px; font-weight:600; line-height:1.25">Measured</h3><p style="font-size:26px; line-height:1.45; color:#4a5058">A golden set. Recall and faithfulness scores. A number you can compare between versions.</p></div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Any three of these puts you ahead of most contract work. All five is what a senior rate buys.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Putting it together</p>
+  <aside>Use this as the acceptance checklist on a client engagement.</aside>
+</section>
+<section id="end-pitfalls" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">The failure modes, collected</h2>
+  <table style="font-family:Inter, sans-serif; font-size:28px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:44%">Mistake</th><th style="width:56%">Consequence</th></tr>
+    <tr><td>No lockfile</td><td>Staging and production drift apart silently</td></tr>
+    <tr><td>extra="ignore" on config models</td><td>A renamed key is accepted and ignored</td></tr>
+    <tr><td>Blocking call in an async handler</td><td>Every concurrent user stalls, health checks included</td></tr>
+    <tr><td>HTTP client created per request</td><td>Handshake cost on every call, pool wasted</td></tr>
+    <tr><td>gather with no semaphore</td><td>Rate limit errors and an unexpected bill</td></tr>
+    <tr><td>Swallowing CancelledError</td><td>Timeouts and shutdown stop working</td></tr>
+    <tr><td>No response_model</td><td>Internal fields leak to clients</td></tr>
+    <tr><td>No eval set</td><td>You cannot tell whether a change helped</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Putting it together</p>
+  <aside>Print this one. It doubles as a code review checklist.</aside>
+</section>
+<section id="end-plan" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">A six-week build plan</h2>
+  <table style="font-family:Inter, sans-serif; font-size:29px; color:#1c2024">
+    <tr style="background:#ebe8e0"><th style="width:14%">Week</th><th style="width:44%">Build</th><th style="width:42%">Evidence produced</th></tr>
+    <tr><td>1</td><td>uv project, Settings, ingestion script</td><td>A repo that installs identically anywhere</td></tr>
+    <tr><td>2</td><td>Pydantic models for every boundary</td><td>Typed contracts, structured extraction</td></tr>
+    <tr><td>3</td><td>Async retrieval with limits and timeouts</td><td>Concurrency benchmark, before and after</td></tr>
+    <tr><td>4</td><td>FastAPI service with streaming</td><td>A live URL and an OpenAPI spec</td></tr>
+    <tr><td>5</td><td>Ruff, pytest, TestClient suite</td><td>A green CI badge</td></tr>
+    <tr><td>6</td><td>Fifty-question golden set, Ragas metrics</td><td>Recall and faithfulness numbers in the README</td></tr>
+  </table>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Putting it together</p>
+  <aside>Six weeks part-time. The evidence column is what goes in the proposal.</aside>
+</section>
+<section id="end-portfolio" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">What the repository README should say</h2>
+  <div style="background:#16191d; border-radius:16px; padding:36px 40px">
+    <p style="font-family:'JetBrains Mono', monospace; font-size:27px; line-height:1.6; color:#e4e7ec">## Results<br>Retrieval recall@5:      0.84   (baseline dense-only: 0.71)<br>Answer faithfulness:     0.91   (Ragas, 50 questions)<br>p95 latency:             1.8 s  (streaming TTFT: 340 ms)<br>Concurrent requests:     120    (single 2-core container)<br><br>## Reproduce<br>uv sync --frozen<br>uv run pytest -m eval</p>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Numbers plus a one-line reproduction command. That combination is rare enough that it does most of the selling for you.</p>
+  <p style="font-size:26px; line-height:1.45; color:#4a5058">Replace every figure above with your own measured values. Quoting numbers you did not produce is the fastest way to lose a technical interview.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Putting it together</p>
+  <aside>The figures on this slide are illustrative placeholders, not claims — say so when presenting.</aside>
+</section>
+<section id="end-links" style="background:#f7f6f2; color:#1c2024; font-family:Inter, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+  <h2 style="font-family:'Space Grotesk', sans-serif; font-size:60px; font-weight:600; line-height:1.1">Primary sources</h2>
+  <div style="display:flex; gap:28px">
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px">
+      <h3 style="font-size:30px; font-weight:600; line-height:1.25">Environment and quality</h3>
+      <p style="font-size:26px; line-height:1.45; color:#4a5058"><a href="https://docs.astral.sh/uv/">docs.astral.sh/uv</a><br><a href="https://docs.astral.sh/ruff/">docs.astral.sh/ruff</a><br><a href="https://docs.pytest.org/en/stable/">docs.pytest.org</a></p>
+    </div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px">
+      <h3 style="font-size:30px; font-weight:600; line-height:1.25">Data and services</h3>
+      <p style="font-size:26px; line-height:1.45; color:#4a5058"><a href="https://docs.pydantic.dev/latest/">docs.pydantic.dev</a><br><a href="https://fastapi.tiangolo.com/tutorial/">fastapi.tiangolo.com</a><br><a href="https://docs.python.org/3/library/asyncio.html">docs.python.org asyncio</a></p>
+    </div>
+    <div style="flex:1; background:#ffffff; border:1px solid #e2e0da; border-radius:16px; padding:32px; display:flex; flex-direction:column; gap:12px">
+      <h3 style="font-size:30px; font-weight:600; line-height:1.25">Read next</h3>
+      <p style="font-size:26px; line-height:1.45; color:#4a5058"><a href="https://docs.ragas.io/">docs.ragas.io</a><br><a href="https://docs.langchain.com/oss/python/langgraph/overview">LangGraph docs</a><br><a href="https://modelcontextprotocol.io/">modelcontextprotocol.io</a></p>
+    </div>
+  </div>
+  <p style="font-size:36px; line-height:1.4; color:#3b4149">Read the official documentation before any tutorial. All six tools here are well documented and move fast enough that secondary sources go stale within months.</p>
+  <p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#5e656c">Putting it together</p>
+  <aside>The third card is the bridge to the RAG and agents stack.</aside>
+</section>
+<section id="end-close" style="background:#16191d; color:#f2f0ec; font-family:Inter, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:center; gap:34px">
+  <h1 style="font-family:'Space Grotesk', sans-serif; font-size:76px; font-weight:600; line-height:1.1; width:1560px">Knowing Python is the entry ticket. Shipping Python is the rate.</h1>
+  <p style="font-size:34px; line-height:1.45; color:#b6bcc4; width:1500px">Nothing in these six modules is conceptually hard. What makes it valuable is that it is unglamorous, it is skipped by almost everyone building AI systems quickly, and it is immediately visible in a repository.</p>
+  <p style="font-size:30px; line-height:1.5; color:#d98a5f; width:1500px">Build one service. Measure it. Put the numbers in the README.</p>
+  <aside>Close on the single action: one service, measured, documented.</aside>
+</section>
+
+</div></div>
+<div id="bar"><a href="pres.htm">← Presentations</a><button onclick="go(i-1)">‹ Prev</button><span id="n"></span><button onclick="go(i+1)">Next ›</button><span>← → keys · F for full screen</span></div>
+<script>
+const S=[...document.querySelectorAll('section')],f=document.getElementById('frame'),n=document.getElementById('n');let i=0;
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);f.style.transform='scale('+s+')'}
+function go(k){i=Math.max(0,Math.min(S.length-1,k));S.forEach((s,j)=>s.classList.toggle('on',j===i));n.textContent=(i+1)+' / '+S.length;history.replaceState(null,'','#'+(i+1))}
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){go(i+1);e.preventDefault()}else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){go(i-1);e.preventDefault()}else if(e.key==='Home')go(0);else if(e.key==='End')go(S.length-1);else if(e.key==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}});
+document.getElementById('stage').addEventListener('click',e=>{if(e.target.closest('a'))return;go(e.clientX<innerWidth/3?i-1:i+1)});
+let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX);addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>40)go(d<0?i+1:i-1);tx=null});
+fit();go((parseInt(location.hash.slice(1))||1)-1);
+</script></body></html>
