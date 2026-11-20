@@ -164,6 +164,162 @@
 <footer>
   <div class="shell">© Faiz ul haque Zeya · <a href="index.html">faizzeya.github.io</a></div>
 </footer>
+<style>
+  .ai-courses-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1f2937;
+    margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  .ai-courses-table thead {
+    background-color: #1e293b;
+    color: #ffffff;
+    text-align: left;
+  }
+  .ai-courses-table th,
+  .ai-courses-table td {
+    padding: 12px 15px;
+    border: 1px solid #e5e7eb;
+    vertical-align: top;
+  }
+  .ai-courses-table tbody tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+  .ai-courses-table tbody tr:hover {
+    background-color: #f1f5f9;
+  }
+  .ai-courses-table .category-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-llm {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+  .badge-transformer {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+  .badge-dl {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  .ai-courses-table a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .ai-courses-table a:hover {
+    text-decoration: underline;
+  }
+</style>
 
+<table class="ai-courses-table">
+  <thead>
+    <tr>
+      <th>Topic</th>
+      <th>University</th>
+      <th>Course Code &amp; Title</th>
+      <th>Instructor(s) / Term</th>
+      <th>Key Focus Areas</th>
+      <th>Playlist Link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Large Language Models -->
+    <tr>
+      <td><span class="category-badge badge-llm">LLMs</span></td>
+      <td><strong>Stanford University</strong></td>
+      <td>CS336: Language Modeling from Scratch</td>
+      <td>Spring 2026</td>
+      <td>Tokenization, Transformer variants, scaling laws, distributed training, alignment, and evaluation from the ground up.</td>
+      <td><a href="http://www.youtube.com/playlist?list=PLoROMvodv4rMqXOcazWaTUHhq-yembLCV" target="_blank" rel="noopener noreferrer">Watch Playlist</a></td>
+    </tr>
+    <tr>
+      <td><span class="category-badge badge-llm">LLMs</span></td>
+      <td><strong>Stanford University</strong></td>
+      <td>CME295: Transformers &amp; Large Language Models</td>
+      <td>Autumn 2025</td>
+      <td>Transformer architectures, fine-tuning/post-training techniques, RAG, agents, and LLM evaluation.</td>
+      <td><a href="http://www.youtube.com/playlist?list=PLoROMvodv4rOCXd21gf0CF4xr35yINeOy" target="_blank" rel="noopener noreferrer">Watch Playlist</a></td>
+    </tr>
+    <tr>
+      <td><span class="category-badge badge-llm">LLMs</span></td>
+      <td><strong>Stanford University</strong></td>
+      <td>CS324: Advances in Foundation Models / LLMs</td>
+      <td>Stanford Online</td>
+      <td>Capabilities, limitations, scaling behavior, data curation, alignment, and societal impacts of LLMs.</td>
+      <td><a href="http://www.youtube.com/playlist?list=PLoROMvodv4rObv1FMizXqumgVVdzX4_05" target="_blank" rel="noopener noreferrer">Watch Playlist</a></td>
+    </tr>
+    <tr>
+      <td><span class="category-badge badge-llm">LLMs</span></td>
+      <td><strong>Carnegie Mellon University (CMU)</strong></td>
+      <td>Advanced NLP</td>
+      <td>Sean Welleck et al. (Spring 2026)</td>
+      <td>Modern LLM post-training, reasoning, decoding algorithms, RLHF/RLVR, and agentic workflows.</td>
+      <td><a href="http://www.youtube.com/playlist?list=PLqC25OT8ZpD15emhQhNjRLym77-sp2kAx" target="_blank" rel="noopener noreferrer">Watch Playlist</a></td>
+    </tr>
+
+    <!-- Transformers & NLP -->
+    <tr>
+      <td><span class="category-badge badge-transformer">Transformers</span></td>
+      <td><strong>Stanford University</strong></td>
+      <td>CS25: Transformers United</td>
+      <td>Seminar Series</td>
+      <td>Deep dives by academic and industry researchers into Transformers across language, vision, multimodal, and scientific domains.</td>
+      <td><a href="http://www.youtube.com/playlist?list=PLoROMvodv4rPZxxeUFvQHCkZJsaEBdDZj" target="_blank" rel="noopener noreferrer">Watch Playlist</a></td>
+    </tr>
+    <tr>
+      <td><span class="category-badge badge-transformer">Transformers</span></td>
+      <td><strong>Stanford University</strong></td>
+      <td>CS224N: Natural Language Processing with Deep Learning</td>
+      <td>Prof. Christopher Manning</td>
+      <td>Word embeddings, RNNs, sequence-to-sequence models, self-attention, Transformers, pre-training, and instruction-tuned LLMs.</td>
+      <td><a href="http://www.youtube.com/playlist?list=PLoROMvodv4rOaMFbaqxPDoLWjDaRAdP9D" target="_blank" rel="noopener noreferrer">Watch Playlist</a></td>
+    </tr>
+
+    <!-- Core Deep Learning -->
+    <tr>
+      <td><span class="category-badge badge-dl">Deep Learning</span></td>
+      <td><strong>MIT</strong></td>
+      <td>6.S191: Introduction to Deep Learning</td>
+      <td>Alexander Amini</td>
+      <td>Neural network fundamentals, CNNs, sequence modeling, attention/Transformers, generative models, and deep RL.</td>
+      <td><a href="http://www.youtube.com/playlist?list=PLtBw6njQRU-rwp5__7C0oIVt26ZgjG9NI" target="_blank" rel="noopener noreferrer">Watch Playlist</a></td>
+    </tr>
+    <tr>
+      <td><span class="category-badge badge-dl">Deep Learning</span></td>
+      <td><strong>Carnegie Mellon University (CMU)</strong></td>
+      <td>11-785: Introduction to Deep Learning</td>
+      <td>Prof. Bhiksha Raj (Spring 2026)</td>
+      <td>Mathematical and architectural depth covering MLPs, backpropagation, CNNs, RNNs, attention, Transformers, and generative models.</td>
+      <td><a href="http://www.youtube.com/playlist?list=PLp-0K3kfddPwarejN0RmVerKwkwgyvh3r" target="_blank" rel="noopener noreferrer">Watch Playlist</a></td>
+    </tr>
+    <tr>
+      <td><span class="category-badge badge-dl">Deep Learning</span></td>
+      <td><strong>New York University (NYU)</strong></td>
+      <td>DS-GA 1008: Deep Learning</td>
+      <td>Prof. Yann LeCun &amp; Alfredo Canziani</td>
+      <td>Theoretical and PyTorch foundations covering optimization, convolutions, self-supervised learning, energy-based models, and Transformers.</td>
+      <td><a href="http://www.youtube.com/playlist?list=PLLHTzKZzVU9d_3TcHbyiAjl5qCbpJR-o0" target="_blank" rel="noopener noreferrer">Watch Playlist</a></td>
+    </tr>
+    <tr>
+      <td><span class="category-badge badge-dl">Deep Learning</span></td>
+      <td><strong>UC Berkeley</strong></td>
+      <td>CS182: Designing, Visualizing &amp; Understanding Deep Neural Networks</td>
+      <td>Prof. Sergey Levine</td>
+      <td>Optimization dynamics, generalization, computer vision, sequence models, Transformers, and deep reinforcement learning.</td>
+      <td><a href="http://www.youtube.com/playlist?list=PL_iWQOsE6TfVmKkQHucjPAoRtIJYt8a5A" target="_blank" rel="noopener noreferrer">Watch Playlist</a></td>
+    </tr>
+  </tbody>
+</table>
 </body>
 </html>
