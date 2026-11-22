@@ -318,6 +318,121 @@
     </tr>
   </tbody>
 </table>
+  <style>
+  .fbk-wrap { max-width: 1000px; margin: 1.5rem auto; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow-x: auto; }
+  .fbk-wrap h2 { font-size: 1.5rem; margin: 0 0 .25rem; }
+  .fbk-wrap p.fbk-note { color: #555; margin: 0 0 1rem; font-size: .95rem; }
+  .fbk-table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  .fbk-table th, .fbk-table td { padding: .6rem .75rem; border-bottom: 1px solid #e3e3e3; text-align: left; vertical-align: top; }
+  .fbk-table thead th { background: #1f3a5f; color: #fff; font-weight: 600; }
+  .fbk-table tr.fbk-cat td { background: #eef3f9; font-weight: 700; color: #1f3a5f; }
+  .fbk-table tbody tr:not(.fbk-cat):hover { background: #fafafa; }
+  .fbk-table a { color: #1a5fb4; text-decoration: none; font-weight: 600; }
+  .fbk-table a:hover { text-decoration: underline; }
+  .fbk-fmt { display: inline-block; padding: .1rem .45rem; border-radius: 4px; background: #e8f5e9; color: #2e7d32; font-size: .8rem; white-space: nowrap; }
+</style>
+
+<div class="fbk-wrap">
+  <h2>Free Books on LLMs, Deep Learning &amp; Agentic AI</h2>
+  <p class="fbk-note">All titles below are legally free, hosted by the authors or publishers.</p>
+  <table class="fbk-table">
+    <thead>
+      <tr><th>Title</th><th>Author(s)</th><th>What it covers</th><th>Format</th></tr>
+    </thead>
+    <tbody>
+      <tr class="fbk-cat"><td colspan="4">Large Language Models</td></tr>
+      <tr>
+        <td><a href="https://arxiv.org/abs/2501.09223" target="_blank" rel="noopener">Foundations of Large Language Models</a></td>
+        <td>Tong Xiao, Jingbo Zhu</td>
+        <td>Pre-training, generative models, prompting, alignment and inference; a full textbook for students and practitioners.</td>
+        <td><span class="fbk-fmt">PDF</span></td>
+      </tr>
+      <tr>
+        <td><a href="https://web.stanford.edu/~jurafsky/slp3/" target="_blank" rel="noopener">Speech and Language Processing (3rd ed. draft)</a></td>
+        <td>Dan Jurafsky, James H. Martin</td>
+        <td>The standard NLP textbook, rebuilt around LLMs: transformers, post-training, RAG, speech. Includes lecture slides.</td>
+        <td><span class="fbk-fmt">PDF + Slides</span></td>
+      </tr>
+      <tr>
+        <td><a href="https://leanpub.com/modern-llms" target="_blank" rel="noopener">Modern LLMs</a></td>
+        <td>Vlad Kulikov</td>
+        <td>Engineering view of the LLM lifecycle: architecture, pretraining, RLHF/DPO/GRPO, efficient inference, RAG, agents, evaluation.</td>
+        <td><span class="fbk-fmt">PDF / EPUB</span></td>
+      </tr>
+
+      <tr class="fbk-cat"><td colspan="4">Deep Learning</td></tr>
+      <tr>
+        <td><a href="https://udlbook.github.io/udlbook/" target="_blank" rel="noopener">Understanding Deep Learning</a></td>
+        <td>Simon J.D. Prince</td>
+        <td>Modern, clear textbook: CNNs, ResNets, transformers, GNNs, GANs, VAEs, diffusion models, RL. Python notebooks included.</td>
+        <td><span class="fbk-fmt">PDF</span></td>
+      </tr>
+      <tr>
+        <td><a href="https://d2l.ai/" target="_blank" rel="noopener">Dive into Deep Learning</a></td>
+        <td>Aston Zhang et al.</td>
+        <td>Hands-on book with runnable code in PyTorch, JAX and TensorFlow.</td>
+        <td><span class="fbk-fmt">PDF / Web</span></td>
+      </tr>
+      <tr>
+        <td><a href="https://fleuret.org/francois/lbdl.html" target="_blank" rel="noopener">The Little Book of Deep Learning</a></td>
+        <td>François Fleuret</td>
+        <td>Compact (~170 pages) overview of deep learning, formatted for phone reading.</td>
+        <td><span class="fbk-fmt">PDF</span></td>
+      </tr>
+      <tr>
+        <td><a href="http://neuralnetworksanddeeplearning.com/" target="_blank" rel="noopener">Neural Networks and Deep Learning</a></td>
+        <td>Michael Nielsen</td>
+        <td>Classic intuitive introduction to neural networks and backpropagation.</td>
+        <td><span class="fbk-fmt">Web</span></td>
+      </tr>
+      <tr>
+        <td><a href="https://www.deeplearningbook.org/" target="_blank" rel="noopener">Deep Learning</a></td>
+        <td>Ian Goodfellow, Yoshua Bengio, Aaron Courville</td>
+        <td>The foundational reference on deep learning theory and methods.</td>
+        <td><span class="fbk-fmt">Web</span></td>
+      </tr>
+      <tr>
+        <td><a href="https://www.bishopbook.com/" target="_blank" rel="noopener">Deep Learning: Foundations and Concepts</a></td>
+        <td>Christopher Bishop, Hugh Bishop</td>
+        <td>Rigorous modern treatment of deep learning foundations, including transformers and diffusion.</td>
+        <td><span class="fbk-fmt">Web</span></td>
+      </tr>
+
+      <tr class="fbk-cat"><td colspan="4">Agentic AI</td></tr>
+      <tr>
+        <td><a href="https://www.kaggle.com/learn-guide/5-day-agents" target="_blank" rel="noopener">AI Agents Whitepaper Series &amp; Course</a></td>
+        <td>Google &amp; Kaggle</td>
+        <td>Five whitepapers (book-length together) with hands-on codelabs using Gemini and Google ADK.</td>
+        <td><span class="fbk-fmt">PDF + Labs</span></td>
+      </tr>
+      <tr>
+        <td><a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Building Effective Agents</a></td>
+        <td>Anthropic</td>
+        <td>Concise engineering guide to agent and workflow patterns, and when to use each.</td>
+        <td><span class="fbk-fmt">Web</span></td>
+      </tr>
+      <tr>
+        <td><a href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" target="_blank" rel="noopener">A Practical Guide to Building Agents</a></td>
+        <td>OpenAI</td>
+        <td>Agent design, orchestration, tools and guardrails.</td>
+        <td><span class="fbk-fmt">PDF</span></td>
+      </tr>
+      <tr>
+        <td><a href="https://leanpub.com/buildintelligentagents" target="_blank" rel="noopener">Build Intelligent Agents: The Definitive Guide to Agentic AI</a></td>
+        <td>Leanpub author</td>
+        <td>From Python basics to production-ready agents. Free Community Edition (name and email required).</td>
+        <td><span class="fbk-fmt">PDF / EPUB</span></td>
+      </tr>
+      <tr>
+        <td><a href="https://huggingface.co/learn/agents-course" target="_blank" rel="noopener">AI Agents Course</a></td>
+        <td>Hugging Face</td>
+        <td>Book-style course on agents with smolagents, LangGraph and LlamaIndex.</td>
+        <td><span class="fbk-fmt">Web</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <footer>
   <div class="shell">© Faiz ul haque Zeya · <a href="index.html">faizzeya.github.io</a></div>
 </footer>
